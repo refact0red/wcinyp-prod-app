@@ -55,7 +55,7 @@ export const HomeScreen = () => {
                         </div>
                         <div className="flex flex-wrap gap-2">
                             <Button size="sm" iconLeading={Server03} href="/documents">
-                                Go to documents
+                                Go to public drive
                             </Button>
                             <Button color="secondary" size="sm" iconLeading={Users01} href="/users">
                                 Invite teammates

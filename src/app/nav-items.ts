@@ -1,4 +1,5 @@
 import {
+    BookOpen01,
     CheckDone01,
     Database03,
     HomeLine,
@@ -17,7 +18,12 @@ export const navItemsSimple: NavItemType[] = [
         icon: HomeLine,
     },
     {
-        label: "Documents",
+        label: "Documentation",
+        href: "/documentation",
+        icon: BookOpen01,
+    },
+    {
+        label: "Public Drive",
         href: "/documents",
         icon: Server03,
     },
