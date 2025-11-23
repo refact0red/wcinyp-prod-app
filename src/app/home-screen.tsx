@@ -13,6 +13,7 @@ import {
 } from "@untitledui/icons";
 import { SidebarNavigationSimple } from "@/components/application/app-navigation/sidebar-navigation/sidebar-simple";
 import { navItemsSimple, footerItems } from "@/app/nav-items";
+import { HeaderTopActions } from "@/components/application/app-navigation/header-top-actions";
 import { Button } from "@/components/base/buttons/button";
 import { ButtonUtility } from "@/components/base/buttons/button-utility";
 import { useClipboard } from "@/hooks/use-clipboard";
@@ -45,92 +46,96 @@ export const HomeScreen = () => {
                 footerItems={footerItems}
             />
 
-            <main className="flex-1">
-                <div className="mx-auto flex max-w-6xl flex-col gap-8 px-4 pb-12 pt-6 md:px-8 lg:pt-10">
-                    <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
-                        <div>
-                            <p className="text-sm font-semibold text-brand-secondary">Home</p>
-                            <h1 className="text-display-xs font-semibold text-primary">Untitled UI workspace</h1>
-                            <p className="text-md text-tertiary">Kick off projects, invite teammates, and add components without leaving this starter.</p>
-                        </div>
-                        <div className="flex flex-wrap gap-2">
-                            <Button size="sm" iconLeading={Server03} href="/documents">
-                                Go to public drive
-                            </Button>
-                            <Button color="secondary" size="sm" iconLeading={Users01} href="/users">
-                                Invite teammates
-                            </Button>
-                        </div>
-                    </div>
+            <div className="flex min-h-dvh flex-1 flex-col">
+                <HeaderTopActions activeUrl={pathname} sidebarItems={navItemsSimple} />
 
-                    <div className="rounded-2xl border border-secondary bg-primary p-6 shadow-xs">
-                        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                <main className="flex-1">
+                    <div className="mx-auto flex max-w-6xl flex-col gap-8 px-4 pb-12 pt-6 md:px-8 lg:pt-10">
+                        <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
                             <div>
-                                <h2 className="text-lg font-semibold text-primary">Get started quickly</h2>
-                                <p className="mt-1 text-sm text-tertiary">
-                                    Pull components or navigate to documents to begin uploading team files.
-                                </p>
+                                <p className="text-sm font-semibold text-brand-secondary">Home</p>
+                                <h1 className="text-display-xs font-semibold text-primary">Untitled UI workspace</h1>
+                                <p className="text-md text-tertiary">Kick off projects, invite teammates, and add components without leaving this starter.</p>
                             </div>
                             <div className="flex flex-wrap gap-2">
-                                <Button size="sm" iconLeading={UploadCloud02} href="/documents">
-                                    Upload files
+                                <Button size="sm" iconLeading={Server03} href="/publicdrive">
+                                    Go to public drive
                                 </Button>
-                                <Button size="sm" color="secondary" href="/directory">
-                                    View directory
-                                </Button>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div className="rounded-2xl border border-secondary bg-primary p-6 shadow-xs">
-                        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-                            <div>
-                                <h2 className="text-lg font-semibold text-primary">Add more components</h2>
-                                <p className="mt-1 text-sm text-tertiary">
-                                    Pull any layout from the Untitled UI CLI without leaving your editor.
-                                </p>
-                            </div>
-                            <div className="flex flex-wrap gap-2">
-                                <Button
-                                    href="https://www.untitledui.com/react/docs/introduction"
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    color="link-color"
-                                    size="sm"
-                                    iconLeading={BookOpen01}
-                                >
-                                    Docs
-                                </Button>
-                                <Button
-                                    href="https://www.untitledui.com/react/resources/icons"
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    color="link-color"
-                                    size="sm"
-                                    iconLeading={Cube01}
-                                >
-                                    Icons
-                                </Button>
-                                <Button
-                                    href="https://github.com/untitleduico/react/issues"
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    color="link-color"
-                                    size="sm"
-                                    iconLeading={HelpCircle}
-                                >
-                                    Help
+                                <Button color="secondary" size="sm" iconLeading={Users01} href="/users">
+                                    Invite teammates
                                 </Button>
                             </div>
                         </div>
 
-                        <div className="mt-4 grid gap-3 md:grid-cols-2">
-                            {renderCommandRow("Use the sidebar template", "npx untitledui@latest add sidebar-navigation-base", "sidebar-command")}
-                            {renderCommandRow("Browse the component catalog", "npx untitledui@latest add", "catalog-command")}
+                        <div className="rounded-2xl border border-secondary bg-primary p-6 shadow-xs">
+                            <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                                <div>
+                                    <h2 className="text-lg font-semibold text-primary">Get started quickly</h2>
+                                    <p className="mt-1 text-sm text-tertiary">
+                                        Pull components or navigate to documents to begin uploading team files.
+                                    </p>
+                                </div>
+                                <div className="flex flex-wrap gap-2">
+                                    <Button size="sm" iconLeading={UploadCloud02} href="/publicdrive">
+                                        Upload files
+                                    </Button>
+                                    <Button size="sm" color="secondary" href="/directory">
+                                        View directory
+                                    </Button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className="rounded-2xl border border-secondary bg-primary p-6 shadow-xs">
+                            <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                                <div>
+                                    <h2 className="text-lg font-semibold text-primary">Add more components</h2>
+                                    <p className="mt-1 text-sm text-tertiary">
+                                        Pull any layout from the Untitled UI CLI without leaving your editor.
+                                    </p>
+                                </div>
+                                <div className="flex flex-wrap gap-2">
+                                    <Button
+                                        href="https://www.untitledui.com/react/docs/introduction"
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        color="link-color"
+                                        size="sm"
+                                        iconLeading={BookOpen01}
+                                    >
+                                        Docs
+                                    </Button>
+                                    <Button
+                                        href="https://www.untitledui.com/react/resources/icons"
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        color="link-color"
+                                        size="sm"
+                                        iconLeading={Cube01}
+                                    >
+                                        Icons
+                                    </Button>
+                                    <Button
+                                        href="https://github.com/untitleduico/react/issues"
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        color="link-color"
+                                        size="sm"
+                                        iconLeading={HelpCircle}
+                                    >
+                                        Help
+                                    </Button>
+                                </div>
+                            </div>
+
+                            <div className="mt-4 grid gap-3 md:grid-cols-2">
+                                {renderCommandRow("Use the sidebar template", "npx untitledui@latest add sidebar-navigation-base", "sidebar-command")}
+                                {renderCommandRow("Browse the component catalog", "npx untitledui@latest add", "catalog-command")}
+                            </div>
                         </div>
                     </div>
-                </div>
-            </main>
+                </main>
+            </div>
         </div>
     );
 };

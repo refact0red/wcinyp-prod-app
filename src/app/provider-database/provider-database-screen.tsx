@@ -3,6 +3,7 @@
 import { usePathname } from "next/navigation";
 import { Database03, UploadCloud02, Users01 } from "@untitledui/icons";
 import { navItemsSimple, footerItems } from "@/app/nav-items";
+import { HeaderTopActions } from "@/components/application/app-navigation/header-top-actions";
 import { SidebarNavigationSimple } from "@/components/application/app-navigation/sidebar-navigation/sidebar-simple";
 import { Table01DividerLineSm, type DirectoryTableItem } from "@/components/application/table/table-01-divider-line-sm";
 import providerDirectory from "@/components/application/table/provider-directory.json";
@@ -20,29 +21,33 @@ export const ProviderDatabaseScreen = () => {
                 footerItems={footerItems}
             />
 
-            <main className="flex-1">
-                <div className="mx-auto flex max-w-6xl flex-col gap-8 px-4 pb-12 pt-6 md:px-8 lg:pt-10">
-                    <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
-                        <div>
-                            <p className="text-sm font-semibold text-brand-secondary">Provider Database</p>
-                            <h1 className="text-display-xs font-semibold text-primary">External providers and clinics</h1>
-                            <p className="text-md text-tertiary">
-                                Track referral partners, view clinic details, and keep contact info up to date.
-                            </p>
-                        </div>
-                        <div className="flex flex-wrap gap-2">
-                            <Button color="secondary" size="sm" iconLeading={UploadCloud02}>
-                                Export providers
-                            </Button>
-                            <Button size="sm" iconLeading={Users01} iconTrailing={Database03}>
-                                Add provider
-                            </Button>
-                        </div>
-                    </div>
+            <div className="flex min-h-dvh flex-1 flex-col">
+                <HeaderTopActions activeUrl={pathname} sidebarItems={navItemsSimple} />
 
-                    <Table01DividerLineSm title="Provider database" badgeLabel={`${providers.length} providers`} items={providers} />
-                </div>
-            </main>
+                <main className="flex-1">
+                    <div className="mx-auto flex max-w-6xl flex-col gap-8 px-4 pb-12 pt-6 md:px-8 lg:pt-10">
+                        <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+                            <div>
+                                <p className="text-sm font-semibold text-brand-secondary">Provider Database</p>
+                                <h1 className="text-display-xs font-semibold text-primary">External providers and clinics</h1>
+                                <p className="text-md text-tertiary">
+                                    Track referral partners, view clinic details, and keep contact info up to date.
+                                </p>
+                            </div>
+                            <div className="flex flex-wrap gap-2">
+                                <Button color="secondary" size="sm" iconLeading={UploadCloud02}>
+                                    Export providers
+                                </Button>
+                                <Button size="sm" iconLeading={Users01} iconTrailing={Database03}>
+                                    Add provider
+                                </Button>
+                            </div>
+                        </div>
+
+                        <Table01DividerLineSm title="Provider database" badgeLabel={`${providers.length} providers`} items={providers} />
+                    </div>
+                </main>
+            </div>
         </div>
     );
 };

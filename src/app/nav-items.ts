@@ -14,7 +14,7 @@ export const navItemsSimple: NavItemType[] = [
     },
     {
         label: "Public Drive",
-        href: "/documents",
+        href: "/publicdrive",
         icon: Server03,
     },
     {
