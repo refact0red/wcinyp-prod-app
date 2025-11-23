@@ -1,3 +1,5 @@
-import { ProviderDatabaseScreen } from "./provider-database-screen";
+import { redirect } from "next/navigation";
 
-export default ProviderDatabaseScreen;
+export default function ProviderDatabaseRedirect() {
+    redirect("/providers");
+}

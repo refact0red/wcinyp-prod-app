@@ -1,6 +1,7 @@
 "use client";
 
-import type { ReactNode } from "react";
+import type { ReactElement, ReactNode } from "react";
+import { Children } from "react";
 import { cx } from "@/utils/cx";
 
 type BreadcrumbDivider = "greater" | "slash";
@@ -27,9 +28,21 @@ interface BreadcrumbsItemProps {
 }
 
 export const Breadcrumbs = ({ divider = "greater", type = "button", className, children }: BreadcrumbsProps) => {
+    const items = Children.toArray(children).filter(Boolean) as ReactElement[];
+
     return (
         <nav aria-label="Breadcrumb" className={cx("flex items-center", className)}>
-            <ol className="flex items-center gap-2 text-sm text-tertiary">{children}</ol>
+            <ol className="flex items-center gap-2 text-sm text-tertiary">
+                {items.map((child, index) => {
+                    const isLast = index === items.length - 1;
+                    return (
+                        <li key={child.key ?? index} className="flex items-center gap-2">
+                            {child}
+                            {!isLast && <DividerIcon divider={divider} />}
+                        </li>
+                    );
+                })}
+            </ol>
         </nav>
     );
 };
@@ -43,25 +56,22 @@ const DividerIcon = ({ divider }: { divider: BreadcrumbDivider }) => {
 
 const BreadcrumbsItem = ({ href = "#", children, className, current }: BreadcrumbsItemProps) => {
     return (
-        <li className="flex items-center gap-2">
-            <button
-                type="button"
-                aria-current={current ? "page" : undefined}
-                onClick={() => {
-                    if (typeof window !== "undefined") {
-                        window.location.assign(href);
-                    }
-                }}
-                className={cx(
-                    "truncate bg-transparent p-0 text-left text-sm font-semibold text-secondary outline-focus-ring hover:text-secondary_hover focus-visible:outline-2 focus-visible:outline-offset-2",
-                    current && "text-primary",
-                    className,
-                )}
-            >
-                {children}
-            </button>
-            <DividerIcon divider="greater" />
-        </li>
+        <button
+            type="button"
+            aria-current={current ? "page" : undefined}
+            onClick={() => {
+                if (typeof window !== "undefined") {
+                    window.location.assign(href);
+                }
+            }}
+            className={cx(
+                "truncate rounded-md px-2 py-1 text-left text-sm font-semibold text-secondary outline-focus-ring hover:bg-primary_hover hover:text-secondary_hover focus-visible:outline-2 focus-visible:outline-offset-2",
+                current && "text-primary",
+                className,
+            )}
+        >
+            {children}
+        </button>
     );
 };
 

@@ -28,7 +28,7 @@ export const ProviderDatabaseScreen = () => {
                     <div className="mx-auto flex max-w-6xl flex-col gap-8 px-4 pb-12 pt-6 md:px-8 lg:pt-10">
                         <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
                             <div>
-                                <p className="text-sm font-semibold text-brand-secondary">Provider Database</p>
+                                <p className="text-sm font-semibold text-brand-secondary">Providers</p>
                                 <h1 className="text-display-xs font-semibold text-primary">External providers and clinics</h1>
                                 <p className="text-md text-tertiary">
                                     Track referral partners, view clinic details, and keep contact info up to date.

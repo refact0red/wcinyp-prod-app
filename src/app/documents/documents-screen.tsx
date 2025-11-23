@@ -26,8 +26,8 @@ export const PublicDriveScreen = () => {
                     <div className="mx-auto flex max-w-6xl flex-col gap-8 px-4 pb-12 pt-6 md:px-8 lg:pt-10">
                         <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
                             <div>
-                                <p className="text-sm font-semibold text-brand-secondary">Public Drive</p>
-                                <h1 className="text-display-xs font-semibold text-primary">Shared team files</h1>
+                                <p className="text-sm font-semibold text-brand-secondary">Drive</p>
+                                <h1 className="text-display-xs font-semibold text-primary">Team drive</h1>
                                 <p className="text-md text-tertiary">Upload, review, and organize the documents your team relies on.</p>
                             </div>
                             <div className="flex flex-wrap gap-2">

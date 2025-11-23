@@ -1,3 +1,5 @@
-import { DocumentationScreen } from "./documentation-screen";
+import { redirect } from "next/navigation";
 
-export default DocumentationScreen;
+export default function DocumentationRedirect() {
+    redirect("/manuals");
+}

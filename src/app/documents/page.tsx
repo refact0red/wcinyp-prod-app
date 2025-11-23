@@ -1,3 +1,5 @@
-import { PublicDriveScreen } from "./documents-screen";
+import { redirect } from "next/navigation";
 
-export default PublicDriveScreen;
+export default function DocumentsRedirect() {
+    redirect("/drive");
+}

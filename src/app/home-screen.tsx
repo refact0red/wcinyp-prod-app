@@ -58,7 +58,7 @@ export const HomeScreen = () => {
                                 <p className="text-md text-tertiary">Kick off projects, invite teammates, and add components without leaving this starter.</p>
                             </div>
                             <div className="flex flex-wrap gap-2">
-                                <Button size="sm" iconLeading={Server03} href="/publicdrive">
+                                <Button size="sm" iconLeading={Server03} href="/drive">
                                     Go to public drive
                                 </Button>
                                 <Button color="secondary" size="sm" iconLeading={Users01} href="/users">
@@ -76,7 +76,7 @@ export const HomeScreen = () => {
                                     </p>
                                 </div>
                                 <div className="flex flex-wrap gap-2">
-                                    <Button size="sm" iconLeading={UploadCloud02} href="/publicdrive">
+                                    <Button size="sm" iconLeading={UploadCloud02} href="/drive">
                                         Upload files
                                     </Button>
                                     <Button size="sm" color="secondary" href="/directory">
