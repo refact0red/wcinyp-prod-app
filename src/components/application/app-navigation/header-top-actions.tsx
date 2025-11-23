@@ -4,6 +4,7 @@ import { useMemo } from "react";
 import { Bell01, ChevronDown, Container, HelpCircle, LayersTwo01, LogOut01, Settings01, User01 } from "@untitledui/icons";
 import { AvatarLabelGroup } from "@/components/base/avatar/avatar-label-group";
 import { Button } from "@/components/base/buttons/button";
+import { Breadcrumbs } from "@/components/application/breadcrumbs/breadcrumbs";
 import { Dropdown } from "@/components/base/dropdown/dropdown";
 import { cx } from "@/utils/cx";
 import type { NavItemType } from "./config";
@@ -122,29 +123,23 @@ export const HeaderTopActions = ({
                 className,
             )}
         >
-            <nav aria-label="Breadcrumb" className="flex min-w-0 flex-1 items-center">
-                <ol className="flex min-w-0 items-center gap-2 text-sm text-tertiary">
+            <div className="flex min-w-0 flex-1 items-center">
+                <Breadcrumbs>
                     {crumbs.map((crumb, index) => {
                         const isLast = index === crumbs.length - 1;
                         return (
-                            <li key={`${crumb.label}-${index}`} className="flex items-center gap-2">
-                                <button
-                                    type="button"
-                                    aria-current={isLast ? "page" : undefined}
-                                    onClick={() => handleBreadcrumbClick(crumb)}
-                                    className={cx(
-                                        "truncate bg-transparent p-0 text-left text-sm font-semibold text-secondary outline-focus-ring hover:text-secondary_hover focus-visible:outline-2 focus-visible:outline-offset-2",
-                                        isLast && "text-primary",
-                                    )}
-                                >
-                                    {crumb.label}
-                                </button>
-                                {!isLast && <span className="text-secondary">{">"}</span>}
-                            </li>
+                            <Breadcrumbs.Item
+                                key={`${crumb.label}-${index}`}
+                                href={crumb.href || activeUrl || "/"}
+                                current={isLast}
+                                className={cx(!isLast && "text-secondary")}
+                            >
+                                {crumb.label}
+                            </Breadcrumbs.Item>
                         );
                     })}
-                </ol>
-            </nav>
+                </Breadcrumbs>
+            </div>
 
             <div className="flex items-center gap-1.5">
                 <NavItemButton
