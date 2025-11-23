@@ -1,0 +1,124 @@
+{
+    "items": [
+        {
+            "username": "angela-patel",
+            "name": "Dr. Angela Patel",
+            "avatarUrl": "https://images.unsplash.com/photo-1544723795-3fb6469f5b39?auto=format&fit=crop&w=200&q=80",
+            "status": "active",
+            "role": "Pediatrics, Evergreen Health",
+            "email": "angela.patel@evergreenhealth.com",
+            "teams": [
+                {
+                    "name": "Evergreen Network",
+                    "color": "brand"
+                },
+                {
+                    "name": "Seattle",
+                    "color": "blue-light"
+                }
+            ]
+        },
+        {
+            "username": "mateo-rivas",
+            "name": "Dr. Mateo Rivas",
+            "avatarUrl": "https://images.unsplash.com/photo-1524504388940-b1c1722653e1?auto=format&fit=crop&w=200&q=80",
+            "status": "active",
+            "role": "Cardiology, HeartCare Partners",
+            "email": "mateo.rivas@heartcarepartners.com",
+            "teams": [
+                {
+                    "name": "HeartCare Network",
+                    "color": "orange"
+                },
+                {
+                    "name": "Austin",
+                    "color": "gray-blue"
+                },
+                {
+                    "name": "Surgery",
+                    "color": "indigo"
+                }
+            ]
+        },
+        {
+            "username": "felicity-wong",
+            "name": "Dr. Felicity Wong",
+            "avatarUrl": "https://images.unsplash.com/photo-1544723795-3fb6469f5b39?auto=format&fit=crop&w=200&q=80",
+            "status": "inactive",
+            "role": "Dermatology, Pacific Skin Clinic",
+            "email": "felicity.wong@pacificskin.com",
+            "teams": [
+                {
+                    "name": "Pacific Skin",
+                    "color": "pink"
+                },
+                {
+                    "name": "San Francisco",
+                    "color": "blue"
+                }
+            ]
+        },
+        {
+            "username": "jonas-meier",
+            "name": "Dr. Jonas Meier",
+            "avatarUrl": "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?auto=format&fit=crop&w=200&q=80",
+            "status": "active",
+            "role": "Orthopedics, Summit Ortho",
+            "email": "jonas.meier@summitortho.com",
+            "teams": [
+                {
+                    "name": "Summit Ortho",
+                    "color": "success"
+                },
+                {
+                    "name": "Denver",
+                    "color": "blue-light"
+                },
+                {
+                    "name": "Referrals",
+                    "color": "gray"
+                }
+            ]
+        },
+        {
+            "username": "olivia-jacobs",
+            "name": "Dr. Olivia Jacobs",
+            "avatarUrl": "https://images.unsplash.com/photo-1508214751196-bcfd4ca60f91?auto=format&fit=crop&w=200&q=80",
+            "status": "inactive",
+            "role": "Behavioral Health, MindWell Clinic",
+            "email": "olivia.jacobs@mindwellclinic.com",
+            "teams": [
+                {
+                    "name": "MindWell",
+                    "color": "purple"
+                },
+                {
+                    "name": "Chicago",
+                    "color": "indigo"
+                }
+            ]
+        },
+        {
+            "username": "sara-nguyen",
+            "name": "Dr. Sara Nguyen",
+            "avatarUrl": "https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=200&q=80",
+            "status": "active",
+            "role": "Family Medicine, Lakeside Clinic",
+            "email": "sara.nguyen@lakesideclinic.com",
+            "teams": [
+                {
+                    "name": "Lakeside Clinic",
+                    "color": "brand"
+                },
+                {
+                    "name": "Minneapolis",
+                    "color": "blue"
+                },
+                {
+                    "name": "Telehealth",
+                    "color": "orange"
+                }
+            ]
+        }
+    ]
+}
