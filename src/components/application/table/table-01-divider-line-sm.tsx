@@ -46,9 +46,11 @@ type DirectoryTableProps = {
     items?: DirectoryTableItem[];
     withCard?: boolean;
     className?: string;
+    onEdit?: (item: DirectoryTableItem) => void;
+    onDelete?: (item: DirectoryTableItem) => void;
 };
 
-export const Table01DividerLineSm = ({ title = "Team directory", badgeLabel, items, withCard = true, className }: DirectoryTableProps) => {
+export const Table01DividerLineSm = ({ title = "Team directory", badgeLabel, items, withCard = true, className, onEdit, onDelete }: DirectoryTableProps) => {
     const data = items ?? (teamMembers as { items: DirectoryTableItem[] }).items;
     const getInitials = (name: string) =>
         name
@@ -200,8 +202,22 @@ export const Table01DividerLineSm = ({ title = "Team directory", badgeLabel, ite
                                 </Table.Cell>
                                 <Table.Cell className="px-3">
                                     <div className="flex justify-end gap-0.5">
-                                        <ButtonUtility size="xs" color="tertiary" tooltip="Delete" icon={Trash01} />
-                                        <ButtonUtility size="xs" color="tertiary" tooltip="Edit" icon={Edit01} />
+                                        <ButtonUtility
+                                            size="xs"
+                                            color="tertiary"
+                                            tooltip="Delete"
+                                            icon={Trash01}
+                                            isDisabled={!onDelete}
+                                            onPress={() => onDelete?.(item)}
+                                        />
+                                        <ButtonUtility
+                                            size="xs"
+                                            color="tertiary"
+                                            tooltip="Edit"
+                                            icon={Edit01}
+                                            isDisabled={!onEdit}
+                                            onPress={() => onEdit?.(item)}
+                                        />
                                     </div>
                                 </Table.Cell>
                             </Table.Row>
