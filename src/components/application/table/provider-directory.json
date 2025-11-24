@@ -3,11 +3,14 @@
         {
             "username": "angela-patel",
             "name": "Dr. Angela Patel",
-            "avatarUrl": "https://images.unsplash.com/photo-1544723795-3fb6469f5b39?auto=format&fit=crop&w=200&q=80",
-            "status": "active",
-            "role": "Pediatrics, Evergreen Health",
-            "email": "angela.patel@evergreenhealth.com",
-            "teams": [
+            "title": "Pediatrics, Evergreen Health",
+            "contacts": [
+                {
+                    "type": "email",
+                    "value": "angela.patel@evergreenhealth.com"
+                }
+            ],
+            "tags": [
                 {
                     "name": "Evergreen Network",
                     "color": "brand"
@@ -16,16 +19,20 @@
                     "name": "Seattle",
                     "color": "blue-light"
                 }
-            ]
+            ],
+            "entityType": "person"
         },
         {
             "username": "mateo-rivas",
             "name": "Dr. Mateo Rivas",
-            "avatarUrl": "https://images.unsplash.com/photo-1524504388940-b1c1722653e1?auto=format&fit=crop&w=200&q=80",
-            "status": "active",
-            "role": "Cardiology, HeartCare Partners",
-            "email": "mateo.rivas@heartcarepartners.com",
-            "teams": [
+            "title": "Cardiology, HeartCare Partners",
+            "contacts": [
+                {
+                    "type": "email",
+                    "value": "mateo.rivas@heartcarepartners.com"
+                }
+            ],
+            "tags": [
                 {
                     "name": "HeartCare Network",
                     "color": "orange"
@@ -38,16 +45,20 @@
                     "name": "Surgery",
                     "color": "indigo"
                 }
-            ]
+            ],
+            "entityType": "person"
         },
         {
             "username": "felicity-wong",
             "name": "Dr. Felicity Wong",
-            "avatarUrl": "https://images.unsplash.com/photo-1544723795-3fb6469f5b39?auto=format&fit=crop&w=200&q=80",
-            "status": "inactive",
-            "role": "Dermatology, Pacific Skin Clinic",
-            "email": "felicity.wong@pacificskin.com",
-            "teams": [
+            "title": "Dermatology, Pacific Skin Clinic",
+            "contacts": [
+                {
+                    "type": "email",
+                    "value": "felicity.wong@pacificskin.com"
+                }
+            ],
+            "tags": [
                 {
                     "name": "Pacific Skin",
                     "color": "pink"
@@ -56,16 +67,20 @@
                     "name": "San Francisco",
                     "color": "blue"
                 }
-            ]
+            ],
+            "entityType": "person"
         },
         {
             "username": "jonas-meier",
             "name": "Dr. Jonas Meier",
-            "avatarUrl": "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?auto=format&fit=crop&w=200&q=80",
-            "status": "active",
-            "role": "Orthopedics, Summit Ortho",
-            "email": "jonas.meier@summitortho.com",
-            "teams": [
+            "title": "Orthopedics, Summit Ortho",
+            "contacts": [
+                {
+                    "type": "email",
+                    "value": "jonas.meier@summitortho.com"
+                }
+            ],
+            "tags": [
                 {
                     "name": "Summit Ortho",
                     "color": "success"
@@ -78,16 +93,20 @@
                     "name": "Referrals",
                     "color": "gray"
                 }
-            ]
+            ],
+            "entityType": "person"
         },
         {
             "username": "olivia-jacobs",
             "name": "Dr. Olivia Jacobs",
-            "avatarUrl": "https://images.unsplash.com/photo-1508214751196-bcfd4ca60f91?auto=format&fit=crop&w=200&q=80",
-            "status": "inactive",
-            "role": "Behavioral Health, MindWell Clinic",
-            "email": "olivia.jacobs@mindwellclinic.com",
-            "teams": [
+            "title": "Behavioral Health, MindWell Clinic",
+            "contacts": [
+                {
+                    "type": "email",
+                    "value": "olivia.jacobs@mindwellclinic.com"
+                }
+            ],
+            "tags": [
                 {
                     "name": "MindWell",
                     "color": "purple"
@@ -96,16 +115,20 @@
                     "name": "Chicago",
                     "color": "indigo"
                 }
-            ]
+            ],
+            "entityType": "person"
         },
         {
             "username": "sara-nguyen",
             "name": "Dr. Sara Nguyen",
-            "avatarUrl": "https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=200&q=80",
-            "status": "active",
-            "role": "Family Medicine, Lakeside Clinic",
-            "email": "sara.nguyen@lakesideclinic.com",
-            "teams": [
+            "title": "Family Medicine, Lakeside Clinic",
+            "contacts": [
+                {
+                    "type": "email",
+                    "value": "sara.nguyen@lakesideclinic.com"
+                }
+            ],
+            "tags": [
                 {
                     "name": "Lakeside Clinic",
                     "color": "brand"
@@ -118,7 +141,8 @@
                     "name": "Telehealth",
                     "color": "orange"
                 }
-            ]
+            ],
+            "entityType": "person"
         }
     ]
 }

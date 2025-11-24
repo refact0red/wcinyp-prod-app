@@ -1,128 +1,96 @@
 {
     "items": [
         {
-            "username": "nicole-day",
-            "name": "Nicole Day",
-            "avatarUrl": "https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=200&q=80",
-            "status": "active",
-            "role": "Senior Product Manager",
-            "email": "nicole.day@untitledui.com",
-            "teams": [
+            "username": "lillian-mcdonough",
+            "name": "Lillian B McDonough",
+            "title": "Senior Nurse Manager",
+            "contacts": [
                 {
-                    "name": "Product",
-                    "color": "indigo"
-                },
-                {
-                    "name": "Research",
-                    "color": "blue"
-                },
-                {
-                    "name": "Mobile",
-                    "color": "orange"
+                    "type": "email",
+                    "value": "lbm9005@med.cornell.edu"
                 }
-            ]
-        },
-        {
-            "username": "marco-segovia",
-            "name": "Marco Segovia",
-            "avatarUrl": "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?auto=format&fit=crop&w=200&q=80",
-            "status": "active",
-            "role": "Lead Engineer",
-            "email": "marco.segovia@untitledui.com",
-            "teams": [
+            ],
+            "tags": [
                 {
-                    "name": "Platform",
-                    "color": "brand"
-                },
-                {
-                    "name": "Security",
-                    "color": "gray-blue"
-                },
-                {
-                    "name": "SRE",
-                    "color": "blue-light"
-                },
-                {
-                    "name": "QA",
-                    "color": "purple"
-                }
-            ]
-        },
-        {
-            "username": "vanessa-king",
-            "name": "Vanessa King",
-            "avatarUrl": "https://images.unsplash.com/photo-1524504388940-b1c1722653e1?auto=format&fit=crop&w=200&q=80",
-            "status": "inactive",
-            "role": "Finance Manager",
-            "email": "vanessa.king@untitledui.com",
-            "teams": [
-                {
-                    "name": "Finance",
-                    "color": "blue"
-                },
-                {
-                    "name": "Compliance",
-                    "color": "gray"
-                }
-            ]
-        },
-        {
-            "username": "annie-lee",
-            "name": "Annie Lee",
-            "avatarUrl": "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=200&q=80",
-            "status": "active",
-            "role": "Design Lead",
-            "email": "annie.lee@untitledui.com",
-            "teams": [
-                {
-                    "name": "Design",
-                    "color": "pink"
-                },
-                {
-                    "name": "Brand",
-                    "color": "purple"
-                },
-                {
-                    "name": "Web",
-                    "color": "blue-light"
-                }
-            ]
-        },
-        {
-            "username": "edward-chu",
-            "name": "Edward Chu",
-            "avatarUrl": "https://images.unsplash.com/photo-1544723795-3fb6469f5b39?auto=format&fit=crop&w=200&q=80",
-            "status": "active",
-            "role": "Solutions Architect",
-            "email": "edward.chu@untitledui.com",
-            "teams": [
-                {
-                    "name": "Enterprise",
-                    "color": "orange"
-                },
-                {
-                    "name": "Partners",
+                    "name": "Nurse Leads",
                     "color": "brand"
                 }
-            ]
+            ],
+            "entityType": "person"
         },
         {
-            "username": "melvin-pope",
-            "name": "Melvin Pope",
-            "avatarUrl": "https://images.unsplash.com/photo-1508214751196-bcfd4ca60f91?auto=format&fit=crop&w=200&q=80",
-            "status": "inactive",
-            "role": "Customer Success",
-            "email": "melvin.pope@untitledui.com",
-            "teams": [
+            "username": "elena-yanucci",
+            "name": "Elena Yanucci",
+            "title": "Senior Registered Nurse",
+            "contacts": [
                 {
-                    "name": "Support",
-                    "color": "gray-blue"
+                    "type": "phone",
+                    "label": "Tel",
+                    "value": "(631) 365-4802"
                 },
                 {
-                    "name": "Enablement",
-                    "color": "indigo"
+                    "type": "email",
+                    "value": "ely3003@med.cornell.edu"
                 }
-            ]
+            ],
+            "tags": [
+                {
+                    "name": "Nurse Leads",
+                    "color": "brand"
+                }
+            ],
+            "entityType": "person"
+        },
+        {
+            "username": "kara-vanrossem",
+            "name": "Kara VanRossem",
+            "title": "Senior Registered Nurse",
+            "contacts": [
+                {
+                    "type": "mobile",
+                    "label": "Cell",
+                    "value": "(347) 408-9590"
+                },
+                {
+                    "type": "email",
+                    "value": "kav3001@med.cornell.edu"
+                }
+            ],
+            "tags": [
+                {
+                    "name": "Nurse Leads",
+                    "color": "brand"
+                }
+            ],
+            "entityType": "person"
+        },
+        {
+            "username": "emily-traylor",
+            "name": "Emily Traylor",
+            "title": "Senior Nurse Manager",
+            "contacts": [
+                {
+                    "type": "phone",
+                    "label": "Tel",
+                    "value": "(646) 962-2235"
+                },
+                {
+                    "type": "mobile",
+                    "label": "Cell",
+                    "value": "(646) 983-1395"
+                },
+                {
+                    "type": "email",
+                    "value": "emt9018@med.cornell.edu"
+                }
+            ],
+            "tags": [
+                {
+                    "name": "Nurse Leads",
+                    "color": "brand"
+                }
+            ],
+            "entityType": "person"
         }
     ]
 }

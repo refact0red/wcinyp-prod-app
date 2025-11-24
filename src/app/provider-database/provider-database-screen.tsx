@@ -6,7 +6,7 @@ import { navItemsSimple, footerItems } from "@/app/nav-items";
 import { HeaderTopActions } from "@/components/application/app-navigation/header-top-actions";
 import { SidebarNavigationSimple } from "@/components/application/app-navigation/sidebar-navigation/sidebar-simple";
 import { Table01DividerLineSm, type DirectoryTableItem } from "@/components/application/table/table-01-divider-line-sm";
-import providerDirectory from "@/components/application/table/provider-directory.json";
+import providerDirectory from "@/components/application/table/provider-directory.json" assert { type: "json" };
 import { Button } from "@/components/base/buttons/button";
 
 export const ProviderDatabaseScreen = () => {
