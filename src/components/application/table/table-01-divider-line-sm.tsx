@@ -1,14 +1,14 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo, useState, type ReactNode } from "react";
 import { Edit01, Trash01 } from "@untitledui/icons";
 import type { SortDescriptor } from "react-aria-components";
 import { PaginationCardMinimal } from "@/components/application/pagination/pagination";
-import { Table, TableCard, TableRowActionsDropdown } from "@/components/application/table/table";
+import { Table, TableCard } from "@/components/application/table/table";
 import teamMembers from "@/components/application/table/team-members.json";
 import { Avatar } from "@/components/base/avatar/avatar";
 import type { BadgeTypes } from "@/components/base/badges/badge-types";
-import { Badge, type BadgeColor, BadgeWithDot } from "@/components/base/badges/badges";
+import { Badge, type BadgeColor } from "@/components/base/badges/badges";
 import { ButtonUtility } from "@/components/base/buttons/button-utility";
 
 export type DirectoryTableItem = {
@@ -26,14 +26,23 @@ export type DirectoryTableItem = {
 
 type DirectoryTableProps = {
     title?: string;
-    badgeLabel?: string;
+    badgeLabel?: ReactNode;
     items?: DirectoryTableItem[];
+    withCard?: boolean;
+    className?: string;
 };
 
-export const Table01DividerLineSm = ({ title = "Team directory", badgeLabel, items }: DirectoryTableProps) => {
+export const Table01DividerLineSm = ({ title = "Team directory", badgeLabel, items, withCard = true, className }: DirectoryTableProps) => {
     const data = items ?? (teamMembers as { items: DirectoryTableItem[] }).items;
+    const getInitials = (name: string) =>
+        name
+            .split(/\s+/)
+            .filter(Boolean)
+            .slice(0, 2)
+            .map((part) => part[0]?.toUpperCase())
+            .join("");
     const [sortDescriptor, setSortDescriptor] = useState<SortDescriptor>({
-        column: "status",
+        column: "name",
         direction: "ascending",
     });
 
@@ -61,22 +70,13 @@ export const Table01DividerLineSm = ({ title = "Team directory", badgeLabel, ite
     }, [data, sortDescriptor]);
 
     const badge = badgeLabel ?? `${data.length} people`;
+    const ariaLabel = typeof badge === "string" ? `${title} (${badge})` : title;
 
-    return (
-        <TableCard.Root size="sm">
-            <TableCard.Header
-                title={title}
-                badge={badge}
-                contentTrailing={
-                    <div className="absolute top-5 right-4 md:right-6">
-                        <TableRowActionsDropdown />
-                    </div>
-                }
-            />
-            <Table aria-label={title} selectionMode="multiple" sortDescriptor={sortDescriptor} onSortChange={setSortDescriptor} size="sm">
+    const tableContent = (
+        <>
+            <Table aria-label={ariaLabel} selectionMode="multiple" sortDescriptor={sortDescriptor} onSortChange={setSortDescriptor} size="sm">
                 <Table.Header>
                     <Table.Head id="name" label="Name" isRowHeader allowsSorting className="w-full max-w-1/4" />
-                    <Table.Head id="status" label="Status" allowsSorting />
                     <Table.Head id="role" label="Role" allowsSorting tooltip="This is a tooltip" />
                     <Table.Head id="email" label="Email address" allowsSorting className="md:hidden xl:table-cell" />
                     <Table.Head id="teams" label="Teams" />
@@ -88,14 +88,9 @@ export const Table01DividerLineSm = ({ title = "Team directory", badgeLabel, ite
                         <Table.Row id={item.username}>
                             <Table.Cell>
                                 <div className="flex items-center gap-2">
-                                    <Avatar src={item.avatarUrl} alt={item.name} size="sm" />
+                                    <Avatar initials={getInitials(item.name)} alt={item.name} size="sm" />
                                     <p className="text-sm font-medium whitespace-nowrap text-primary">{item.name}</p>
                                 </div>
-                            </Table.Cell>
-                            <Table.Cell>
-                                <BadgeWithDot size="sm" color={item.status === "active" ? "success" : "gray"} type="modern">
-                                    {item.status === "active" ? "Active" : "Inactive"}
-                                </BadgeWithDot>
                             </Table.Cell>
                             <Table.Cell className="whitespace-nowrap">{item.role}</Table.Cell>
                             <Table.Cell className="whitespace-nowrap md:hidden xl:table-cell">{item.email}</Table.Cell>
@@ -126,6 +121,16 @@ export const Table01DividerLineSm = ({ title = "Team directory", badgeLabel, ite
             </Table>
 
             <PaginationCardMinimal align="right" page={1} total={10} className="px-4 py-3 md:px-5 md:pt-3 md:pb-4" />
-        </TableCard.Root>
+        </>
     );
+
+    if (withCard) {
+        return (
+            <TableCard.Root size="sm" className={className}>
+                {tableContent}
+            </TableCard.Root>
+        );
+    }
+
+    return <div className={className}>{tableContent}</div>;
 };
