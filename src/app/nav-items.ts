@@ -1,4 +1,4 @@
-import { BookOpen01, Calendar, Database03, HomeLine, LayersTwo01, Rows01, SearchSm, Server03 } from "@untitledui/icons";
+import { Bookmark, BookOpen01, Calendar, Database03, HomeLine, LayersTwo01, Rows01, SearchSm, Server03 } from "@untitledui/icons";
 import type { NavItemType } from "@/components/application/app-navigation/config";
 
 export const navItemsSimple: NavItemType[] = [
@@ -16,6 +16,11 @@ export const navItemsSimple: NavItemType[] = [
         label: "Drive",
         href: "/drive",
         icon: Server03,
+    },
+    {
+        label: "Bookmarks",
+        href: "/bookmarks",
+        icon: Bookmark,
     },
     {
         label: "Directory",

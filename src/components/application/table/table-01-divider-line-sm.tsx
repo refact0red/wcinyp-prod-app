@@ -169,9 +169,7 @@ export const Table01DividerLineSm = ({ title = "Team directory", badgeLabel, ite
                                 <Table.Cell className="align-top">
                                     <div className="flex flex-col gap-1">
                                         {(() => {
-                                            const renderValue = (contact: ContactMethod | null, showLabel = false) => {
-                                                if (!contact?.value) return <span className="text-quaternary">Not provided</span>;
-
+                                            const renderValue = (contact: ContactMethod, showLabel = false) => {
                                                 const label = contact.label ?? formatLabel(contact.type);
                                                 const href =
                                                     contact.type === "email"
@@ -198,31 +196,52 @@ export const Table01DividerLineSm = ({ title = "Team directory", badgeLabel, ite
                                                 );
                                             };
 
-                                            return (
-                                                <>
-                                                    <div className="flex items-start gap-1 text-sm">
+                                            const rows: React.ReactNode[] = [];
+
+                                            if (tel) {
+                                                rows.push(
+                                                    <div key="tel" className="flex items-start gap-1 text-sm">
                                                         <span className="text-quaternary">Tel:</span>
                                                         {renderValue(tel)}
-                                                    </div>
-                                                    <div className="flex items-start gap-1 text-sm">
+                                                    </div>,
+                                                );
+                                            }
+
+                                            if (cell) {
+                                                rows.push(
+                                                    <div key="cell" className="flex items-start gap-1 text-sm">
                                                         <span className="text-quaternary">Cell:</span>
                                                         {renderValue(cell)}
-                                                    </div>
+                                                    </div>,
+                                                );
+                                            }
 
-                                                    {email && (
-                                                        <div className="flex items-start gap-1 text-sm">
-                                                            <span className="text-quaternary">Email:</span>
-                                                            {renderValue(email)}
-                                                        </div>
-                                                    )}
+                                            if (email) {
+                                                rows.push(
+                                                    <div key="email" className="flex items-start gap-1 text-sm">
+                                                        <span className="text-quaternary">Email:</span>
+                                                        {renderValue(email)}
+                                                    </div>,
+                                                );
+                                            }
 
-                                                    {others.map((contact, index) => (
-                                                        <div key={`${contact.value}-${index}`} className="flex items-start gap-1 text-sm">
-                                                            {renderValue(contact, true)}
-                                                        </div>
-                                                    ))}
-                                                </>
-                                            );
+                                            others.forEach((contact, index) => {
+                                                rows.push(
+                                                    <div key={`${contact.value}-${index}`} className="flex items-start gap-1 text-sm">
+                                                        {renderValue(contact, true)}
+                                                    </div>,
+                                                );
+                                            });
+
+                                            if (rows.length === 0) {
+                                                rows.push(
+                                                    <span key="none" className="text-sm text-quaternary">
+                                                        No contact info
+                                                    </span>,
+                                                );
+                                            }
+
+                                            return rows;
                                         })()}
                                     </div>
                                 </Table.Cell>
