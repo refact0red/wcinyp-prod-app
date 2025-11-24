@@ -31,7 +31,7 @@ export const SidebarNavigationSimple = ({
     hideBorder = false,
     className,
 }: SidebarNavigationProps) => {
-    const MAIN_SIDEBAR_WIDTH = 296;
+    const MAIN_SIDEBAR_WIDTH = 256;
 
     const content = (
         <aside

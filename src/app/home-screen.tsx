@@ -85,54 +85,6 @@ export const HomeScreen = () => {
                                 </div>
                             </div>
                         </div>
-
-                        <div className="rounded-2xl border border-secondary bg-primary p-6 shadow-xs">
-                            <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-                                <div>
-                                    <h2 className="text-lg font-semibold text-primary">Add more components</h2>
-                                    <p className="mt-1 text-sm text-tertiary">
-                                        Pull any layout from the Untitled UI CLI without leaving your editor.
-                                    </p>
-                                </div>
-                                <div className="flex flex-wrap gap-2">
-                                    <Button
-                                        href="https://www.untitledui.com/react/docs/introduction"
-                                        target="_blank"
-                                        rel="noopener noreferrer"
-                                        color="link-color"
-                                        size="sm"
-                                        iconLeading={BookOpen01}
-                                    >
-                                        Docs
-                                    </Button>
-                                    <Button
-                                        href="https://www.untitledui.com/react/resources/icons"
-                                        target="_blank"
-                                        rel="noopener noreferrer"
-                                        color="link-color"
-                                        size="sm"
-                                        iconLeading={Cube01}
-                                    >
-                                        Icons
-                                    </Button>
-                                    <Button
-                                        href="https://github.com/untitleduico/react/issues"
-                                        target="_blank"
-                                        rel="noopener noreferrer"
-                                        color="link-color"
-                                        size="sm"
-                                        iconLeading={HelpCircle}
-                                    >
-                                        Help
-                                    </Button>
-                                </div>
-                            </div>
-
-                            <div className="mt-4 grid gap-3 md:grid-cols-2">
-                                {renderCommandRow("Use the sidebar template", "npx untitledui@latest add sidebar-navigation-base", "sidebar-command")}
-                                {renderCommandRow("Browse the component catalog", "npx untitledui@latest add", "catalog-command")}
-                            </div>
-                        </div>
                     </div>
                 </main>
             </div>

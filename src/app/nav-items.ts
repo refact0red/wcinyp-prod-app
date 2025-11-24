@@ -8,8 +8,8 @@ export const navItemsSimple: NavItemType[] = [
         icon: HomeLine,
     },
     {
-        label: "Manuals",
-        href: "/manuals",
+        label: "Manual",
+        href: "/manual",
         icon: BookOpen01,
     },
     {
