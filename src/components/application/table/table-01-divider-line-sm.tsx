@@ -116,6 +116,25 @@ export const Table01DividerLineSm = ({ title = "Team directory", badgeLabel, ite
         return contacts;
     };
 
+    const getPhoneContacts = (item: DirectoryTableItem) => {
+        const contacts = normalizeContacts(item);
+        const tel =
+            contacts.find(
+                (contact) =>
+                    contact.type === "phone" || contact.type === "desk" || contact.label?.toLowerCase() === "tel" || contact.label?.toLowerCase() === "office",
+            ) ?? null;
+        const cell =
+            contacts.find(
+                (contact) =>
+                    contact.type === "mobile" || contact.label?.toLowerCase() === "cell" || contact.label?.toLowerCase() === "mobile",
+            ) ?? null;
+        const email =
+            contacts.find((contact) => contact.type === "email") ?? (item.email ? ({ type: "email", value: item.email } as ContactMethod) : null);
+        const others = contacts.filter((contact) => contact !== tel && contact !== cell && contact !== email);
+
+        return { tel, cell, email, others };
+    };
+
     const normalizeTags = (item: DirectoryTableItem) => item.tags ?? item.teams ?? [];
     const normalizeTitle = (item: DirectoryTableItem) => item.title ?? item.role;
 
@@ -131,7 +150,7 @@ export const Table01DividerLineSm = ({ title = "Team directory", badgeLabel, ite
 
                 <Table.Body items={sortedItems}>
                     {(item) => {
-                        const contacts = normalizeContacts(item);
+                        const { tel, cell, email, others } = getPhoneContacts(item);
                         const tags = normalizeTags(item);
                         const title = normalizeTitle(item);
                         const initials = item.initials ?? getInitials(item.name);
@@ -149,10 +168,10 @@ export const Table01DividerLineSm = ({ title = "Team directory", badgeLabel, ite
                                 </Table.Cell>
                                 <Table.Cell className="align-top">
                                     <div className="flex flex-col gap-1">
-                                        {contacts.length === 0 ? (
-                                            <span className="text-sm text-quaternary">No contact info</span>
-                                        ) : (
-                                            contacts.map((contact, index) => {
+                                        {(() => {
+                                            const renderValue = (contact: ContactMethod | null, showLabel = false) => {
+                                                if (!contact?.value) return <span className="text-quaternary">Not provided</span>;
+
                                                 const label = contact.label ?? formatLabel(contact.type);
                                                 const href =
                                                     contact.type === "email"
@@ -172,13 +191,39 @@ export const Table01DividerLineSm = ({ title = "Team directory", badgeLabel, ite
                                                           );
 
                                                 return (
-                                                    <div key={`${contact.value}-${index}`} className="flex items-start gap-1 text-sm">
-                                                        {label && <span className="text-quaternary">{label}:</span>}
+                                                    <>
+                                                        {showLabel && label && <span className="text-quaternary">{label}:</span>}
                                                         {displayValue}
-                                                    </div>
+                                                    </>
                                                 );
-                                            })
-                                        )}
+                                            };
+
+                                            return (
+                                                <>
+                                                    <div className="flex items-start gap-1 text-sm">
+                                                        <span className="text-quaternary">Tel:</span>
+                                                        {renderValue(tel)}
+                                                    </div>
+                                                    <div className="flex items-start gap-1 text-sm">
+                                                        <span className="text-quaternary">Cell:</span>
+                                                        {renderValue(cell)}
+                                                    </div>
+
+                                                    {email && (
+                                                        <div className="flex items-start gap-1 text-sm">
+                                                            <span className="text-quaternary">Email:</span>
+                                                            {renderValue(email)}
+                                                        </div>
+                                                    )}
+
+                                                    {others.map((contact, index) => (
+                                                        <div key={`${contact.value}-${index}`} className="flex items-start gap-1 text-sm">
+                                                            {renderValue(contact, true)}
+                                                        </div>
+                                                    ))}
+                                                </>
+                                            );
+                                        })()}
                                     </div>
                                 </Table.Cell>
                                 <Table.Cell>

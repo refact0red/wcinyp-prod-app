@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState, type FormEvent } from "react";
 import { usePathname } from "next/navigation";
 import { Plus, SearchLg } from "@untitledui/icons";
+import { Checkbox as AriaCheckbox, CheckboxGroup as AriaCheckboxGroup } from "react-aria-components";
 import { navItemsSimple, footerItems } from "@/app/nav-items";
 import { HeaderTopActions } from "@/components/application/app-navigation/header-top-actions";
 import { SidebarNavigationSimple } from "@/components/application/app-navigation/sidebar-navigation/sidebar-simple";
@@ -10,24 +11,31 @@ import { SectionHeader } from "@/components/application/section-headers/section-
 import { Table01DividerLineSm, type DirectoryTableItem } from "@/components/application/table/table-01-divider-line-sm";
 import { SlideoutMenu } from "@/components/application/slideout-menus/slideout-menu";
 import teamMembers from "@/components/application/table/team-members.json" assert { type: "json" };
+import { Badge } from "@/components/base/badges/badges";
 import { Button } from "@/components/base/buttons/button";
+import { Checkbox } from "@/components/base/checkbox/checkbox";
 import { Form } from "@/components/base/form/form";
 import { Input } from "@/components/base/input/input";
+import { Label } from "@/components/base/input/label";
+import type { BadgeColors } from "@/components/base/badges/badge-types";
+import { cx } from "@/utils/cx";
 
 type PersonFormState = {
     name: string;
     title: string;
     email: string;
-    phone: string;
-    tags: string;
+    officePhone: string;
+    mobilePhone: string;
+    tagIds: string[];
 };
 
 const emptyForm: PersonFormState = {
     name: "",
     title: "",
     email: "",
-    phone: "",
-    tags: "",
+    officePhone: "",
+    mobilePhone: "",
+    tagIds: [],
 };
 
 const slugify = (value: string) =>
@@ -39,25 +47,52 @@ const slugify = (value: string) =>
         .replace(/-+/g, "-")
         .replace(/^-|-$/g, "");
 
-const formatTags = (tags: string) =>
-    tags
-        .split(",")
-        .map((tag) => tag.trim())
-        .filter(Boolean);
-
 const formFromPerson = (person: DirectoryTableItem | null): PersonFormState => {
     if (!person) return emptyForm;
 
     const emailContact = person.contacts?.find((c) => c.type === "email")?.value ?? person.email ?? "";
-    const phoneContact = person.contacts?.find((c) => c.type !== "email")?.value ?? "";
+    const officeContact = person.contacts?.find((c) => c.type === "phone" || c.type === "desk")?.value ?? "";
+    const mobileContact =
+        person.contacts?.find((c) => c.type === "mobile" || c.label?.toLowerCase() === "cell" || c.label?.toLowerCase() === "mobile")?.value ?? "";
 
     return {
         name: person.name ?? "",
         title: person.title ?? person.role ?? "",
         email: emailContact,
-        phone: phoneContact,
-        tags: person.tags?.map((tag) => tag.name).join(", ") ?? "",
+        officePhone: officeContact,
+        mobilePhone: mobileContact,
+        tagIds: person.tags?.map((tag) => slugify(tag.name)) ?? [],
     };
+};
+
+type TagOption = { id: string; name: string; color: BadgeColors; label?: string };
+
+const collectTagOptions = (): TagOption[] => {
+    const fromData = ((teamMembers as { items: DirectoryTableItem[] }).items ?? []).flatMap((person) => person.tags ?? []);
+    const map = new Map<string, TagOption>();
+
+    fromData.forEach((tag) => {
+        const id = slugify(tag.name);
+        if (!map.has(id)) {
+            map.set(id, { id, name: tag.name, label: tag.name, color: tag.color });
+        }
+    });
+
+    const defaults: TagOption[] = [
+        { id: "nurse-lead", name: "Nurse Lead", label: "Nurse Lead", color: "brand" },
+        { id: "it", name: "IT", label: "IT", color: "gray-blue" },
+        { id: "supervisor", name: "Supervisor", label: "Supervisor", color: "gray" },
+        { id: "operations", name: "Operations", label: "Operations", color: "blue-light" },
+        { id: "management", name: "Management", label: "Management", color: "pink" },
+    ];
+
+    defaults.forEach((tag) => {
+        if (!map.has(tag.id)) {
+            map.set(tag.id, tag);
+        }
+    });
+
+    return Array.from(map.values());
 };
 
 type PersonSlideoutProps = {
@@ -67,9 +102,11 @@ type PersonSlideoutProps = {
     person: DirectoryTableItem | null;
     onSubmit: (data: PersonFormState) => void;
     onDelete?: () => void;
+    tagOptions: TagOption[];
+    onCreateTag: (name: string) => string | null;
 };
 
-const PersonSlideout = ({ isOpen, onOpenChange, mode, person, onSubmit, onDelete }: PersonSlideoutProps) => {
+const PersonSlideout = ({ isOpen, onOpenChange, mode, person, onSubmit, onDelete, tagOptions, onCreateTag }: PersonSlideoutProps) => {
     const [formState, setFormState] = useState<PersonFormState>(emptyForm);
 
     useEffect(() => {
@@ -87,6 +124,15 @@ const PersonSlideout = ({ isOpen, onOpenChange, mode, person, onSubmit, onDelete
 
     const heading = mode === "edit" ? "Edit person" : "Add person";
     const subheading = mode === "edit" ? "Update contact details, tags, and role." : "Create a new entry for the directory.";
+
+    const addCustomTag = () => {
+        if (typeof window === "undefined") return;
+        const name = window.prompt("Add new tag name")?.trim();
+        if (!name) return;
+        const id = onCreateTag(name);
+        if (!id) return;
+        setFormState((prev) => (prev.tagIds.includes(id) ? prev : { ...prev, tagIds: [...prev.tagIds, id] }));
+    };
 
     return (
         <SlideoutMenu.Trigger isOpen={isOpen} onOpenChange={onOpenChange}>
@@ -121,18 +167,52 @@ const PersonSlideout = ({ isOpen, onOpenChange, mode, person, onSubmit, onDelete
                         />
                         <Input
                             size="md"
-                            label="Phone"
+                            label="Office"
                             placeholder="(555) 555-5555"
-                            value={formState.phone}
-                            onChange={updateField("phone")}
+                            value={formState.officePhone}
+                            onChange={updateField("officePhone")}
                         />
                         <Input
                             size="md"
-                            label="Tags"
-                            placeholder="Comma separated (e.g. Nurse Lead, IT)"
-                            value={formState.tags}
-                            onChange={updateField("tags")}
+                            label="Cell"
+                            placeholder="(555) 555-5555"
+                            value={formState.mobilePhone}
+                            onChange={updateField("mobilePhone")}
                         />
+
+                        <section className="mt-1 flex flex-col gap-3">
+                            <Label className="text-sm font-semibold text-primary">Tags</Label>
+                            <AriaCheckboxGroup
+                                value={formState.tagIds}
+                                onChange={(values) => setFormState((prev) => ({ ...prev, tagIds: values as string[] }))}
+                                className="flex flex-col gap-3"
+                            >
+                                <div className="flex flex-col items-start gap-3 pl-1">
+                                    {tagOptions.map((tag) => (
+                                        <Checkbox
+                                            key={tag.id}
+                                            value={tag.id}
+                                            size="sm"
+                                            label={
+                                                <Badge size="md" type="pill-color" color={tag.color}>
+                                                    {tag.name}
+                                                </Badge>
+                                            }
+                                            className={(state) =>
+                                                cx(
+                                                    "flex w-full items-center gap-3 rounded-md px-1 py-1 transition duration-100 ease-linear",
+                                                    state.isSelected && "bg-secondary",
+                                                    state.isDisabled && "cursor-not-allowed",
+                                                )
+                                            }
+                                        />
+                                    ))}
+                                    <Button size="md" color="link-color" iconLeading={Plus} type="button" onClick={addCustomTag} className="pl-0">
+                                        Add tag
+                                    </Button>
+                                </div>
+                            </AriaCheckboxGroup>
+                        </section>
                     </Form>
                 </SlideoutMenu.Content>
                 <SlideoutMenu.Footer className="flex w-full items-center justify-end gap-3">
@@ -156,6 +236,7 @@ const PersonSlideout = ({ isOpen, onOpenChange, mode, person, onSubmit, onDelete
 export const DirectoryScreen = () => {
     const pathname = usePathname();
     const [people, setPeople] = useState<DirectoryTableItem[]>(() => (teamMembers as { items: DirectoryTableItem[] }).items);
+    const [tagOptions, setTagOptions] = useState<TagOption[]>(() => collectTagOptions());
     const [search, setSearch] = useState("");
     const [isSlideoutOpen, setIsSlideoutOpen] = useState(false);
     const [mode, setMode] = useState<"create" | "edit">("create");
@@ -201,17 +282,33 @@ export const DirectoryScreen = () => {
         return attempt;
     };
 
+    const upsertTagOption = (name: string) => {
+        const trimmed = name.trim();
+        if (!trimmed) return null;
+
+        const id = slugify(trimmed);
+        setTagOptions((prev) => {
+            if (prev.some((tag) => tag.id === id)) return prev;
+            return [...prev, { id, name: trimmed, label: trimmed, color: "gray-blue" }];
+        });
+        return id;
+    };
+
     const handleSave = (data: PersonFormState) => {
-        const tags = formatTags(data.tags).map((tag) => ({
-            name: tag,
-            color: "gray-blue" as const,
-        }));
-        const contacts: NonNullable<DirectoryTableItem["contacts"]> = [];
+        const tags = data.tagIds
+            .map((tagId) => tagOptions.find((option) => option.id === tagId) ?? { id: tagId, name: tagId.replace(/-/g, " "), color: "gray-blue" as const })
+            .map((tag) => ({ name: tag.name, color: tag.color }));
+        const preservedOtherContacts =
+            activePerson?.contacts?.filter((contact) => !["email", "phone", "mobile", "desk"].includes(contact.type)) ?? [];
+        const contacts: NonNullable<DirectoryTableItem["contacts"]> = [...preservedOtherContacts];
         if (data.email) {
             contacts.push({ type: "email", value: data.email });
         }
-        if (data.phone) {
-            contacts.push({ type: "phone", label: "Phone", value: data.phone });
+        if (data.officePhone) {
+            contacts.push({ type: "phone", label: "Tel", value: data.officePhone });
+        }
+        if (data.mobilePhone) {
+            contacts.push({ type: "mobile", label: "Cell", value: data.mobilePhone });
         }
 
         const username = activePerson
@@ -305,6 +402,8 @@ export const DirectoryScreen = () => {
                 person={activePerson}
                 onSubmit={handleSave}
                 onDelete={activePerson ? () => handleDelete(activePerson) : undefined}
+                tagOptions={tagOptions}
+                onCreateTag={upsertTagOption}
             />
         </div>
     );
