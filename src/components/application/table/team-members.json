@@ -91,6 +91,98 @@
                 }
             ],
             "entityType": "person"
+        },
+        {
+            "username": "annette-viera",
+            "name": "Annette Viera",
+            "title": "Senior Practice Supervisor",
+            "contacts": [
+                {
+                    "type": "mobile",
+                    "label": "Cell",
+                    "value": "(646) 477-2051"
+                },
+                {
+                    "type": "email",
+                    "value": "anv9009@med.cornell.edu"
+                }
+            ],
+            "tags": [
+                {
+                    "name": "Evening/Weekend Managers",
+                    "color": "brand"
+                }
+            ],
+            "entityType": "person"
+        },
+        {
+            "username": "ericca-bartolome",
+            "name": "Ericca Bartolome",
+            "title": "Practice Supervisor",
+            "contacts": [
+                {
+                    "type": "mobile",
+                    "label": "Cell",
+                    "value": "(917) 574-6280"
+                },
+                {
+                    "type": "email",
+                    "value": "erb2007@med.cornell.edu"
+                }
+            ],
+            "tags": [
+                {
+                    "name": "Evening/Weekend Managers",
+                    "color": "brand"
+                }
+            ],
+            "entityType": "person"
+        },
+        {
+            "username": "anna-wysocka",
+            "name": "Anna Wysocka",
+            "title": "Practice Supervisor",
+            "contacts": [
+                {
+                    "type": "mobile",
+                    "label": "Cell",
+                    "value": "(917) 747-1459"
+                },
+                {
+                    "type": "email",
+                    "value": "anw3005@med.cornell.edu"
+                }
+            ],
+            "tags": [
+                {
+                    "name": "Evening/Weekend Managers",
+                    "color": "brand"
+                }
+            ],
+            "entityType": "person"
+        },
+        {
+            "username": "jacob-taggart",
+            "name": "Jacob Taggart",
+            "title": "Practice Supervisor",
+            "contacts": [
+                {
+                    "type": "mobile",
+                    "label": "Cell",
+                    "value": "(646) 656-8665"
+                },
+                {
+                    "type": "email",
+                    "value": "jat4010@med.cornell.edu"
+                }
+            ],
+            "tags": [
+                {
+                    "name": "Evening/Weekend Managers",
+                    "color": "brand"
+                }
+            ],
+            "entityType": "person"
         }
     ]
 }

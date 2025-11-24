@@ -150,41 +150,32 @@ export const Table01DividerLineSm = ({ title = "Team directory", badgeLabel, ite
                                         {contacts.length === 0 ? (
                                             <span className="text-sm text-quaternary">No contact info</span>
                                         ) : (
-                                            <>
-                                                {contacts.slice(0, 2).map((contact, index) => {
-                                                    const label = contact.label ?? formatLabel(contact.type);
-                                                    const href =
-                                                        contact.type === "email"
-                                                            ? `mailto:${contact.value}`
-                                                            : ["phone", "mobile", "desk", "fax"].includes(contact.type)
-                                                              ? `tel:${contact.value.replace(/[()\s-]/g, "")}`
-                                                              : undefined;
-                                                    const displayValue =
-                                                        contact.type === "email" || href?.startsWith("tel:")
-                                                            ? (
-                                                                  <a
-                                                                      className="text-primary underline-offset-2 hover:underline"
-                                                                      href={href}
-                                                                  >
-                                                                      {contact.value}
-                                                                  </a>
-                                                              )
-                                                            : (
-                                                                  <span className="text-primary">{contact.value}</span>
-                                                              );
+                                            contacts.map((contact, index) => {
+                                                const label = contact.label ?? formatLabel(contact.type);
+                                                const href =
+                                                    contact.type === "email"
+                                                        ? `mailto:${contact.value}`
+                                                        : ["phone", "mobile", "desk", "fax"].includes(contact.type)
+                                                          ? `tel:${contact.value.replace(/[()\s-]/g, "")}`
+                                                          : undefined;
+                                                const displayValue =
+                                                    contact.type === "email" || href?.startsWith("tel:")
+                                                        ? (
+                                                              <a className="text-primary underline-offset-2 hover:underline" href={href}>
+                                                                  {contact.value}
+                                                              </a>
+                                                          )
+                                                        : (
+                                                              <span className="text-primary">{contact.value}</span>
+                                                          );
 
-                                                    return (
-                                                        <div key={`${contact.value}-${index}`} className="flex items-start gap-1 text-sm">
-                                                            {label && <span className="text-quaternary">{label}:</span>}
-                                                            {displayValue}
-                                                        </div>
-                                                    );
-                                                })}
-
-                                                {contacts.length > 2 && (
-                                                    <span className="text-xs text-quaternary">+{contacts.length - 2} more</span>
-                                                )}
-                                            </>
+                                                return (
+                                                    <div key={`${contact.value}-${index}`} className="flex items-start gap-1 text-sm">
+                                                        {label && <span className="text-quaternary">{label}:</span>}
+                                                        {displayValue}
+                                                    </div>
+                                                );
+                                            })
                                         )}
                                     </div>
                                 </Table.Cell>
