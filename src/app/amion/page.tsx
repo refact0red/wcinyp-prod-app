@@ -1,3 +1,5 @@
+"use client";
+
 import { usePathname } from "next/navigation";
 import { navItemsFlat, navSections } from "@/app/nav-items";
 import { HeaderTopActions } from "@/components/application/app-navigation/header-top-actions";

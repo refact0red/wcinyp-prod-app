@@ -345,6 +345,57 @@
                 }
             ],
             "entityType": "person"
+        },
+        {
+            "username": "kayla-pozzuto",
+            "name": "Kayla Pozzuto",
+            "title": "Child Life Specialist",
+            "contacts": [
+                {
+                    "type": "mobile",
+                    "label": "Cell",
+                    "value": "(646) 689-3147"
+                },
+                {
+                    "type": "email",
+                    "value": "kap9210@med.cornell.edu"
+                }
+            ],
+            "tags": [
+                {
+                    "name": "Child Life",
+                    "color": "purple"
+                }
+            ],
+            "entityType": "person"
+        },
+        {
+            "username": "rachel-cavaliere",
+            "name": "Rachel M. Cavaliere",
+            "title": "Child Life Specialist",
+            "contacts": [
+                {
+                    "type": "phone",
+                    "label": "Tel",
+                    "value": "(646) 962-9173"
+                },
+                {
+                    "type": "mobile",
+                    "label": "Cell",
+                    "value": "(917) 484-0741"
+                },
+                {
+                    "type": "email",
+                    "value": "rmp9016@nyp.org"
+                }
+            ],
+            "tags": [
+                {
+                    "name": "Child Life",
+                    "color": "purple"
+                }
+            ],
+            "entityType": "person"
         }
     ]
 }

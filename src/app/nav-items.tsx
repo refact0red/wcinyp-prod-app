@@ -12,7 +12,7 @@ const generalItems: NavItemType[] = [
     { label: "Providers", href: "/providers", icon: Database03 },
     { label: "Amion", href: "/amion", icon: LayersTwo01 },
     { label: "NPI Lookup", href: "/npi-lookup", icon: SearchSm },
-    { label: "Calendars", href: "/calendars", icon: Calendar },
+    { label: "Calendar", href: "/calendars", icon: Calendar },
 ];
 
 const adminItems: NavItemType[] = [
