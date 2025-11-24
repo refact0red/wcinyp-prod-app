@@ -110,7 +110,7 @@
             "tags": [
                 {
                     "name": "Evening/Weekend Managers",
-                    "color": "brand"
+                    "color": "gray"
                 }
             ],
             "entityType": "person"
@@ -133,7 +133,7 @@
             "tags": [
                 {
                     "name": "Evening/Weekend Managers",
-                    "color": "brand"
+                    "color": "gray"
                 }
             ],
             "entityType": "person"
@@ -156,7 +156,7 @@
             "tags": [
                 {
                     "name": "Evening/Weekend Managers",
-                    "color": "brand"
+                    "color": "gray"
                 }
             ],
             "entityType": "person"
@@ -179,7 +179,7 @@
             "tags": [
                 {
                     "name": "Evening/Weekend Managers",
-                    "color": "brand"
+                    "color": "gray"
                 }
             ],
             "entityType": "person"
