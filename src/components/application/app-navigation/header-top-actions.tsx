@@ -145,14 +145,6 @@ export const HeaderTopActions = ({
             <div className="flex items-center gap-1.5">
                 <ThemeToggle />
                 <NavItemButton
-                    current={activeUrl === "/settings-01"}
-                    size="md"
-                    icon={Settings01}
-                    label="Settings"
-                    href="/settings-01"
-                    tooltipPlacement="bottom"
-                />
-                <NavItemButton
                     current={activeUrl === "/notifications-01"}
                     size="md"
                     icon={Bell01}
@@ -176,15 +168,10 @@ export const HeaderTopActions = ({
                             <div className="flex items-center justify-between gap-3 border-b border-secondary p-3">
                                 <AvatarLabelGroup
                                     size="md"
-                                    src="https://www.untitledui.com/images/avatars/olivia-rhye?fm=webp&q=80"
-                                    status="online"
-                                    title="Olivia Rhye"
-                                    subtitle="olivia@untitledui.com"
+                                    initials="TB"
+                                    title="Test Bacon"
+                                    subtitle="test.bacon@med.cornell.edu"
                                 />
-                                <div className="flex flex-col items-end">
-                                    <span className="text-sm font-semibold text-primary">ABC1234</span>
-                                    <span className="text-xs text-tertiary">Campus ID</span>
-                                </div>
                             </div>
 
                             <Dropdown.Menu>
