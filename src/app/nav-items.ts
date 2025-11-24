@@ -1,4 +1,4 @@
-import { BookOpen01, Calendar, Database03, HomeLine, Rows01, Server03 } from "@untitledui/icons";
+import { BookOpen01, Calendar, Database03, HomeLine, LayersTwo01, Rows01, SearchSm, Server03 } from "@untitledui/icons";
 import type { NavItemType } from "@/components/application/app-navigation/config";
 
 export const navItemsSimple: NavItemType[] = [
@@ -26,6 +26,16 @@ export const navItemsSimple: NavItemType[] = [
         label: "Providers",
         href: "/providers",
         icon: Database03,
+    },
+    {
+        label: "Amion",
+        href: "/amion",
+        icon: LayersTwo01,
+    },
+    {
+        label: "NPI Lookup",
+        href: "/npi-lookup",
+        icon: SearchSm,
     },
     {
         label: "Calendars",
