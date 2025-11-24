@@ -29,7 +29,7 @@ export const DirectoryScreen = () => {
                             <div className="flex flex-col gap-5 border-b border-secondary p-4 md:p-5">
                                 <SectionHeader.Group>
                                     <div className="flex min-w-0 flex-1 flex-col gap-1">
-                                        <SectionHeader.Heading>People and teams</SectionHeader.Heading>
+                                        <SectionHeader.Heading>People</SectionHeader.Heading>
                                         <SectionHeader.Subheading>Find teammates, see which teams they are on, and make updates quickly.</SectionHeader.Subheading>
                                     </div>
                                     <div className="w-full md:w-80">

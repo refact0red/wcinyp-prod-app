@@ -2,6 +2,10 @@
 
 This is an official Untitled UI starter kit for Next.js. Kickstart your Untitled UI project with Next.js in seconds.
 
+## Project context (WCINYP)
+
+This repository is customized for Weill Cornell Imaging at New York Presbyterian (WCINYP). It powers an internal “supertool” for administrators to manage people across WCINYP—surfacing contact info, roles, and tags to keep teams aligned. Any copy or features should assume an internal admin audience rather than public-facing users.
+
 ## Untitled UI React
 
 [Untitled UI React](https://www.untitledui.com/react) is the world’s largest collection of open-source React UI components. Everything you need to design and develop modern, beautiful interfaces—fast.
