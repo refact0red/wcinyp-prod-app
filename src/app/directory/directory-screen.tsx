@@ -1,30 +1,16 @@
 "use client";
 
-import { useState } from "react";
 import { usePathname } from "next/navigation";
-import { SearchLg, UploadCloud02, Users01 } from "@untitledui/icons";
-import type { Key } from "react-aria-components";
+import { SearchLg } from "@untitledui/icons";
 import { navItemsSimple, footerItems } from "@/app/nav-items";
 import { HeaderTopActions } from "@/components/application/app-navigation/header-top-actions";
 import { SidebarNavigationSimple } from "@/components/application/app-navigation/sidebar-navigation/sidebar-simple";
 import { SectionHeader } from "@/components/application/section-headers/section-headers";
 import { Table01DividerLineSm } from "@/components/application/table/table-01-divider-line-sm";
-import { TabList, Tabs } from "@/components/application/tabs/tabs";
-import { Button } from "@/components/base/buttons/button";
 import { Input } from "@/components/base/input/input";
-import { NativeSelect } from "@/components/base/select/select-native";
-
-const contentTypeTabs = [
-    { id: "all", label: "All" },
-    { id: "people", label: "Leads" },
-    { id: "teams", label: "Locations" },
-    { id: "providers", label: "Providers" },
-    { id: "guests", label: "Guests" },
-];
 
 export const DirectoryScreen = () => {
     const pathname = usePathname();
-    const [selectedContentType, setSelectedContentType] = useState<Key>(contentTypeTabs[0].id);
 
     return (
         <div className="flex min-h-dvh flex-col bg-primary lg:flex-row">
@@ -50,31 +36,6 @@ export const DirectoryScreen = () => {
                                         <Input shortcut size="sm" aria-label="Search" placeholder="Search directory" icon={SearchLg} />
                                     </div>
                                 </SectionHeader.Group>
-
-                                <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between md:gap-4">
-                                    <div className="w-full sm:hidden">
-                                        <NativeSelect
-                                            aria-label="Filter directory"
-                                            value={String(selectedContentType)}
-                                            onChange={(event) => setSelectedContentType(event.target.value)}
-                                            options={contentTypeTabs.map((tab) => ({ label: tab.label, value: tab.id }))}
-                                        />
-                                    </div>
-                                    <div className="hidden flex-1 sm:block">
-                                        <Tabs selectedKey={selectedContentType} onSelectionChange={setSelectedContentType}>
-                                            <TabList type="button-border" className="flex w-full flex-wrap gap-2" items={contentTypeTabs} />
-                                        </Tabs>
-                                    </div>
-
-                                    <div className="flex flex-wrap gap-2">
-                                        <Button color="secondary" size="sm" iconLeading={UploadCloud02}>
-                                            Export list
-                                        </Button>
-                                        <Button size="sm" iconLeading={Users01}>
-                                            Invite teammate
-                                        </Button>
-                                    </div>
-                                </div>
                             </div>
 
                             <Table01DividerLineSm withCard={false} />

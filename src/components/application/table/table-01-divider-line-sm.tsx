@@ -121,9 +121,9 @@ export const Table01DividerLineSm = ({ title = "Team directory", badgeLabel, ite
         <>
             <Table aria-label={ariaLabel} selectionMode="multiple" sortDescriptor={sortDescriptor} onSortChange={setSortDescriptor} size="sm">
                 <Table.Header>
-                    <Table.Head id="name" label="Name" isRowHeader allowsSorting className="w-full max-w-[40%]" />
-                    <Table.Head id="contacts" label="Contact details" className="w-full max-w-[30%]" />
-                    <Table.Head id="tags" label="Tags" className="min-w-[160px]" />
+                    <Table.Head id="name" label="Name" isRowHeader allowsSorting className="w-[45%] min-w-[240px]" />
+                    <Table.Head id="contacts" label="Contact" className="w-[35%] min-w-[200px]" />
+                    <Table.Head id="tags" label="Tags" className="w-[20%] min-w-[120px]" />
                     <Table.Head id="actions" />
                 </Table.Header>
 
