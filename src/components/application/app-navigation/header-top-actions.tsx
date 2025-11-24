@@ -6,6 +6,7 @@ import { AvatarLabelGroup } from "@/components/base/avatar/avatar-label-group";
 import { Button } from "@/components/base/buttons/button";
 import { Breadcrumbs } from "@/components/application/breadcrumbs/breadcrumbs";
 import { Dropdown } from "@/components/base/dropdown/dropdown";
+import { ThemeToggle } from "@/components/application/app-navigation/theme-toggle";
 import { cx } from "@/utils/cx";
 import type { NavItemType } from "./config";
 import { NavItemButton } from "./base-components/nav-item-button";
@@ -142,6 +143,7 @@ export const HeaderTopActions = ({
             </div>
 
             <div className="flex items-center gap-1.5">
+                <ThemeToggle />
                 <NavItemButton
                     current={activeUrl === "/settings-01"}
                     size="md"
