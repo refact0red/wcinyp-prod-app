@@ -4,9 +4,9 @@ import { useEffect, useMemo, useState, type FormEvent } from "react";
 import { usePathname } from "next/navigation";
 import { Plus, SearchLg } from "@untitledui/icons";
 import { Checkbox as AriaCheckbox, CheckboxGroup as AriaCheckboxGroup } from "react-aria-components";
-import { navItemsSimple, footerItems } from "@/app/nav-items";
+import { navItemsFlat, navSections } from "@/app/nav-items";
 import { HeaderTopActions } from "@/components/application/app-navigation/header-top-actions";
-import { SidebarNavigationSimple } from "@/components/application/app-navigation/sidebar-navigation/sidebar-simple";
+import { SidebarNavigationSectionsSubheadings } from "@/components/application/app-navigation/sidebar-navigation/sidebar-sections-subheadings";
 import { SectionHeader } from "@/components/application/section-headers/section-headers";
 import { Table01DividerLineSm, type DirectoryTableItem } from "@/components/application/table/table-01-divider-line-sm";
 import { SlideoutMenu } from "@/components/application/slideout-menus/slideout-menu";
@@ -348,14 +348,10 @@ export const DirectoryScreen = () => {
 
     return (
         <div className="flex min-h-dvh flex-col bg-primary lg:flex-row">
-            <SidebarNavigationSimple
-                activeUrl={pathname}
-                items={navItemsSimple}
-                footerItems={footerItems}
-            />
+            <SidebarNavigationSectionsSubheadings activeUrl={pathname} items={navSections} />
 
             <div className="flex min-h-dvh flex-1 flex-col">
-                <HeaderTopActions activeUrl={pathname} sidebarItems={navItemsSimple} />
+                <HeaderTopActions activeUrl={pathname} sidebarItems={navItemsFlat} />
 
                 <main className="flex-1">
                     <div className="mx-auto flex max-w-6xl flex-col gap-8 px-4 pb-12 pt-6 md:px-8 lg:pt-10">
