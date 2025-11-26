@@ -32,6 +32,19 @@ Open [http://localhost:3000](http://localhost:3000) with your browser to see the
 
 You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
 
+## Storybook
+
+Run component previews at [http://localhost:6006](http://localhost:6006):
+
+```bash
+pnpm storybook
+```
+
+- Stories live in `src/stories/untitledui` (Untitled UI) and `src/stories/shadcn` (Shadcn-inspired primitives).
+- Global Tailwind v4 styles, fonts, and light/dark themes are loaded from `.storybook/preview.tsx`; switch themes from the Storybook toolbar.
+- Use `pnpm build-storybook` to create a static build for sharing.
+- Shadcn-style `Card` and `Alert` components live in `src/components/shadcn` and reuse the same tokens as the rest of the kit.
+
 ## Resources
 
 Untitled UI React is built on top of [Untitled UI Figma](https://www.untitledui.com/figma), the world's largest and most popular Figma UI kit and design system. Explore more:
