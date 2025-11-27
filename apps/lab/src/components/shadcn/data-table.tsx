@@ -20,30 +20,10 @@ import {
   verticalListSortingStrategy,
 } from "@dnd-kit/sortable"
 import { CSS } from "@dnd-kit/utilities"
-import {
-  ColumnDef,
-  ColumnFiltersState,
-  Row,
-  SortingState,
-  VisibilityState,
-  flexRender,
-  getCoreRowModel,
-  getFacetedRowModel,
-  getFacetedUniqueValues,
-  getFilteredRowModel,
-  getPaginationRowModel,
-  getSortedRowModel,
-  useReactTable,
-} from "@tanstack/react-table"
+import { ColumnDef, Row, flexRender } from "@tanstack/react-table"
 import {
   CheckCircle2Icon,
   CheckCircleIcon,
-  ChevronDownIcon,
-  ChevronLeftIcon,
-  ChevronRightIcon,
-  ChevronsLeftIcon,
-  ChevronsRightIcon,
-  ColumnsIcon,
   GripVerticalIcon,
   LoaderIcon,
   MoreVerticalIcon,
@@ -55,6 +35,14 @@ import { toast } from "sonner"
 import { z } from "zod"
 
 import { useIsMobile } from "@/components/hooks/use-mobile"
+import { EmptyState } from "@/components/table/empty-state"
+import { TableShell } from "@/components/table/table-shell"
+import { TableToolbar } from "@/components/table/table-toolbar"
+import { BulkActionsBar } from "@/components/table/bulk-actions-bar"
+import { TablePagination } from "@/components/table/table-pagination"
+import { VirtualTable } from "@/components/table/virtual-table"
+import { useDataTable } from "@/components/table/use-data-table"
+import { defaultTableState } from "@/components/table/table-config"
 import { Badge } from "@/components/shadcn/ui/badge"
 import { Button } from "@/components/shadcn/ui/button"
 import {
@@ -66,7 +54,6 @@ import {
 import { Checkbox } from "@/components/shadcn/ui/checkbox"
 import {
   DropdownMenu,
-  DropdownMenuCheckboxItem,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuSeparator,
@@ -117,7 +104,15 @@ export const schema = z.object({
   reviewer: z.string(),
 })
 
-// Create a separate component for the drag handle
+type OutlineItem = z.infer<typeof schema>
+
+function getPinnedStyle(column: { getIsPinned: () => false | "left" | "right" }) {
+  const pinned = column.getIsPinned()
+  if (pinned === "left") return { position: "sticky" as const, left: 0, zIndex: 5 }
+  if (pinned === "right") return { position: "sticky" as const, right: 0, zIndex: 5 }
+  return {}
+}
+
 function DragHandle({ id }: { id: number }) {
   const { attributes, listeners } = useSortable({
     id,
@@ -137,10 +132,13 @@ function DragHandle({ id }: { id: number }) {
   )
 }
 
-const columns: ColumnDef<z.infer<typeof schema>>[] = [
+const columns: ColumnDef<OutlineItem>[] = [
   {
     id: "drag",
     header: () => null,
+    size: 50,
+    enableResizing: false,
+    enablePinning: false,
     cell: ({ row }) => <DragHandle id={row.original.id} />,
   },
   {
@@ -157,6 +155,10 @@ const columns: ColumnDef<z.infer<typeof schema>>[] = [
         />
       </div>
     ),
+    size: 50,
+    enableSorting: false,
+    enableResizing: false,
+    enablePinning: false,
     cell: ({ row }) => (
       <div className="flex items-center justify-center">
         <Checkbox
@@ -166,7 +168,6 @@ const columns: ColumnDef<z.infer<typeof schema>>[] = [
         />
       </div>
     ),
-    enableSorting: false,
     enableHiding: false,
   },
   {
@@ -176,10 +177,12 @@ const columns: ColumnDef<z.infer<typeof schema>>[] = [
       return <TableCellViewer item={row.original} />
     },
     enableHiding: false,
+    size: 240,
   },
   {
     accessorKey: "type",
     header: "Section Type",
+    size: 160,
     cell: ({ row }) => (
       <div className="w-32">
         <Badge variant="outline" className="px-1.5 text-muted-foreground">
@@ -191,6 +194,7 @@ const columns: ColumnDef<z.infer<typeof schema>>[] = [
   {
     accessorKey: "status",
     header: "Status",
+    size: 140,
     cell: ({ row }) => (
       <Badge
         variant="outline"
@@ -208,6 +212,7 @@ const columns: ColumnDef<z.infer<typeof schema>>[] = [
   {
     accessorKey: "target",
     header: () => <div className="w-full text-right">Target</div>,
+    size: 120,
     cell: ({ row }) => (
       <form
         onSubmit={(e) => {
@@ -233,6 +238,7 @@ const columns: ColumnDef<z.infer<typeof schema>>[] = [
   {
     accessorKey: "limit",
     header: () => <div className="w-full text-right">Limit</div>,
+    size: 120,
     cell: ({ row }) => (
       <form
         onSubmit={(e) => {
@@ -290,6 +296,10 @@ const columns: ColumnDef<z.infer<typeof schema>>[] = [
   },
   {
     id: "actions",
+    enablePinning: true,
+    enableHiding: false,
+    size: 70,
+    enableResizing: false,
     cell: () => (
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
@@ -314,7 +324,7 @@ const columns: ColumnDef<z.infer<typeof schema>>[] = [
   },
 ]
 
-function DraggableRow({ row }: { row: Row<z.infer<typeof schema>> }) {
+function DraggableRow({ row }: { row: Row<OutlineItem> }) {
   const { transform, transition, setNodeRef, isDragging } = useSortable({
     id: row.original.id,
   })
@@ -331,7 +341,11 @@ function DraggableRow({ row }: { row: Row<z.infer<typeof schema>> }) {
       }}
     >
       {row.getVisibleCells().map((cell) => (
-        <TableCell key={cell.id}>
+        <TableCell
+          key={cell.id}
+          style={{ width: cell.column.getSize(), ...getPinnedStyle(cell.column) }}
+          className={cell.column.getIsPinned() ? "bg-card" : undefined}
+        >
           {flexRender(cell.column.columnDef.cell, cell.getContext())}
         </TableCell>
       ))}
@@ -339,23 +353,9 @@ function DraggableRow({ row }: { row: Row<z.infer<typeof schema>> }) {
   )
 }
 
-export function DataTable({
-  data: initialData,
-}: {
-  data: z.infer<typeof schema>[]
-}) {
+export function DataTable({ data: initialData }: { data: OutlineItem[] }) {
   const [data, setData] = React.useState(() => initialData)
-  const [rowSelection, setRowSelection] = React.useState({})
-  const [columnVisibility, setColumnVisibility] =
-    React.useState<VisibilityState>({})
-  const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
-    []
-  )
-  const [sorting, setSorting] = React.useState<SortingState>([])
-  const [pagination, setPagination] = React.useState({
-    pageIndex: 0,
-    pageSize: 10,
-  })
+  const [virtualized, setVirtualized] = React.useState(false)
   const sortableId = React.useId()
   const sensors = useSensors(
     useSensor(MouseSensor, {}),
@@ -368,38 +368,31 @@ export function DataTable({
     [data]
   )
 
-  const table = useReactTable({
+  const { table, resetState } = useDataTable<OutlineItem>({
     data,
     columns,
-    state: {
-      sorting,
-      columnVisibility,
-      rowSelection,
-      columnFilters,
-      pagination,
-    },
     getRowId: (row) => row.id.toString(),
-    enableRowSelection: true,
-    onRowSelectionChange: setRowSelection,
-    onSortingChange: setSorting,
-    onColumnFiltersChange: setColumnFilters,
-    onColumnVisibilityChange: setColumnVisibility,
-    onPaginationChange: setPagination,
-    getCoreRowModel: getCoreRowModel(),
-    getFilteredRowModel: getFilteredRowModel(),
-    getPaginationRowModel: getPaginationRowModel(),
-    getSortedRowModel: getSortedRowModel(),
-    getFacetedRowModel: getFacetedRowModel(),
-    getFacetedUniqueValues: getFacetedUniqueValues(),
+    stateKey: "dashboard-outline-table",
+    initialState: {
+      columnPinning: { right: ["actions"] },
+      pagination: defaultTableState.pagination,
+    },
+    meta: {
+      onRowUpdate: (updatedRow: OutlineItem) => {
+        setData((prev) =>
+          prev.map((item) => (item.id === updatedRow.id ? updatedRow : item))
+        )
+      },
+    },
   })
 
   function handleDragEnd(event: DragEndEvent) {
     const { active, over } = event
     if (active && over && active.id !== over.id) {
-      setData((data) => {
+      setData((current) => {
         const oldIndex = dataIds.indexOf(active.id)
         const newIndex = dataIds.indexOf(over.id)
-        return arrayMove(data, oldIndex, newIndex)
+        return arrayMove(current, oldIndex, newIndex)
       })
     }
   }
@@ -450,64 +443,51 @@ export function DataTable({
           <TabsTrigger value="focus-documents">Focus Documents</TabsTrigger>
         </TabsList>
         <div className="flex items-center gap-2">
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="outline" size="sm">
-                <ColumnsIcon />
-                <span className="hidden lg:inline">Customize Columns</span>
-                <span className="lg:hidden">Columns</span>
-                <ChevronDownIcon />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-56">
-              {table
-                .getAllColumns()
-                .filter(
-                  (column) =>
-                    typeof column.accessorFn !== "undefined" &&
-                    column.getCanHide()
-                )
-                .map((column) => {
-                  return (
-                    <DropdownMenuCheckboxItem
-                      key={column.id}
-                      className="capitalize"
-                      checked={column.getIsVisible()}
-                      onCheckedChange={(value) =>
-                        column.toggleVisibility(!!value)
-                      }
-                    >
-                      {column.id}
-                    </DropdownMenuCheckboxItem>
-                  )
-                })}
-            </DropdownMenuContent>
-          </DropdownMenu>
           <Button variant="outline" size="sm">
-            <PlusIcon />
+            <PlusIcon className="mr-2 size-4" />
             <span className="hidden lg:inline">Add Section</span>
+            <span className="lg:hidden">Add</span>
           </Button>
         </div>
       </div>
       <TabsContent
         value="outline"
-        className="relative flex flex-col gap-4 overflow-auto px-4 lg:px-6"
+        className="relative flex flex-col overflow-hidden rounded-lg border bg-card"
       >
-        <div className="overflow-hidden rounded-lg border">
-          <DndContext
-            collisionDetection={closestCenter}
-            modifiers={[restrictToVerticalAxis]}
-            onDragEnd={handleDragEnd}
-            sensors={sensors}
-            id={sortableId}
-          >
-            <Table>
-              <TableHeader className="sticky top-0 z-10 bg-muted">
-                {table.getHeaderGroups().map((headerGroup) => (
-                  <TableRow key={headerGroup.id}>
-                    {headerGroup.headers.map((header) => {
-                      return (
-                        <TableHead key={header.id} colSpan={header.colSpan}>
+        <TableToolbar
+          table={table}
+          searchPlaceholder="Search sections"
+          onReset={resetState}
+          rightSlot={
+            <Button variant="ghost" size="sm" onClick={() => setVirtualized((v) => !v)}>
+              {virtualized ? "Disable virtualization" : "Enable virtualization"}
+            </Button>
+          }
+        />
+        <BulkActionsBar
+          table={table}
+          actions={
+            <Button variant="destructive" size="sm">
+              Delete
+            </Button>
+          }
+        />
+        <TableShell stickyHeader>
+          {virtualized ? (
+            <VirtualTable
+              table={table}
+              scrollHeight="520px"
+              renderHeader={() => (
+                <TableHeader className="bg-muted">
+                  {table.getHeaderGroups().map((headerGroup) => (
+                    <TableRow key={headerGroup.id}>
+                      {headerGroup.headers.map((header) => (
+                        <TableHead
+                          key={header.id}
+                          colSpan={header.colSpan}
+                          style={{ width: header.getSize(), ...getPinnedStyle(header.column) }}
+                          className={header.column.getIsPinned() ? "bg-muted" : undefined}
+                        >
                           {header.isPlaceholder
                             ? null
                             : flexRender(
@@ -515,112 +495,85 @@ export function DataTable({
                                 header.getContext()
                               )}
                         </TableHead>
-                      )
-                    })}
-                  </TableRow>
-                ))}
-              </TableHeader>
-              <TableBody className="**:data-[slot=table-cell]:first:w-8">
-                {table.getRowModel().rows?.length ? (
-                  <SortableContext
-                    items={dataIds}
-                    strategy={verticalListSortingStrategy}
-                  >
-                    {table.getRowModel().rows.map((row) => (
-                      <DraggableRow key={row.id} row={row} />
-                    ))}
-                  </SortableContext>
-                ) : (
-                  <TableRow>
-                    <TableCell
-                      colSpan={columns.length}
-                      className="h-24 text-center"
-                    >
-                      No results.
-                    </TableCell>
-                  </TableRow>
-                )}
-              </TableBody>
-            </Table>
-          </DndContext>
-        </div>
-        <div className="flex items-center justify-between px-4">
-          <div className="hidden flex-1 text-sm text-muted-foreground lg:flex">
-            {table.getFilteredSelectedRowModel().rows.length} of{" "}
-            {table.getFilteredRowModel().rows.length} row(s) selected.
-          </div>
-          <div className="flex w-full items-center gap-8 lg:w-fit">
-            <div className="hidden items-center gap-2 lg:flex">
-              <Label htmlFor="rows-per-page" className="text-sm font-medium">
-                Rows per page
-              </Label>
-              <Select
-                value={`${table.getState().pagination.pageSize}`}
-                onValueChange={(value) => {
-                  table.setPageSize(Number(value))
-                }}
-              >
-                <SelectTrigger className="w-20" id="rows-per-page">
-                  <SelectValue
-                    placeholder={table.getState().pagination.pageSize}
-                  />
-                </SelectTrigger>
-                <SelectContent side="top">
-                  {[10, 20, 30, 40, 50].map((pageSize) => (
-                    <SelectItem key={pageSize} value={`${pageSize}`}>
-                      {pageSize}
-                    </SelectItem>
+                      ))}
+                    </TableRow>
                   ))}
-                </SelectContent>
-              </Select>
-            </div>
-            <div className="flex w-fit items-center justify-center text-sm font-medium">
-              Page {table.getState().pagination.pageIndex + 1} of{" "}
-              {table.getPageCount()}
-            </div>
-            <div className="ml-auto flex items-center gap-2 lg:ml-0">
-              <Button
-                variant="outline"
-                className="hidden h-8 w-8 p-0 lg:flex"
-                onClick={() => table.setPageIndex(0)}
-                disabled={!table.getCanPreviousPage()}
-              >
-                <span className="sr-only">Go to first page</span>
-                <ChevronsLeftIcon />
-              </Button>
-              <Button
-                variant="outline"
-                className="size-8"
-                size="icon"
-                onClick={() => table.previousPage()}
-                disabled={!table.getCanPreviousPage()}
-              >
-                <span className="sr-only">Go to previous page</span>
-                <ChevronLeftIcon />
-              </Button>
-              <Button
-                variant="outline"
-                className="size-8"
-                size="icon"
-                onClick={() => table.nextPage()}
-                disabled={!table.getCanNextPage()}
-              >
-                <span className="sr-only">Go to next page</span>
-                <ChevronRightIcon />
-              </Button>
-              <Button
-                variant="outline"
-                className="hidden size-8 lg:flex"
-                size="icon"
-                onClick={() => table.setPageIndex(table.getPageCount() - 1)}
-                disabled={!table.getCanNextPage()}
-              >
-                <span className="sr-only">Go to last page</span>
-                <ChevronsRightIcon />
-              </Button>
-            </div>
-          </div>
-        </div>
+                </TableHeader>
+              )}
+              emptyState={
+                <EmptyState title="No sections" description="Adjust your filters or add a section." />
+              }
+              renderRow={(row) =>
+                row.getVisibleCells().map((cell) => (
+                  <TableCell
+                    key={cell.id}
+                    style={{ width: cell.column.getSize(), ...getPinnedStyle(cell.column) }}
+                    className={cell.column.getIsPinned() ? "bg-card" : undefined}
+                  >
+                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                  </TableCell>
+                ))
+              }
+            />
+          ) : (
+            <DndContext
+              collisionDetection={closestCenter}
+              modifiers={[restrictToVerticalAxis]}
+              onDragEnd={handleDragEnd}
+              sensors={sensors}
+              id={sortableId}
+            >
+              <Table>
+                <TableHeader className="bg-muted">
+                  {table.getHeaderGroups().map((headerGroup) => (
+                    <TableRow key={headerGroup.id}>
+                      {headerGroup.headers.map((header) => (
+                        <TableHead
+                          key={header.id}
+                          colSpan={header.colSpan}
+                          style={{ width: header.getSize(), ...getPinnedStyle(header.column) }}
+                          className={header.column.getIsPinned() ? "bg-muted" : undefined}
+                        >
+                          {header.isPlaceholder
+                            ? null
+                            : flexRender(
+                                header.column.columnDef.header,
+                                header.getContext()
+                              )}
+                        </TableHead>
+                      ))}
+                    </TableRow>
+                  ))}
+                </TableHeader>
+                <TableBody className="**:data-[slot=table-cell]:first:w-8">
+                  {table.getRowModel().rows?.length ? (
+                    <SortableContext
+                      items={dataIds}
+                      strategy={verticalListSortingStrategy}
+                    >
+                      {table.getRowModel().rows.map((row) => (
+                        <DraggableRow key={row.id} row={row} />
+                      ))}
+                    </SortableContext>
+                  ) : (
+                    <TableRow>
+                      <TableCell
+                        colSpan={columns.length}
+                        className="h-24 text-center"
+                      >
+                        <EmptyState
+                          title="No sections"
+                          description="Adjust your filters or add a section."
+                        />
+                      </TableCell>
+                    </TableRow>
+                  )}
+                </TableBody>
+              </Table>
+            </DndContext>
+          )}
+        </TableShell>
+        <TablePagination table={table} />
       </TabsContent>
       <TabsContent
         value="past-performance"
@@ -661,7 +614,7 @@ const chartConfig = {
   },
 } satisfies ChartConfig
 
-function TableCellViewer({ item }: { item: z.infer<typeof schema> }) {
+function TableCellViewer({ item }: { item: OutlineItem }) {
   const isMobile = useIsMobile()
 
   return (
