@@ -2,11 +2,14 @@
 
 import * as React from "react"
 import {
+  BarChart3Icon,
   BookIcon,
+  BotIcon,
   CameraIcon,
-  ClipboardListIcon,
-  DatabaseIcon,
   BlocksIcon,
+  CalendarDaysIcon,
+  CircleUserRoundIcon,
+  ClipboardClockIcon,
   HardDriveIcon,
   FileCodeIcon,
   FileIcon,
@@ -127,19 +130,29 @@ const data = {
       icon: LayoutDashboardIcon,
     },
     {
-      name: "Data Library",
+      name: "Timesheet",
       url: "#",
-      icon: DatabaseIcon,
+      icon: ClipboardClockIcon,
     },
     {
-      name: "Reports",
+      name: "Calendar",
       url: "#",
-      icon: ClipboardListIcon,
+      icon: CalendarDaysIcon,
     },
     {
-      name: "Word Assistant",
+      name: "Self-Pay Automation",
       url: "#",
-      icon: FileIcon,
+      icon: BotIcon,
+    },
+    {
+      name: "EPIC DAR",
+      url: "#",
+      icon: BarChart3Icon,
+    },
+    {
+      name: "AMION",
+      url: "#",
+      icon: CircleUserRoundIcon,
     },
   ],
   admin: [

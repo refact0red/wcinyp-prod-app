@@ -1,6 +1,7 @@
 "use client";
 
-import { useMemo, useState, type FormEvent } from "react";
+import { useMemo, useState, useEffect, type FormEvent } from "react";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { ExternalLink, HospitalIcon, IdCardIcon, Loader2, PlusIcon, RadiationIcon, Search, StethoscopeIcon, UsersIcon } from "lucide-react";
 
 import { AppSidebar } from "@/components/shadcn/app-sidebar";
@@ -145,6 +146,10 @@ const TableSection = ({ title, columns, rows, emptyMessage }: TableSectionProps)
 );
 
 export default function DirectoryPage() {
+    const router = useRouter();
+    const pathname = usePathname();
+    const searchParams = useSearchParams();
+    const [activeTab, setActiveTab] = useState<string>("people");
     const [npiInput, setNpiInput] = useState("");
     const [result, setResult] = useState<NormalizedNpiRecord | null>(null);
     const [error, setError] = useState<string | null>(null);
@@ -227,6 +232,23 @@ export default function DirectoryPage() {
         [result],
     );
 
+    useEffect(() => {
+        const tabFromUrl = searchParams?.get("tab") ?? undefined;
+        const allowedTabs = ["people", "locations", "radiologists", "providers", "npi"] as const;
+        const nextTab = allowedTabs.includes(tabFromUrl as any) ? (tabFromUrl as string) : "people";
+        setActiveTab(nextTab);
+    }, [searchParams]);
+
+    const handleTabChange = (nextTab: string) => {
+        setActiveTab(nextTab);
+
+        const params = new URLSearchParams(searchParams?.toString() ?? "");
+        params.set("tab", nextTab);
+
+        const next = `${pathname}?${params.toString()}`;
+        router.replace(next);
+    };
+
     return (
         <SidebarProvider>
             <AppSidebar variant="inset" />
@@ -244,7 +266,7 @@ export default function DirectoryPage() {
                     <div className="container @container/main flex flex-1 flex-col gap-2">
                         <div className="flex flex-col gap-4 py-4 md:gap-6 md:py-6">
                             <div className="px-4 lg:px-6">
-                                <Tabs defaultValue="people" className="w-full">
+                                <Tabs value={activeTab} onValueChange={handleTabChange} className="w-full">
                                     <TabsList className="w-fit">
                                         <TabsTrigger value="people" className="gap-2">
                                             <UsersIcon className="size-4" />

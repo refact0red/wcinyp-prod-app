@@ -3,9 +3,27 @@
 import * as React from "react"
 import Link from "next/link"
 import { usePathname, useRouter } from "next/navigation"
-import { MailIcon, SearchIcon, type LucideIcon } from "lucide-react"
+import {
+  FolderIcon,
+  HospitalIcon,
+  IdCardIcon,
+  MailIcon,
+  MoreHorizontalIcon,
+  RadiationIcon,
+  SearchIcon,
+  ShareIcon,
+  StethoscopeIcon,
+  UsersIcon,
+  type LucideIcon,
+} from "lucide-react"
 
 import { Button } from "@/components/shadcn/ui/button"
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/shadcn/ui/dropdown-menu"
 import {
   CommandDialog,
   CommandEmpty,
@@ -18,8 +36,10 @@ import {
   SidebarGroup,
   SidebarGroupContent,
   SidebarMenu,
+  SidebarMenuAction,
   SidebarMenuButton,
   SidebarMenuItem,
+  useSidebar,
 } from "@/components/shadcn/ui/sidebar"
 
 import { ThemeToggle } from "@/components/shadcn/theme-toggle"
@@ -35,6 +55,7 @@ export function NavMain({
 }) {
   const router = useRouter()
   const pathname = usePathname()
+  const { isMobile } = useSidebar()
   const [openCommand, setOpenCommand] = React.useState(false)
 
   React.useEffect(() => {
@@ -86,12 +107,81 @@ export function NavMain({
           <SidebarMenu>
             {items.map((item) => (
               <SidebarMenuItem key={item.title}>
-                <SidebarMenuButton tooltip={item.title} asChild isActive={getIsActive(item.url)}>
+                <SidebarMenuButton
+                  tooltip={item.title}
+                  asChild
+                  isActive={getIsActive(item.url)}
+                >
                   <Link href={item.url}>
                     {item.icon && <item.icon />}
                     <span>{item.title}</span>
                   </Link>
                 </SidebarMenuButton>
+                {item.title === "Directory" ? (
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <SidebarMenuAction
+                        showOnHover
+                        className="rounded-sm data-[state=open]:bg-accent"
+                      >
+                        <MoreHorizontalIcon />
+                        <span className="sr-only">More</span>
+                      </SidebarMenuAction>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent
+                      className="w-40 rounded-lg"
+                      side={isMobile ? "bottom" : "right"}
+                      align={isMobile ? "end" : "start"}
+                    >
+                      <DropdownMenuItem onClick={() => handleNavigate("/directory?tab=people")}>
+                        <UsersIcon className="mr-2 h-4 w-4" />
+                        <span>People</span>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem onClick={() => handleNavigate("/directory?tab=locations")}>
+                        <HospitalIcon className="mr-2 h-4 w-4" />
+                        <span>Locations</span>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem onClick={() => handleNavigate("/directory?tab=radiologists")}>
+                        <RadiationIcon className="mr-2 h-4 w-4" />
+                        <span>Radiologists</span>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem onClick={() => handleNavigate("/directory?tab=providers")}>
+                        <StethoscopeIcon className="mr-2 h-4 w-4" />
+                        <span>Providers</span>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem onClick={() => handleNavigate("/directory?tab=npi")}>
+                        <IdCardIcon className="mr-2 h-4 w-4" />
+                        <span>NPI Lookup</span>
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                ) : (
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <SidebarMenuAction
+                        showOnHover
+                        className="rounded-sm data-[state=open]:bg-accent"
+                      >
+                        <MoreHorizontalIcon />
+                        <span className="sr-only">More</span>
+                      </SidebarMenuAction>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent
+                      className="w-24 rounded-lg"
+                      side={isMobile ? "bottom" : "right"}
+                      align={isMobile ? "end" : "start"}
+                    >
+                      <DropdownMenuItem>
+                        <FolderIcon />
+                        <span>Open</span>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem>
+                        <ShareIcon />
+                        <span>Share</span>
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                )}
               </SidebarMenuItem>
             ))}
           </SidebarMenu>
