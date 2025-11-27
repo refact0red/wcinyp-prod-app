@@ -5,6 +5,8 @@ import { useRouter } from "next/navigation";
 
 import { Button } from "@/components/shadcn/ui/button";
 
+// TODO: Align this 404 page with the main app’s not-found design once Labs has a dedicated home/landing experience.
+
 export default function NotFound() {
     const router = useRouter();
 
@@ -39,4 +41,3 @@ export default function NotFound() {
         </section>
     );
 }
-
