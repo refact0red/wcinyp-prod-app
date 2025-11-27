@@ -4,7 +4,10 @@ import type { Metadata } from "next";
 import React from "react";
 
 export const metadata: Metadata = {
-    title: "WCINYP",
+    title: {
+        default: "WCINYP",
+        template: "WCINYP / %s",
+    },
     description: "WCINYP labs dashboard",
     icons: {
         icon: [

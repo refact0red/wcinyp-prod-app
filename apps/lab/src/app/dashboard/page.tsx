@@ -1,11 +1,16 @@
-import { AppSidebar } from "@/components/shadcn/app-sidebar"
-import { ChartAreaInteractive } from "@/components/shadcn/chart-area-interactive"
-import { DataTable } from "@/components/shadcn/data-table"
-import { SectionCards } from "@/components/shadcn/section-cards"
-import { SiteHeader } from "@/components/shadcn/site-header"
-import { SidebarInset, SidebarProvider } from "@/components/shadcn/ui/sidebar"
+import type { Metadata } from "next";
+import { AppSidebar } from "@/components/shadcn/app-sidebar";
+import { ChartAreaInteractive } from "@/components/shadcn/chart-area-interactive";
+import { DataTable } from "@/components/shadcn/data-table";
+import { SectionCards } from "@/components/shadcn/section-cards";
+import { SiteHeader } from "@/components/shadcn/site-header";
+import { SidebarInset, SidebarProvider } from "@/components/shadcn/ui/sidebar";
 
-import data from "./data.json"
+import data from "./data.json";
+
+export const metadata: Metadata = {
+    title: "Dashboard",
+};
 
 export default function Page() {
   return (

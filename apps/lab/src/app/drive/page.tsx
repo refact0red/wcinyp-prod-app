@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { UploadCloudIcon } from "lucide-react";
 
 import { DriveSidebar } from "./drive-sidebar";
@@ -7,6 +8,10 @@ import { SiteHeader } from "@/components/shadcn/site-header";
 import { Button } from "@/components/shadcn/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/shadcn/ui/tabs";
 import { SidebarInset, SidebarProvider } from "@/components/shadcn/ui/sidebar";
+
+export const metadata: Metadata = {
+    title: "Drive",
+};
 
 export default function DrivePage() {
     return (

@@ -1,6 +1,11 @@
+import type { Metadata } from "next";
 import { AppSidebar } from "@/components/shadcn/app-sidebar";
 import { SiteHeader } from "@/components/shadcn/site-header";
 import { SidebarInset, SidebarProvider } from "@/components/shadcn/ui/sidebar";
+
+export const metadata: Metadata = {
+    title: "Manual",
+};
 
 export default function ManualPage() {
     return (
