@@ -27,6 +27,7 @@ export type WcinypLocationMaps = {
 export type WcinypLocation = {
     id: string;
     slug: string;
+    shortCode: string;
     name: string;
     region: WcinypRegion;
     borough: WcinypBorough;
@@ -43,6 +44,7 @@ export const wcinypLocations: WcinypLocation[] = [
     {
         id: "weill-greenberg-center",
         slug: "weill-greenberg-center",
+        shortCode: "WGC",
         name: "Weill Greenberg Center",
         region: "Upper East Side",
         borough: "Manhattan",
@@ -61,13 +63,14 @@ export const wcinypLocations: WcinypLocation[] = [
             lng: -73.9553663,
         },
         image: {
-            src: "https://wcinyp.org/sites/default/files/styles/16_9_landscape_1280x720_manual_crop/public/wgc_lobby_updated.jpg?itok=z_i4h2sH&c=931d2a7d5b630e497f4212a83260cb7d",
+            src: "/images/locations/weill-greenberg-center.jpg",
             alt: "Weill Cornell Imaging at NewYork-Presbyterian, Weill Greenberg Center",
         },
     },
     {
         id: "david-h-koch-center",
         slug: "david-h-koch-center",
+        shortCode: "DHK",
         name: "David H. Koch Center",
         region: "Upper East Side",
         borough: "Manhattan",
@@ -93,13 +96,14 @@ export const wcinypLocations: WcinypLocation[] = [
             lng: -73.9557336,
         },
         image: {
-            src: "https://wcinyp.org/sites/default/files/styles/16_9_landscape_1280x720_manual_crop/public/dhk.jpg?itok=1S5JQzoG&c=126c6ac360200bb4f98bd114b4b410a2",
+            src: "/images/locations/david-h-koch-center.jpg",
             alt: "David H. Koch Center",
         },
     },
     {
         id: "starr-pavillion",
         slug: "starr-pavillion",
+        shortCode: "STARR",
         name: "Starr Pavillion",
         region: "Upper East Side",
         borough: "Manhattan",
@@ -118,13 +122,14 @@ export const wcinypLocations: WcinypLocation[] = [
             lng: -73.953756,
         },
         image: {
-            src: "https://wcinyp.org/sites/default/files/styles/16_9_landscape_1280x720_manual_crop/public/starr_4.png?itok=Q6CdSRBo&c=126c6ac360200bb4f98bd114b4b410a2",
+            src: "/images/locations/starr-pavillion.png",
             alt: "Starr Pavillion",
         },
     },
     {
         id: "iris-cantor-womens-health-center",
         slug: "iris-cantor-womens-health-center",
+        shortCode: "ICWHC",
         name: "Iris Cantor Women’s Health Center",
         region: "Midtown",
         borough: "Manhattan",
@@ -148,13 +153,14 @@ export const wcinypLocations: WcinypLocation[] = [
             lng: -73.9591669,
         },
         image: {
-            src: "https://wcinyp.org/sites/default/files/styles/16_9_landscape_1280x720_manual_crop/public/61st_edited.jpg?itok=VE__alMP&c=126c6ac360200bb4f98bd114b4b410a2",
+            src: "/images/locations/iris-cantor-womens-health-center.jpg",
             alt: "Iris Cantor Women’s Health Center",
         },
     },
     {
         id: "midtown-east",
         slug: "midtown-east",
+        shortCode: "ME",
         name: "Midtown East",
         region: "Midtown",
         borough: "Manhattan",
@@ -172,13 +178,14 @@ export const wcinypLocations: WcinypLocation[] = [
             lng: -73.9629144,
         },
         image: {
-            src: "https://wcinyp.org/sites/default/files/styles/16_9_landscape_1280x720_manual_crop/public/55th207.jpg?itok=BlZpL0Pa&c=126c6ac360200bb4f98bd114b4b410a2",
+            src: "/images/locations/midtown-east.jpg",
             alt: "Weill Cornell Imaging at NewYork-Presbyterian Midtown East lobby",
         },
     },
     {
         id: "hudson-yards",
         slug: "hudson-yards",
+        shortCode: "HY",
         name: "Hudson Yards",
         region: "Midtown",
         borough: "Manhattan",
@@ -196,13 +203,14 @@ export const wcinypLocations: WcinypLocation[] = [
             lng: -73.9991184,
         },
         image: {
-            src: "https://wcinyp.org/sites/default/files/styles/16_9_landscape_1280x720_manual_crop/public/lobby_1.jpg?itok=tuHVb-6c&c=0c773d641fbac1270a246298311f3e6f",
+            src: "/images/locations/hudson-yards.jpg",
             alt: "Patient lobby of 504 West 35th Street location",
         },
     },
     {
         id: "upper-west-side",
         slug: "upper-west-side",
+        shortCode: "UWS",
         name: "Upper West Side",
         region: "Upper West Side",
         borough: "Manhattan",
@@ -220,13 +228,14 @@ export const wcinypLocations: WcinypLocation[] = [
             lng: -73.9781361,
         },
         image: {
-            src: "https://wcinyp.org/sites/default/files/styles/16_9_landscape_1280x720_manual_crop/public/2315broadway_edited.jpg?itok=ZMHteU8G&c=a6c31a145b3e210acd971af2ed0c2b94",
+            src: "/images/locations/upper-west-side.jpg",
             alt: "2315 Broadway, 4th Floor",
         },
     },
     {
         id: "lower-manhattan",
         slug: "lower-manhattan",
+        shortCode: "LM",
         name: "Lower Manhattan",
         region: "Lower Manhattan",
         borough: "Manhattan",
@@ -252,13 +261,14 @@ export const wcinypLocations: WcinypLocation[] = [
             lng: -74.0051753,
         },
         image: {
-            src: "https://wcinyp.org/sites/default/files/styles/16_9_landscape_1280x720_manual_crop/public/beekman_1.jpg?itok=09xOIYBS&c=880b9e5d3a906a54e97a759ff7825aa5",
+            src: "/images/locations/lower-manhattan.jpg",
             alt: "53 Beekman St, Ground Floor",
         },
     },
     {
         id: "long-island-city",
         slug: "long-island-city",
+        shortCode: "LIC",
         name: "Long Island City",
         region: "Long Island City",
         borough: "Queens",
@@ -283,9 +293,8 @@ export const wcinypLocations: WcinypLocation[] = [
             lng: -73.9382352,
         },
         image: {
-            src: "https://wcinyp.org/sites/default/files/styles/16_9_landscape_1280x720_manual_crop/public/lic_temp.jpg?itok=t9yU_mhs&c=3761c7fb1428b06b6e59ec4a4249fc13",
+            src: "/images/locations/long-island-city.jpg",
             alt: "Long island city",
         },
     },
 ];
-

@@ -1,12 +1,13 @@
 "use client";
 
 import * as React from "react";
-import { BlocksIcon, Edit2Icon } from "lucide-react";
+import { BlocksIcon, Edit2Icon, ImageUpIcon, LinkIcon } from "lucide-react";
 
 import { AppSidebar } from "@/components/shadcn/app-sidebar";
 import { SiteHeader } from "@/components/shadcn/site-header";
+import { Badge } from "@/components/shadcn/ui/badge";
 import { Button } from "@/components/shadcn/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/shadcn/ui/card";
+import { Card, CardContent } from "@/components/shadcn/ui/card";
 import { Input } from "@/components/shadcn/ui/input";
 import { Label } from "@/components/shadcn/ui/label";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/shadcn/ui/sheet";
@@ -16,6 +17,8 @@ import { wcinypLocations, type WcinypLocation, type WcinypBorough, type WcinypRe
 
 type LocationFormState = {
     id: string;
+    slug: string;
+    shortCode: string;
     name: string;
     region: string;
     borough: string;
@@ -35,6 +38,8 @@ type LocationFormState = {
 
 const toFormState = (location: WcinypLocation): LocationFormState => ({
     id: location.id,
+    slug: location.slug,
+    shortCode: location.shortCode,
     name: location.name,
     region: location.region,
     borough: location.borough,
@@ -64,8 +69,16 @@ const updateLocationFromForm = (original: WcinypLocation, form: LocationFormStat
         return Number.isFinite(parsed) ? parsed : fallback;
     };
 
+    const normalizeShortCode = (value: string, fallback: string) => {
+        const cleaned = value.trim().toUpperCase();
+        const safe = cleaned.replace(/[^A-Z0-9_-]/g, "");
+        return safe || fallback;
+    };
+
     return {
         ...original,
+        slug: original.slug,
+        shortCode: normalizeShortCode(form.shortCode, original.shortCode),
         name: form.name.trim() || original.name,
         region: (form.region.trim() || original.region) as WcinypRegion,
         borough: (form.borough.trim() || original.borough) as WcinypBorough,
@@ -91,10 +104,78 @@ const updateLocationFromForm = (original: WcinypLocation, form: LocationFormStat
     };
 };
 
+const useImageDimensions = (src: string | null) => {
+    const [state, setState] = React.useState<{
+        status: "idle" | "loading" | "ready" | "error";
+        width?: number;
+        height?: number;
+    }>({ status: "idle" });
+
+    React.useEffect(() => {
+        if (!src) {
+            setState({ status: "idle" });
+            return;
+        }
+
+        let cancelled = false;
+        const img = new Image();
+
+        img.onload = () => {
+            if (cancelled) return;
+            setState({ status: "ready", width: img.naturalWidth, height: img.naturalHeight });
+        };
+
+        img.onerror = () => {
+            if (cancelled) return;
+            setState({ status: "error" });
+        };
+
+        setState({ status: "loading" });
+        img.src = src;
+
+        return () => {
+            cancelled = true;
+        };
+    }, [src]);
+
+    return state;
+};
+
+const formatDimensions = (width?: number, height?: number) => {
+    if (!width || !height) return null;
+    return `${width}×${height}`;
+};
+
+const LocationImageCell = ({ src, alt }: { src: string; alt: string }) => {
+    const meta = useImageDimensions(src);
+
+    return (
+        <div className="space-y-1 text-xs">
+            <a
+                href={src}
+                target="_blank"
+                rel="noreferrer"
+                className="inline-flex items-center gap-1 text-blue-600 underline-offset-2 hover:underline"
+            >
+                <LinkIcon className="size-3.5" />
+                <span className="line-clamp-2">Lobby image</span>
+            </a>
+            <div className="text-muted-foreground">
+                {meta.status === "ready" && formatDimensions(meta.width, meta.height)}
+                {meta.status === "loading" && "Loading dimensions…"}
+                {meta.status === "error" && "Could not load image"}
+            </div>
+            <div className="text-muted-foreground line-clamp-2">{alt}</div>
+        </div>
+    );
+};
+
 export default function LocationsAdminPage() {
     const [locations, setLocations] = React.useState<WcinypLocation[]>(wcinypLocations);
     const [editingId, setEditingId] = React.useState<string | null>(null);
     const [formState, setFormState] = React.useState<LocationFormState | null>(null);
+    const [uploadedPreviewUrl, setUploadedPreviewUrl] = React.useState<string | null>(null);
+    const previewMeta = useImageDimensions(formState?.imageSrc ?? null);
 
     const editingLocation = React.useMemo(
         () => (editingId ? locations.find((location) => location.id === editingId) ?? null : null),
@@ -108,6 +189,22 @@ export default function LocationsAdminPage() {
         }
         setFormState(toFormState(editingLocation));
     }, [editingLocation]);
+
+    React.useEffect(
+        () => () => {
+            if (uploadedPreviewUrl) {
+                URL.revokeObjectURL(uploadedPreviewUrl);
+            }
+        },
+        [uploadedPreviewUrl],
+    );
+
+    React.useEffect(() => {
+        if (!editingLocation && uploadedPreviewUrl) {
+            URL.revokeObjectURL(uploadedPreviewUrl);
+            setUploadedPreviewUrl(null);
+        }
+    }, [editingLocation, uploadedPreviewUrl]);
 
     const normalize = (value?: string | null) => value?.trim() ?? "";
 
@@ -124,7 +221,29 @@ export default function LocationsAdminPage() {
             setFormState({ ...formState, [field]: event.target.value });
         };
 
+    const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+        if (!formState) return;
+        const file = event.target.files?.[0];
+        if (!file) return;
+
+        if (uploadedPreviewUrl) {
+            URL.revokeObjectURL(uploadedPreviewUrl);
+        }
+
+        const objectUrl = URL.createObjectURL(file);
+        setUploadedPreviewUrl(objectUrl);
+        setFormState({
+            ...formState,
+            imageSrc: objectUrl,
+            imageAlt: formState.imageAlt || file.name,
+        });
+    };
+
     const handleEdit = (location: WcinypLocation) => {
+        if (uploadedPreviewUrl) {
+            URL.revokeObjectURL(uploadedPreviewUrl);
+            setUploadedPreviewUrl(null);
+        }
         setEditingId(location.id);
     };
 
@@ -177,13 +296,17 @@ export default function LocationsAdminPage() {
                                                     <TableHead className="w-[160px]">Region / Borough</TableHead>
                                                     <TableHead>Address</TableHead>
                                                     <TableHead className="w-[220px]">Modalities</TableHead>
+                                                    <TableHead className="w-[220px]">Image</TableHead>
                                                     <TableHead className="w-[80px]" />
                                                 </TableRow>
                                             </TableHeader>
                                             <TableBody>
                                                 {locations.map((location) => (
                                                     <TableRow key={location.id}>
-                                                        <TableCell className="font-medium">{location.name}</TableCell>
+                                                        <TableCell className="font-medium">
+                                                            <div>{location.name}</div>
+                                                            <div className="text-xs text-muted-foreground">{location.shortCode}</div>
+                                                        </TableCell>
                                                         <TableCell className="text-sm leading-tight">
                                                             <div>{location.region}</div>
                                                             <div className="text-xs text-muted-foreground">{location.borough}</div>
@@ -201,6 +324,9 @@ export default function LocationsAdminPage() {
                                                         </TableCell>
                                                         <TableCell className="text-xs leading-snug">
                                                             {location.modalities.join(", ")}
+                                                        </TableCell>
+                                                        <TableCell className="text-xs leading-snug">
+                                                            <LocationImageCell src={location.image.src} alt={location.image.alt} />
                                                         </TableCell>
                                                         <TableCell className="text-right">
                                                             <Button
@@ -232,15 +358,37 @@ export default function LocationsAdminPage() {
                         {formState && (
                             <div className="flex-1 overflow-y-auto px-4 pr-5">
                                 <form id="location-form" className="mt-4 space-y-4 pb-4" onSubmit={handleSave}>
-                                    <div className="space-y-1.5">
-                                        <Label htmlFor="loc-name">Name</Label>
-                                        <Input
-                                            id="loc-name"
-                                            value={formState.name}
-                                            onChange={handleFieldChange("name")}
-                                            placeholder="Location name"
-                                            required
-                                        />
+                                    <div className="grid gap-3 sm:grid-cols-2">
+                                        <div className="space-y-1.5">
+                                            <Label htmlFor="loc-name">Name</Label>
+                                            <Input
+                                                id="loc-name"
+                                                value={formState.name}
+                                                onChange={handleFieldChange("name")}
+                                                placeholder="Location name"
+                                                required
+                                            />
+                                        </div>
+                                        <div className="space-y-1.5">
+                                            <Label htmlFor="loc-shortcode">Short code</Label>
+                                            <Input
+                                                id="loc-shortcode"
+                                                value={formState.shortCode}
+                                                onChange={handleFieldChange("shortCode")}
+                                                placeholder="e.g., DHK"
+                                            />
+                                        </div>
+                                    </div>
+
+                                    <div className="grid gap-3 sm:grid-cols-2">
+                                        <div className="space-y-1.5">
+                                            <Label htmlFor="loc-id">ID</Label>
+                                            <Input id="loc-id" value={formState.id} readOnly />
+                                        </div>
+                                        <div className="space-y-1.5">
+                                            <Label htmlFor="loc-slug">Slug</Label>
+                                            <Input id="loc-slug" value={formState.slug} readOnly />
+                                        </div>
                                     </div>
 
                                     <div className="grid gap-3 sm:grid-cols-2">
@@ -352,21 +500,69 @@ export default function LocationsAdminPage() {
                                         </div>
                                     </div>
 
-                                    <div className="space-y-1.5">
-                                        <Label htmlFor="loc-image-src">Image URL</Label>
-                                        <Input
-                                            id="loc-image-src"
-                                            value={formState.imageSrc}
-                                            onChange={handleFieldChange("imageSrc")}
-                                        />
-                                    </div>
-                                    <div className="space-y-1.5">
-                                        <Label htmlFor="loc-image-alt">Image alt text</Label>
-                                        <Input
-                                            id="loc-image-alt"
-                                            value={formState.imageAlt}
-                                            onChange={handleFieldChange("imageAlt")}
-                                        />
+                                    <div className="space-y-3 rounded-lg border p-3">
+                                        <div className="flex items-start justify-between gap-2">
+                                            <div className="space-y-0.5">
+                                                <div className="text-sm font-medium leading-none">Lobby image</div>
+                                                <div className="text-xs text-muted-foreground">
+                                                    Preview with current URL. Dimensions are also surfaced in the table.
+                                                </div>
+                                            </div>
+                                            {previewMeta.status === "ready" && formatDimensions(previewMeta.width, previewMeta.height) && (
+                                                <Badge variant="secondary">
+                                                    {formatDimensions(previewMeta.width, previewMeta.height)}
+                                                </Badge>
+                                            )}
+                                            {previewMeta.status === "loading" && <Badge variant="outline">Loading…</Badge>}
+                                            {previewMeta.status === "error" && <Badge variant="destructive">Image error</Badge>}
+                                        </div>
+
+                                        <div className="aspect-video overflow-hidden rounded-md border bg-muted/50">
+                                            {formState.imageSrc ? (
+                                                <img
+                                                    src={formState.imageSrc}
+                                                    alt={formState.imageAlt || "Location lobby image"}
+                                                    className="h-full w-full object-cover"
+                                                />
+                                            ) : (
+                                                <div className="flex h-full items-center justify-center text-xs text-muted-foreground">
+                                                    No image provided
+                                                </div>
+                                            )}
+                                        </div>
+
+                                        <div className="space-y-1.5">
+                                            <Label htmlFor="loc-image-src">Image URL</Label>
+                                            <Input
+                                                id="loc-image-src"
+                                                value={formState.imageSrc}
+                                                onChange={handleFieldChange("imageSrc")}
+                                            />
+                                        </div>
+                                        <div className="space-y-1.5">
+                                            <Label htmlFor="loc-image-alt">Image alt text</Label>
+                                            <Input
+                                                id="loc-image-alt"
+                                                value={formState.imageAlt}
+                                                onChange={handleFieldChange("imageAlt")}
+                                            />
+                                        </div>
+                                        <div className="space-y-1.5">
+                                            <Label htmlFor="loc-image-upload" className="flex items-center gap-1.5">
+                                                <ImageUpIcon className="size-4 text-muted-foreground" />
+                                                Upload replacement
+                                            </Label>
+                                            <Input
+                                                id="loc-image-upload"
+                                                type="file"
+                                                accept="image/*"
+                                                onChange={handleImageUpload}
+                                            />
+                                            <p className="text-xs text-muted-foreground">
+                                                Uploading sets a temporary preview and replaces the URL value. Refreshing clears
+                                                uploaded previews.
+                                            </p>
+                                        </div>
                                     </div>
 
                                 </form>
