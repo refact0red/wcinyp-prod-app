@@ -6,6 +6,7 @@ import { ExternalLink, HospitalIcon, IdCardIcon, Loader2, PlusIcon, RadiationIco
 import { AppSidebar } from "@/components/shadcn/app-sidebar";
 import { Alert, AlertDescription, AlertTitle } from "@/components/shadcn/alert";
 import { DirectoryLocationsList } from "@/components/shadcn/directory-locations-list";
+import { DirectoryLocationsMap } from "@/components/shadcn/directory-locations-map";
 import { DirectoryTable } from "@/components/shadcn/directory-table";
 import { SiteHeader } from "@/components/shadcn/site-header";
 import { Button } from "@/components/shadcn/ui/button";
@@ -16,7 +17,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/shadcn/ui/tabs";
 import { SidebarInset, SidebarProvider } from "@/components/shadcn/ui/sidebar";
 import type { NormalizedAddress, NormalizedNpiRecord, NpiLookupError, NpiLookupResponse } from "@/app/npi-lookup/types";
-import { wcinypLocations } from "@/lib/wcinyp/locations";
+import { wcinypLocations, type WcinypLocation } from "@/lib/wcinyp/locations";
 
 const formatAddress = (address?: NormalizedAddress) => address?.lines?.filter(Boolean).join("\n") || "—";
 
@@ -150,6 +151,12 @@ export default function DirectoryPage() {
     const [isLoading, setIsLoading] = useState(false);
     const [selectedLocationId, setSelectedLocationId] = useState<string | null>(null);
 
+    const handleOpenLocationInMaps = (location: WcinypLocation) => {
+        if (typeof window === "undefined") return;
+        if (!location.maps.placeUrl) return;
+        window.open(location.maps.placeUrl, "_blank", "noopener,noreferrer");
+    };
+
     const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
         event.preventDefault();
         setError(null);
@@ -264,11 +271,19 @@ export default function DirectoryPage() {
                                         <DirectoryTable />
                                     </TabsContent>
                                     <TabsContent value="locations" className="mt-4">
-                                        <DirectoryLocationsList
-                                            locations={wcinypLocations}
-                                            selectedLocationId={selectedLocationId}
-                                            onSelectLocation={setSelectedLocationId}
-                                        />
+                                        <div className="space-y-4">
+                                            <DirectoryLocationsList
+                                                locations={wcinypLocations}
+                                                selectedLocationId={selectedLocationId}
+                                                onSelectLocation={setSelectedLocationId}
+                                                onOpenInMaps={handleOpenLocationInMaps}
+                                            />
+                                            <DirectoryLocationsMap
+                                                locations={wcinypLocations}
+                                                selectedLocationId={selectedLocationId}
+                                                onSelectLocation={setSelectedLocationId}
+                                            />
+                                        </div>
                                     </TabsContent>
                                     <TabsContent value="radiologists" className="mt-4">
                                         <div className="text-sm text-muted-foreground">No radiologists yet.</div>

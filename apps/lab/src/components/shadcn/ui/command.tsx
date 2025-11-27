@@ -5,7 +5,7 @@ import { Command as CommandPrimitive } from "cmdk"
 import { Search } from "lucide-react"
 
 import { cn } from "@/lib/utils"
-import { Dialog, DialogContent } from "@/components/shadcn/ui/dialog"
+import { Dialog, DialogContent, DialogTitle } from "@/components/shadcn/ui/dialog"
 
 const Command = React.forwardRef<
   React.ElementRef<typeof CommandPrimitive>,
@@ -39,6 +39,7 @@ const CommandDialog = ({
       modal={modal}
     >
       <DialogContent className="overflow-hidden p-0 shadow-lg">
+        <DialogTitle className="sr-only">Command menu</DialogTitle>
         <Command
           className="[&_[cmdk-group-heading]]:text-muted-foreground [&_[cmdk-group-heading]]:px-2 [&_[cmdk-group-heading]]:text-xs [&_[cmdk-group-heading]]:font-medium [&_[cmdk-group-heading]]:mb-1 [&_[cmdk-group]]:px-2 [&_[cmdk-input-wrapper]]:px-3 [&_[cmdk-list]]:max-h-[400px] [&_[cmdk-item]]:px-2 [&_[cmdk-item]]:py-2"
           {...commandProps}

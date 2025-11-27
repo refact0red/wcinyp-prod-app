@@ -59,7 +59,7 @@ const TreeNode = ({ item, depth = 0 }: TreeProps) => {
     return (
         <Container className="flex flex-col gap-1">
             <ButtonComp
-                asChild={!hasChildren}
+                asChild
                 isActive={item.isActive}
                 onClick={hasChildren ? handleToggle : undefined}
                 className={cn(
