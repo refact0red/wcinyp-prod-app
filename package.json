@@ -11,6 +11,8 @@
     "start:main": "pnpm --filter main start",
     "storybook:main": "pnpm --filter main storybook",
     "build-storybook:main": "pnpm --filter main build-storybook",
+    "storybook:lab": "pnpm --filter lab storybook",
+    "build-storybook:lab": "pnpm --filter lab build-storybook",
     "dev:lab": "pnpm --filter lab dev",
     "build:lab": "pnpm --filter lab build",
     "start:lab": "pnpm --filter lab start",
