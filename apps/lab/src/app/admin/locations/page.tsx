@@ -13,6 +13,7 @@ import { Label } from "@/components/shadcn/ui/label";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/shadcn/ui/sheet";
 import { SidebarInset, SidebarProvider } from "@/components/shadcn/ui/sidebar";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/shadcn/ui/table";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/shadcn/ui/select";
 import { wcinypLocations, type WcinypLocation, type WcinypBorough, type WcinypRegion } from "@/lib/wcinyp/locations";
 
 type LocationFormState = {
@@ -56,6 +57,14 @@ const toFormState = (location: WcinypLocation): LocationFormState => ({
     imageSrc: location.image.src,
     imageAlt: location.image.alt,
 });
+
+const regionOptions: WcinypRegion[] = Array.from(
+    new Set(wcinypLocations.map((location) => location.region)),
+) as WcinypRegion[];
+
+const boroughOptions: WcinypBorough[] = Array.from(
+    new Set(wcinypLocations.map((location) => location.borough)),
+) as WcinypBorough[];
 
 const updateLocationFromForm = (original: WcinypLocation, form: LocationFormState): WcinypLocation => {
     const normalizeList = (value: string) =>
@@ -264,6 +273,51 @@ export default function LocationsAdminPage() {
         event.preventDefault();
         if (!editingLocation || !formState) return;
 
+        const errors: string[] = [];
+        const requireField = (value: string, label: string) => {
+            if (!value.trim()) {
+                errors.push(`${label} is required.`);
+            }
+        };
+
+        requireField(formState.name, "Name");
+        requireField(formState.line1, "Address line 1");
+        requireField(formState.city, "City");
+        requireField(formState.state, "State");
+
+        const latTrimmed = formState.lat.trim();
+        const lngTrimmed = formState.lng.trim();
+
+        if (latTrimmed) {
+            const lat = Number.parseFloat(latTrimmed);
+            if (!Number.isFinite(lat) || lat < 40 || lat > 41) {
+                errors.push("Latitude should be a valid number roughly within the NYC area.");
+            }
+        }
+
+        if (lngTrimmed) {
+            const lng = Number.parseFloat(lngTrimmed);
+            if (!Number.isFinite(lng) || lng > -72 || lng < -75) {
+                errors.push("Longitude should be a valid number roughly within the NYC area.");
+            }
+        }
+
+        const placeUrlTrimmed = formState.placeUrl.trim();
+        if (placeUrlTrimmed && !placeUrlTrimmed.startsWith("https://www.google.com/maps/")) {
+            errors.push("Google Maps URL should start with https://www.google.com/maps/.");
+        }
+
+        if (errors.length) {
+            const message = errors.join("\n");
+            if (typeof window === "undefined") {
+                // eslint-disable-next-line no-console
+                console.error("Location form validation failed:\n", message);
+            } else {
+                window.alert(`Please fix the following before saving:\n\n${message}`);
+            }
+            return;
+        }
+
         const updated = updateLocationFromForm(editingLocation, formState);
 
         setLocations((prev) => prev.map((loc) => (loc.id === updated.id ? updated : loc)));
@@ -394,19 +448,47 @@ export default function LocationsAdminPage() {
                                     <div className="grid gap-3 sm:grid-cols-2">
                                         <div className="space-y-1.5">
                                             <Label htmlFor="loc-region">Region</Label>
-                                            <Input
-                                                id="loc-region"
+                                            <Select
                                                 value={formState.region}
-                                                onChange={handleFieldChange("region")}
-                                            />
+                                                onValueChange={(value) =>
+                                                    setFormState((current) =>
+                                                        current ? { ...current, region: value } : current,
+                                                    )
+                                                }
+                                            >
+                                                <SelectTrigger id="loc-region" className="w-full">
+                                                    <SelectValue placeholder="Select region" />
+                                                </SelectTrigger>
+                                                <SelectContent>
+                                                    {regionOptions.map((region) => (
+                                                        <SelectItem key={region} value={region}>
+                                                            {region}
+                                                        </SelectItem>
+                                                    ))}
+                                                </SelectContent>
+                                            </Select>
                                         </div>
                                         <div className="space-y-1.5">
                                             <Label htmlFor="loc-borough">Borough</Label>
-                                            <Input
-                                                id="loc-borough"
+                                            <Select
                                                 value={formState.borough}
-                                                onChange={handleFieldChange("borough")}
-                                            />
+                                                onValueChange={(value) =>
+                                                    setFormState((current) =>
+                                                        current ? { ...current, borough: value } : current,
+                                                    )
+                                                }
+                                            >
+                                                <SelectTrigger id="loc-borough" className="w-full">
+                                                    <SelectValue placeholder="Select borough" />
+                                                </SelectTrigger>
+                                                <SelectContent>
+                                                    {boroughOptions.map((borough) => (
+                                                        <SelectItem key={borough} value={borough}>
+                                                            {borough}
+                                                        </SelectItem>
+                                                    ))}
+                                                </SelectContent>
+                                            </Select>
                                         </div>
                                     </div>
 
