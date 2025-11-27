@@ -62,6 +62,16 @@ const columns: ColumnDef<DirectoryPerson>[] = [
     ),
   },
   {
+    accessorKey: "team",
+    header: "Team",
+    size: 180,
+    cell: ({ row }) => (
+      <Badge variant="outline" className="w-fit capitalize">
+        {row.original.team}
+      </Badge>
+    ),
+  },
+  {
     accessorKey: "name",
     header: "Name",
     enableHiding: false,
@@ -88,16 +98,6 @@ const columns: ColumnDef<DirectoryPerson>[] = [
         </div>
       )
     },
-  },
-  {
-    accessorKey: "team",
-    header: "Team",
-    size: 180,
-    cell: ({ row }) => (
-      <Badge variant="outline" className="w-fit capitalize">
-        {row.original.team}
-      </Badge>
-    ),
   },
   {
     accessorKey: "location",

@@ -24,8 +24,10 @@ import {
 } from "@/components/shadcn/ui/sidebar"
 
 export function NavDocuments({
+  label = "Documents",
   items,
 }: {
+  label?: string
   items: {
     name: string
     url: string
@@ -36,12 +38,12 @@ export function NavDocuments({
 
   return (
     <SidebarGroup className="group-data-[collapsible=icon]:hidden">
-      <SidebarGroupLabel>Documents</SidebarGroupLabel>
-      <SidebarMenu>
-        {items.map((item) => (
-          <SidebarMenuItem key={item.name}>
-            <SidebarMenuButton asChild>
-              <a href={item.url}>
+      <SidebarGroupLabel>{label}</SidebarGroupLabel>
+        <SidebarMenu>
+          {items.map((item) => (
+            <SidebarMenuItem key={item.name}>
+              <SidebarMenuButton asChild>
+                <a href={item.url}>
                 <item.icon />
                 <span>{item.name}</span>
               </a>
@@ -70,15 +72,9 @@ export function NavDocuments({
                   <span>Share</span>
                 </DropdownMenuItem>
               </DropdownMenuContent>
-            </DropdownMenu>
-          </SidebarMenuItem>
-        ))}
-        <SidebarMenuItem>
-          <SidebarMenuButton className="text-sidebar-foreground/70">
-            <MoreHorizontalIcon className="text-sidebar-foreground/70" />
-            <span>More</span>
-          </SidebarMenuButton>
-        </SidebarMenuItem>
+                </DropdownMenu>
+              </SidebarMenuItem>
+            ))}
       </SidebarMenu>
     </SidebarGroup>
   )

@@ -1,4 +1,4 @@
-import { HospitalIcon, PlusIcon, RadiationIcon, UsersIcon } from "lucide-react";
+import { HospitalIcon, IdCardIcon, PlusIcon, RadiationIcon, StethoscopeIcon, UsersIcon } from "lucide-react";
 
 import { AppSidebar } from "@/components/shadcn/app-sidebar";
 import { DirectoryTable } from "@/components/shadcn/directory-table";
@@ -39,6 +39,14 @@ export default function DirectoryPage() {
                                             <RadiationIcon className="size-4" />
                                             Radiologists
                                         </TabsTrigger>
+                                        <TabsTrigger value="providers" className="gap-2">
+                                            <StethoscopeIcon className="size-4" />
+                                            Providers
+                                        </TabsTrigger>
+                                        <TabsTrigger value="npi" className="gap-2">
+                                            <IdCardIcon className="size-4" />
+                                            NPI Lookup
+                                        </TabsTrigger>
                                     </TabsList>
                                     <TabsContent value="people" className="mt-4">
                                         <DirectoryTable />
@@ -48,6 +56,12 @@ export default function DirectoryPage() {
                                     </TabsContent>
                                     <TabsContent value="radiologists" className="mt-4">
                                         <div className="text-sm text-muted-foreground">No radiologists yet.</div>
+                                    </TabsContent>
+                                    <TabsContent value="providers" className="mt-4">
+                                        <div className="text-sm text-muted-foreground">No providers yet.</div>
+                                    </TabsContent>
+                                    <TabsContent value="npi" className="mt-4">
+                                        <div className="text-sm text-muted-foreground">No NPI lookups yet.</div>
                                     </TabsContent>
                                 </Tabs>
                             </div>

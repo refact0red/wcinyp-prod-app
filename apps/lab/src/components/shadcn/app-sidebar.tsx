@@ -2,7 +2,6 @@
 
 import * as React from "react"
 import {
-  ArrowUpCircleIcon,
   BookIcon,
   CameraIcon,
   ClipboardListIcon,
@@ -35,16 +34,11 @@ const data = {
   user: {
     name: "Neo",
     email: "taa001@med.cornell.edu",
-    avatar: "/avatars/neo.jpg",
+    avatar: "/avatars/neo-matrix.png",
     initials: "TA",
   },
   navMain: [
     {
-      title: "Dashboard",
-      url: "/dashboard",
-      icon: LayoutDashboardIcon,
-    },
-  {
       title: "Drive",
       url: "/drive",
       icon: HardDriveIcon,
@@ -127,6 +121,11 @@ const data = {
   ],
   documents: [
     {
+      name: "Dashboard",
+      url: "/dashboard",
+      icon: LayoutDashboardIcon,
+    },
+    {
       name: "Data Library",
       url: "#",
       icon: DatabaseIcon,
@@ -142,6 +141,47 @@ const data = {
       icon: FileIcon,
     },
   ],
+  admin: [
+    {
+      name: "Users",
+      url: "/admin/users",
+      icon: UsersIcon,
+    },
+  ],
+}
+
+function WciLogoIcon(props: React.SVGProps<SVGSVGElement>) {
+  return (
+    <svg
+      viewBox="0 0 96 96"
+      role="img"
+      aria-hidden="true"
+      {...props}
+    >
+      <circle
+        cx="48"
+        cy="48"
+        r="44"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="8"
+      />
+      <path
+        d="M32 30h32v22c0 10.5-7 20-16 23.5C39 72 32 62.5 32 52Z"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="8"
+        strokeLinejoin="round"
+      />
+      <path
+        d="M36 38h24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="8"
+        strokeLinecap="round"
+      />
+    </svg>
+  )
 }
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
@@ -155,7 +195,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
               className="data-[slot=sidebar-menu-button]:!p-1.5"
             >
               <a href="#">
-                <ArrowUpCircleIcon className="h-5 w-5" />
+                <WciLogoIcon className="h-5 w-5" />
                 <span className="text-base font-semibold">Weill Cornell Imaging</span>
               </a>
             </SidebarMenuButton>
@@ -164,7 +204,8 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       </SidebarHeader>
       <SidebarContent>
         <NavMain items={data.navMain} />
-        <NavDocuments items={data.documents} />
+        <NavDocuments label="Experimental" items={data.documents} />
+        <NavDocuments label="Admin" items={data.admin} />
         <NavSecondary items={data.navSecondary} className="mt-auto" />
       </SidebarContent>
       <SidebarFooter>
