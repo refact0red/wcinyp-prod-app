@@ -275,8 +275,7 @@ export default function DirectoryPage() {
                                                 <CardHeader className="pb-4">
                                                     <CardTitle>NPI Lookup</CardTitle>
                                                     <CardDescription>
-                                                        Search the CMS NPPES Registry by NPI. We only send your query to the registry—no caching or local storage. Blank
-                                                        cells reflect missing CMS data.
+                                                        Search the CMS NPPES Registry by NPI. Blank cells reflect missing CMS data.
                                                     </CardDescription>
                                                 </CardHeader>
                                                 <CardContent>
