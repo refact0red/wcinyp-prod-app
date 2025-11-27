@@ -14,8 +14,8 @@
 /coverage
 
 # next.js
-/.next/
-/out/
+/apps/*/.next/
+/apps/*/out/
 
 # production
 /build
@@ -38,3 +38,6 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+*storybook.log
+storybook-static
