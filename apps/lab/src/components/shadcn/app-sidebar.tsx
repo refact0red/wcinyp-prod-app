@@ -7,13 +7,13 @@ import {
   CameraIcon,
   ClipboardListIcon,
   DatabaseIcon,
+  HardDriveIcon,
   FileCodeIcon,
   FileIcon,
   FileTextIcon,
   FolderIcon,
   HelpCircleIcon,
   LayoutDashboardIcon,
-  ListIcon,
   SearchIcon,
   SettingsIcon,
   UsersIcon,
@@ -42,13 +42,13 @@ const data = {
   navMain: [
     {
       title: "Dashboard",
-      url: "#",
+      url: "/dashboard",
       icon: LayoutDashboardIcon,
     },
-    {
-      title: "Lifecycle",
-      url: "#",
-      icon: ListIcon,
+  {
+      title: "Drive",
+      url: "/drive",
+      icon: HardDriveIcon,
     },
     {
       title: "Analytics",

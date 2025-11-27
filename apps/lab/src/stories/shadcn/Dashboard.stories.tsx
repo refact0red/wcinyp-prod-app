@@ -13,7 +13,7 @@ const DashboardStory = () => (
         <div className="flex min-h-[85vh] overflow-hidden rounded-xl border border-border shadow-md">
             <AppSidebar variant="inset" />
             <SidebarInset>
-                <SiteHeader />
+                <SiteHeader title="Dashboard" />
                 <div className="flex flex-1 flex-col">
                     <div className="container @container/main flex flex-1 flex-col gap-2">
                         <div className="flex flex-col gap-4 py-4 md:gap-6 md:py-6">
