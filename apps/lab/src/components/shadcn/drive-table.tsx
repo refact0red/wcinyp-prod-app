@@ -1,11 +1,22 @@
 "use client";
 
 import * as React from "react";
-import { FileSpreadsheetIcon, FileTextIcon, FolderIcon, ImageIcon, KanbanIcon, Link2Icon, MoreVerticalIcon, SearchIcon, ShareIcon } from "lucide-react";
+import {
+    DownloadIcon,
+    FileSpreadsheetIcon,
+    FileTextIcon,
+    FolderIcon,
+    ImageIcon,
+    KanbanIcon,
+    Link2Icon,
+    MoreVerticalIcon,
+    PrinterIcon,
+    SearchIcon,
+    ShareIcon,
+} from "lucide-react";
 
-import type { DriveItem, DriveItemStatus, DriveItemType } from "@/app/drive/data";
+import type { DriveItemStatus, DriveItemType } from "@/app/drive/data";
 import { driveItems } from "@/app/drive/data";
-import { Avatar, AvatarFallback } from "@/components/shadcn/ui/avatar";
 import { Badge } from "@/components/shadcn/ui/badge";
 import { Button } from "@/components/shadcn/ui/button";
 import { Checkbox } from "@/components/shadcn/ui/checkbox";
@@ -14,6 +25,7 @@ import { Input } from "@/components/shadcn/ui/input";
 import { Label } from "@/components/shadcn/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/shadcn/ui/select";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/shadcn/ui/table";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/shadcn/ui/tooltip";
 
 const typeIcon: Record<DriveItemType, typeof FileTextIcon> = {
     Document: FileTextIcon,
@@ -109,10 +121,12 @@ export function DriveTable() {
                                 />
                             </TableHead>
                             <TableHead className="w-[45%]">Name</TableHead>
-                            <TableHead>Owner</TableHead>
+                            <TableHead className="w-[220px]">Quick Actions</TableHead>
                             <TableHead>Updated</TableHead>
                             <TableHead className="text-right">Size</TableHead>
-                            <TableHead className="w-[80px] text-right">Actions</TableHead>
+                            <TableHead className="w-[80px] text-right">
+                                <span className="sr-only">Actions</span>
+                            </TableHead>
                         </TableRow>
                     </TableHeader>
                     <TableBody>
@@ -154,24 +168,52 @@ export function DriveTable() {
                                         </div>
                                     </TableCell>
                                     <TableCell>
-                                        <div className="flex items-center gap-2">
-                                            <Avatar className="size-8">
-                                                <AvatarFallback>{item.owner.slice(0, 2).toUpperCase()}</AvatarFallback>
-                                            </Avatar>
-                                            <div className="leading-tight">
-                                                <div className="text-sm font-medium">{item.owner}</div>
-                                                <div className="text-muted-foreground text-xs">Owner</div>
-                                            </div>
+                                        <div className="inline-flex overflow-hidden rounded-md border bg-background shadow-xs">
+                                            <Tooltip>
+                                                <TooltipTrigger asChild>
+                                                    <Button
+                                                        variant="ghost"
+                                                        size="sm"
+                                                        className="border-border focus-visible:z-10 inline-flex h-auto rounded-none border-l px-3 py-2 first:border-l-0"
+                                                    >
+                                                        <PrinterIcon className="size-4" />
+                                                        <span className="text-xs font-medium">Print</span>
+                                                    </Button>
+                                                </TooltipTrigger>
+                                                <TooltipContent sideOffset={6}>Print</TooltipContent>
+                                            </Tooltip>
+                                            <Tooltip>
+                                                <TooltipTrigger asChild>
+                                                    <Button
+                                                        variant="ghost"
+                                                        size="sm"
+                                                        className="border-border focus-visible:z-10 inline-flex h-auto rounded-none border-l px-3 py-2 first:border-l-0"
+                                                    >
+                                                        <DownloadIcon className="size-4" />
+                                                        <span className="text-xs font-medium">Download</span>
+                                                    </Button>
+                                                </TooltipTrigger>
+                                                <TooltipContent sideOffset={6}>Download</TooltipContent>
+                                            </Tooltip>
+                                            <Tooltip>
+                                                <TooltipTrigger asChild>
+                                                    <Button
+                                                        variant="ghost"
+                                                        size="sm"
+                                                        className="border-border focus-visible:z-10 inline-flex h-auto rounded-none border-l px-3 py-2 first:border-l-0"
+                                                    >
+                                                        <Link2Icon className="size-4" />
+                                                        <span className="text-xs font-medium">Copy Link</span>
+                                                    </Button>
+                                                </TooltipTrigger>
+                                                <TooltipContent sideOffset={6}>Copy link</TooltipContent>
+                                            </Tooltip>
                                         </div>
                                     </TableCell>
                                     <TableCell className="text-sm text-muted-foreground">{formatDate(item.updated)}</TableCell>
                                     <TableCell className="text-right text-sm font-medium">{item.size}</TableCell>
                                     <TableCell className="text-right">
                                         <div className="flex justify-end gap-2">
-                                            <Button variant="ghost" size="icon-sm" className="size-8">
-                                                <Link2Icon className="size-4" />
-                                                <span className="sr-only">Copy link</span>
-                                            </Button>
                                             <DropdownMenu>
                                                 <DropdownMenuTrigger asChild>
                                                     <Button variant="ghost" size="icon-sm" className="size-8">

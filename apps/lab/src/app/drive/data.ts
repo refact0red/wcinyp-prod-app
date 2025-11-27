@@ -8,7 +8,6 @@ export type DriveItem = {
     type: DriveItemType;
     status: DriveItemStatus;
     updated: string;
-    owner: string;
     size: string;
     shared: boolean;
 };
@@ -20,7 +19,6 @@ export const driveItems: DriveItem[] = [
         type: "Document",
         status: "Synced",
         updated: "2024-08-04T12:30:00Z",
-        owner: "Alex Kim",
         size: "1.2 MB",
         shared: true,
     },
@@ -30,7 +28,6 @@ export const driveItems: DriveItem[] = [
         type: "Document",
         status: "In Review",
         updated: "2024-08-02T14:10:00Z",
-        owner: "Sam Lee",
         size: "840 KB",
         shared: false,
     },
@@ -40,7 +37,6 @@ export const driveItems: DriveItem[] = [
         type: "Spreadsheet",
         status: "Draft",
         updated: "2024-07-29T09:00:00Z",
-        owner: "Morgan Hill",
         size: "2.4 MB",
         shared: true,
     },
@@ -50,7 +46,6 @@ export const driveItems: DriveItem[] = [
         type: "Presentation",
         status: "Synced",
         updated: "2024-07-28T18:00:00Z",
-        owner: "Taylor Fox",
         size: "3.8 MB",
         shared: false,
     },
@@ -60,7 +55,6 @@ export const driveItems: DriveItem[] = [
         type: "Image",
         status: "In Review",
         updated: "2024-07-25T11:00:00Z",
-        owner: "Jordan Cruz",
         size: "24.1 MB",
         shared: true,
     },
@@ -70,7 +64,6 @@ export const driveItems: DriveItem[] = [
         type: "Folder",
         status: "Synced",
         updated: "2024-07-21T16:00:00Z",
-        owner: "Priya Singh",
         size: "—",
         shared: true,
     },
@@ -80,7 +73,6 @@ export const driveItems: DriveItem[] = [
         type: "Spreadsheet",
         status: "Draft",
         updated: "2024-07-20T15:30:00Z",
-        owner: "Chris Young",
         size: "980 KB",
         shared: false,
     },
@@ -90,7 +82,6 @@ export const driveItems: DriveItem[] = [
         type: "Presentation",
         status: "Synced",
         updated: "2024-07-18T08:00:00Z",
-        owner: "Eddie Lake",
         size: "5.1 MB",
         shared: true,
     },

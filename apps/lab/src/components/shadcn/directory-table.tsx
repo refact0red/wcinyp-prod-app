@@ -120,7 +120,7 @@ export function DirectoryTable() {
             </div>
 
             <div className="overflow-hidden rounded-lg border">
-                <Table>
+                <Table className="[&_td]:py-3 [&_th]:py-3">
                     <TableHeader className="bg-muted/40">
                         <TableRow>
                             <TableHead className="w-[40px] min-w-[40px]">
@@ -132,10 +132,12 @@ export function DirectoryTable() {
                             </TableHead>
                             <TableHead className="w-[30%] min-w-[200px]">Name</TableHead>
                             <TableHead className="w-[24%]">Team</TableHead>
-                            <TableHead className="w-[24%]">Email</TableHead>
                             <TableHead className="w-[11%]">Office</TableHead>
                             <TableHead className="w-[11%]">Cell</TableHead>
-                            <TableHead className="w-[80px] text-right">Actions</TableHead>
+                            <TableHead className="w-[24%]">Email</TableHead>
+                            <TableHead className="w-[80px] text-right">
+                                <span className="sr-only">Actions</span>
+                            </TableHead>
                         </TableRow>
                     </TableHeader>
                     <TableBody>
@@ -168,6 +170,8 @@ export function DirectoryTable() {
                                         {person.team}
                                     </Badge>
                                 </TableCell>
+                                <TableCell className="text-sm">{renderPhone(person.officePhone)}</TableCell>
+                                <TableCell className="text-sm">{renderPhone(person.mobilePhone)}</TableCell>
                                 <TableCell className="text-sm font-medium">
                                     {person.email ? (
                                         <a className="hover:underline" href={`mailto:${person.email}`}>
@@ -177,8 +181,6 @@ export function DirectoryTable() {
                                         <span className="text-muted-foreground">—</span>
                                     )}
                                 </TableCell>
-                                <TableCell className="text-sm">{renderPhone(person.officePhone)}</TableCell>
-                                <TableCell className="text-sm">{renderPhone(person.mobilePhone)}</TableCell>
                                 <TableCell className="text-right">
                                     <div className="flex justify-end gap-2">
                                         <Button variant="ghost" size="icon-sm" className="size-8">

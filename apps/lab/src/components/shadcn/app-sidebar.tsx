@@ -14,7 +14,6 @@ import {
   FolderIcon,
   HelpCircleIcon,
   LayoutDashboardIcon,
-  SearchIcon,
   SettingsIcon,
   UsersIcon,
 } from "lucide-react"
@@ -125,11 +124,6 @@ const data = {
       url: "#",
       icon: HelpCircleIcon,
     },
-    {
-      title: "Search",
-      url: "#",
-      icon: SearchIcon,
-    },
   ],
   documents: [
     {
@@ -162,7 +156,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
             >
               <a href="#">
                 <ArrowUpCircleIcon className="h-5 w-5" />
-                <span className="text-base font-semibold">Acme Inc.</span>
+                <span className="text-base font-semibold">Weill Cornell Imaging</span>
               </a>
             </SidebarMenuButton>
           </SidebarMenuItem>
