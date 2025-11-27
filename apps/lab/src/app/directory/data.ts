@@ -1,0 +1,177 @@
+export type DirectoryStatus = "Active" | "On call" | "Out of office";
+
+export type DirectoryPerson = {
+    id: number;
+    name: string;
+    title: string;
+    team: string;
+    email: string;
+    officePhone?: string;
+    mobilePhone?: string;
+    location?: string;
+    status: DirectoryStatus;
+};
+
+export const directoryPeople: DirectoryPerson[] = [
+    {
+        id: 1,
+        name: "Lillian B McDonough",
+        title: "Senior Nurse Manager",
+        team: "Nurse Lead",
+        email: "lbm9005@med.cornell.edu",
+        status: "Active",
+    },
+    {
+        id: 2,
+        name: "Elena Yanucci",
+        title: "Senior Registered Nurse",
+        team: "Nurse Lead",
+        email: "ely3003@med.cornell.edu",
+        officePhone: "(631) 365-4802",
+        status: "Active",
+    },
+    {
+        id: 3,
+        name: "Kara VanRossem",
+        title: "Senior Registered Nurse",
+        team: "Nurse Lead",
+        email: "kav3001@med.cornell.edu",
+        mobilePhone: "(347) 408-9590",
+        status: "Active",
+    },
+    {
+        id: 4,
+        name: "Emily Traylor",
+        title: "Senior Nurse Manager",
+        team: "Nurse Lead",
+        email: "emt9018@med.cornell.edu",
+        officePhone: "(646) 962-2235",
+        mobilePhone: "(646) 983-1395",
+        status: "Active",
+    },
+    {
+        id: 5,
+        name: "Annette Viera",
+        title: "Senior Practice Supervisor",
+        team: "Supervisor",
+        email: "anv9009@med.cornell.edu",
+        mobilePhone: "(646) 477-2051",
+        status: "Active",
+    },
+    {
+        id: 6,
+        name: "Ericca Bartolome",
+        title: "Practice Supervisor",
+        team: "Supervisor",
+        email: "erb2007@med.cornell.edu",
+        mobilePhone: "(917) 574-6280",
+        status: "Active",
+    },
+    {
+        id: 7,
+        name: "Anna Wysocka",
+        title: "Practice Supervisor",
+        team: "Supervisor",
+        email: "anw3005@med.cornell.edu",
+        mobilePhone: "(917) 747-1459",
+        status: "Active",
+    },
+    {
+        id: 8,
+        name: "Jacob Taggart",
+        title: "Practice Supervisor",
+        team: "Supervisor",
+        email: "jat4010@med.cornell.edu",
+        mobilePhone: "(646) 656-8665",
+        status: "Active",
+    },
+    {
+        id: 9,
+        name: "Thomas",
+        title: "Practice Supervisor",
+        team: "Supervisor",
+        email: "",
+        status: "Active",
+    },
+    {
+        id: 10,
+        name: "Kevin Hansel (Manager)",
+        title: "IT",
+        team: "IT",
+        email: "keh2020@med.cornell.edu",
+        officePhone: "(646)-891-9327",
+        status: "Active",
+    },
+    {
+        id: 11,
+        name: "Chi K. Ng",
+        title: "IT",
+        team: "IT",
+        email: "ckn9001@med.cornell.edu",
+        officePhone: "(212) 746-2549",
+        status: "Active",
+    },
+    {
+        id: 12,
+        name: "Sean Hom",
+        title: "IT",
+        team: "IT",
+        email: "seh4008@med.cornell.edu",
+        officePhone: "(646) 877-1872",
+        status: "Active",
+    },
+    {
+        id: 13,
+        name: "Amanda Harriot",
+        title: "IT",
+        team: "IT",
+        email: "amh7010@med.cornell.edu",
+        officePhone: "(917) 886-5697",
+        status: "Active",
+    },
+    {
+        id: 14,
+        name: "Sarah L. Starin",
+        title: "IT",
+        team: "IT",
+        email: "sls2007@med.cornell.edu",
+        officePhone: "(646) 522-8222",
+        status: "Active",
+    },
+    {
+        id: 15,
+        name: "Edwin Guadalupe",
+        title: "IT",
+        team: "IT",
+        email: "edg2013@med.cornell.edu",
+        officePhone: "646-823-5926",
+        status: "Active",
+    },
+    {
+        id: 16,
+        name: "Victor Tung",
+        title: "IT",
+        team: "IT",
+        email: "vit4012@med.cornell.edu",
+        status: "Active",
+    },
+    {
+        id: 17,
+        name: "Kayla Pozzuto",
+        title: "Child Life Specialist",
+        team: "Child Life",
+        email: "kap9210@med.cornell.edu",
+        mobilePhone: "(646) 689-3147",
+        status: "Active",
+    },
+    {
+        id: 18,
+        name: "Rachel M. Cavaliere",
+        title: "Child Life Specialist",
+        team: "Child Life",
+        email: "rmp9016@nyp.org",
+        officePhone: "(646) 962-9173",
+        mobilePhone: "(917) 484-0741",
+        status: "Active",
+    },
+];

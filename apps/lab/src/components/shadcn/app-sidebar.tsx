@@ -50,10 +50,10 @@ const data = {
       url: "/drive",
       icon: HardDriveIcon,
     },
-    {
-      title: "Analytics",
-      url: "#",
-      icon: BarChartIcon,
+  {
+      title: "Directory",
+      url: "/directory",
+      icon: UsersIcon,
     },
     {
       title: "Projects",

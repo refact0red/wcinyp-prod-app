@@ -57,6 +57,13 @@ export function DriveTable() {
         });
     };
 
+    const toggleAll = (checked: boolean) => {
+        setSelectedIds(() => (checked ? new Set(filtered.map((item) => item.id)) : new Set()));
+    };
+
+    const allSelected = filtered.length > 0 && filtered.every((item) => selectedIds.has(item.id));
+    const someSelected = filtered.some((item) => selectedIds.has(item.id));
+
     return (
         <div className="flex flex-col gap-3">
             <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
@@ -95,7 +102,11 @@ export function DriveTable() {
                     <TableHeader className="bg-muted/40">
                         <TableRow>
                             <TableHead className="w-[40px]">
-                                <span className="sr-only">Select</span>
+                                <Checkbox
+                                    aria-label="Select all"
+                                    checked={allSelected ? true : someSelected ? "indeterminate" : false}
+                                    onCheckedChange={(value) => toggleAll(value === true)}
+                                />
                             </TableHead>
                             <TableHead className="w-[45%]">Name</TableHead>
                             <TableHead>Owner</TableHead>
