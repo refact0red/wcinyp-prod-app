@@ -103,14 +103,6 @@ const columns: ColumnDef<DriveItem>[] = [
           </span>
           <div className="flex flex-col gap-1">
             <span className="font-medium">{item.name}</span>
-            {item.shared && (
-              <div className="text-muted-foreground flex flex-wrap items-center gap-2 text-xs">
-                <span className="flex items-center gap-1">
-                  <ShareIcon className="size-3.5" />
-                  Shared
-                </span>
-              </div>
-            )}
           </div>
         </div>
       )
