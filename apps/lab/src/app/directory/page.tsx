@@ -1,4 +1,4 @@
-import { PlusIcon } from "lucide-react";
+import { HospitalIcon, PlusIcon, RadiationIcon, UsersIcon } from "lucide-react";
 
 import { AppSidebar } from "@/components/shadcn/app-sidebar";
 import { DirectoryTable } from "@/components/shadcn/directory-table";
@@ -27,9 +27,18 @@ export default function DirectoryPage() {
                             <div className="px-4 lg:px-6">
                                 <Tabs defaultValue="people" className="w-full">
                                     <TabsList className="w-fit">
-                                        <TabsTrigger value="people">People</TabsTrigger>
-                                        <TabsTrigger value="locations">Locations</TabsTrigger>
-                                        <TabsTrigger value="radiologists">Radiologists</TabsTrigger>
+                                        <TabsTrigger value="people" className="gap-2">
+                                            <UsersIcon className="size-4" />
+                                            People
+                                        </TabsTrigger>
+                                        <TabsTrigger value="locations" className="gap-2">
+                                            <HospitalIcon className="size-4" />
+                                            Locations
+                                        </TabsTrigger>
+                                        <TabsTrigger value="radiologists" className="gap-2">
+                                            <RadiationIcon className="size-4" />
+                                            Radiologists
+                                        </TabsTrigger>
                                     </TabsList>
                                     <TabsContent value="people" className="mt-4">
                                         <DirectoryTable />
