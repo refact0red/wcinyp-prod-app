@@ -6,6 +6,7 @@ import {
   CameraIcon,
   ClipboardListIcon,
   DatabaseIcon,
+  BlocksIcon,
   HardDriveIcon,
   FileCodeIcon,
   FileIcon,
@@ -146,6 +147,11 @@ const data = {
       name: "Users",
       url: "/admin/users",
       icon: UsersIcon,
+    },
+    {
+      name: "Locations",
+      url: "/admin/locations",
+      icon: BlocksIcon,
     },
   ],
 }
