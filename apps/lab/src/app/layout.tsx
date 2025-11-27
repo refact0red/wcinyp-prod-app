@@ -4,8 +4,8 @@ import type { Metadata } from "next";
 import React from "react";
 
 export const metadata: Metadata = {
-    title: "Lab Dashboard",
-    description: "Shadcn dashboard app",
+    title: "WCINYP",
+    description: "WCINYP labs dashboard",
     icons: {
         icon: [
             { url: "/icon.png?v=3" },
