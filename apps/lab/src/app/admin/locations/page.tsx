@@ -383,11 +383,11 @@ export default function LocationsAdminPage() {
                                     <div className="grid gap-3 sm:grid-cols-2">
                                         <div className="space-y-1.5">
                                             <Label htmlFor="loc-id">ID</Label>
-                                            <Input id="loc-id" value={formState.id} readOnly />
+                                            <Input id="loc-id" value={formState.id} disabled />
                                         </div>
                                         <div className="space-y-1.5">
                                             <Label htmlFor="loc-slug">Slug</Label>
-                                            <Input id="loc-slug" value={formState.slug} readOnly />
+                                            <Input id="loc-slug" value={formState.slug} disabled />
                                         </div>
                                     </div>
 
