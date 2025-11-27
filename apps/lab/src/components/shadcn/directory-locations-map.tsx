@@ -11,37 +11,17 @@ export type DirectoryLocationsMapProps = {
     onSelectLocation?: (id: string) => void;
 };
 
-export function DirectoryLocationsMap({ locations }: DirectoryLocationsMapProps) {
-    const firstWithCoords = React.useMemo(
-        () => locations.find((location) => Number.isFinite(location.maps.lat) && Number.isFinite(location.maps.lng)) ?? null,
-        [locations],
-    );
+const ALL_LOCATIONS_EMBED_URL =
+    "https://www.google.com/maps/d/embed?mid=1mvf1EJzbPJ7yEJcUZqaQnvi18XYfyKE&ehbc=2E312F";
 
-    const embedUrl = React.useMemo(() => {
-        if (firstWithCoords) {
-            const { lat, lng } = firstWithCoords.maps;
-            const params = new URLSearchParams({
-                q: `${lat},${lng}`,
-                z: "13",
-                output: "embed",
-            });
-            return `https://www.google.com/maps?${params.toString()}`;
-        }
+export function DirectoryLocationsMap(_: DirectoryLocationsMapProps) {
+    const embedUrl = ALL_LOCATIONS_EMBED_URL;
 
-        // Fallback to a generic Manhattan-centered map if no coordinates are available.
-        const fallbackParams = new URLSearchParams({
-            q: "New York, NY",
-            z: "11",
-            output: "embed",
-        });
-        return `https://www.google.com/maps?${fallbackParams.toString()}`;
-    }, [firstWithCoords]);
-
-    // TODO: In the future, replace this iframe with a Google Maps JS API implementation that:
-    // - Renders one marker per WCINYP location using maps.lat/maps.lng.
-    // - Fits the map bounds to show all markers.
-    // - Calls onSelectLocation(id) when a marker is clicked.
-    // - Reacts to selectedLocationId by centering and showing an info window.
+    // TODO: In the future, replace this static My Maps embed with a Google Maps JS API implementation that:
+    // - Uses the locations prop (maps.lat/maps.lng) to render one marker per WCINYP location.
+    // - Fits the map bounds to show all markers without relying on a prebuilt My Maps layer.
+    // - Calls onSelectLocation(id) when a marker is clicked to sync with the locations list.
+    // - Reacts to selectedLocationId by centering and showing an info window for the selected marker.
 
     return (
         <Card className="overflow-hidden border-border/70 bg-card">
@@ -62,4 +42,3 @@ export function DirectoryLocationsMap({ locations }: DirectoryLocationsMapProps)
         </Card>
     );
 }
-
