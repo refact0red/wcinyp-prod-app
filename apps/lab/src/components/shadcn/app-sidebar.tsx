@@ -3,7 +3,7 @@
 import * as React from "react"
 import {
   ArrowUpCircleIcon,
-  BarChartIcon,
+  BookIcon,
   CameraIcon,
   ClipboardListIcon,
   DatabaseIcon,
@@ -11,7 +11,6 @@ import {
   FileCodeIcon,
   FileIcon,
   FileTextIcon,
-  FolderIcon,
   HelpCircleIcon,
   LayoutDashboardIcon,
   SettingsIcon,
@@ -34,9 +33,10 @@ import {
 
 const data = {
   user: {
-    name: "shadcn",
-    email: "m@example.com",
-    avatar: "/avatars/shadcn.jpg",
+    name: "Neo",
+    email: "taa001@med.cornell.edu",
+    avatar: "/avatars/neo.jpg",
+    initials: "TA",
   },
   navMain: [
     {
@@ -49,15 +49,15 @@ const data = {
       url: "/drive",
       icon: HardDriveIcon,
     },
-  {
+    {
       title: "Directory",
       url: "/directory",
       icon: UsersIcon,
     },
     {
-      title: "Projects",
-      url: "#",
-      icon: FolderIcon,
+      title: "Manual",
+      url: "/manual",
+      icon: BookIcon,
     },
     {
       title: "Team",
