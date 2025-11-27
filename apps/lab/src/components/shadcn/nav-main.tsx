@@ -22,6 +22,8 @@ import {
   SidebarMenuItem,
 } from "@/components/shadcn/ui/sidebar"
 
+import { ThemeToggle } from "@/components/shadcn/theme-toggle"
+
 export function NavMain({
   items,
 }: {
@@ -78,14 +80,7 @@ export function NavMain({
                 <SearchIcon />
                 <span>Search</span>
               </SidebarMenuButton>
-              <Button
-                size="icon"
-                className="h-9 w-9 shrink-0 group-data-[collapsible=icon]:opacity-0"
-                variant="outline"
-              >
-                <MailIcon />
-                <span className="sr-only">Inbox</span>
-              </Button>
+              <ThemeToggle />
             </SidebarMenuItem>
           </SidebarMenu>
           <SidebarMenu>
