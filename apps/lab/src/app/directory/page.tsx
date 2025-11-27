@@ -5,6 +5,7 @@ import { ExternalLink, HospitalIcon, IdCardIcon, Loader2, PlusIcon, RadiationIco
 
 import { AppSidebar } from "@/components/shadcn/app-sidebar";
 import { Alert, AlertDescription, AlertTitle } from "@/components/shadcn/alert";
+import { DirectoryLocationsList } from "@/components/shadcn/directory-locations-list";
 import { DirectoryTable } from "@/components/shadcn/directory-table";
 import { SiteHeader } from "@/components/shadcn/site-header";
 import { Button } from "@/components/shadcn/ui/button";
@@ -15,6 +16,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/shadcn/ui/tabs";
 import { SidebarInset, SidebarProvider } from "@/components/shadcn/ui/sidebar";
 import type { NormalizedAddress, NormalizedNpiRecord, NpiLookupError, NpiLookupResponse } from "@/app/npi-lookup/types";
+import { wcinypLocations } from "@/lib/wcinyp/locations";
 
 const formatAddress = (address?: NormalizedAddress) => address?.lines?.filter(Boolean).join("\n") || "—";
 
@@ -146,6 +148,7 @@ export default function DirectoryPage() {
     const [result, setResult] = useState<NormalizedNpiRecord | null>(null);
     const [error, setError] = useState<string | null>(null);
     const [isLoading, setIsLoading] = useState(false);
+    const [selectedLocationId, setSelectedLocationId] = useState<string | null>(null);
 
     const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
         event.preventDefault();
@@ -261,7 +264,11 @@ export default function DirectoryPage() {
                                         <DirectoryTable />
                                     </TabsContent>
                                     <TabsContent value="locations" className="mt-4">
-                                        <div className="text-sm text-muted-foreground">No locations yet.</div>
+                                        <DirectoryLocationsList
+                                            locations={wcinypLocations}
+                                            selectedLocationId={selectedLocationId}
+                                            onSelectLocation={setSelectedLocationId}
+                                        />
                                     </TabsContent>
                                     <TabsContent value="radiologists" className="mt-4">
                                         <div className="text-sm text-muted-foreground">No radiologists yet.</div>
