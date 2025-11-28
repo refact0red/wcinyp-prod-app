@@ -2,6 +2,13 @@
 
 @layer base {
     :root {
+        /* TODO: Keep in sync with outline Button override (see ui/button.tsx) —
+           Tailwind v4 uses CSS vars for bg/text opacity; default them to 1 so
+           shadcn outline/ghost buttons render with a solid fill. Without this,
+           Tailwind can fall back to 0.3, making white fills look gray on white backgrounds. */
+        --tw-bg-opacity: 1;
+        --tw-text-opacity: 1;
+
         --radius: 0.625rem;
         --background: oklch(1 0 0);
         --foreground: oklch(0.145 0 0);
