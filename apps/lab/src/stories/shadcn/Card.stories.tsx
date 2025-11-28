@@ -30,7 +30,7 @@ const meta = {
 type Story = StoryObj<typeof meta>;
 
 export const Default: Story = {
-    render: ({ title, description, body, primaryAction, secondaryAction }) => (
+    render: ({ title, description, body, primaryAction, secondaryAction }: CardStoryProps) => (
         <Card className="max-w-xl">
             <CardHeader>
                 <CardTitle>{title}</CardTitle>
@@ -53,7 +53,7 @@ export const WithTertiaryAction: Story = {
     args: {
         secondaryAction: "Archive",
     },
-    render: ({ title, description, body, primaryAction, secondaryAction }) => (
+    render: ({ title, description, body, primaryAction, secondaryAction }: CardStoryProps) => (
         <Card className="max-w-xl">
             <CardHeader>
                 <CardTitle>{title}</CardTitle>

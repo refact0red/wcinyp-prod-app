@@ -4,6 +4,8 @@ import * as React from "react";
 import Image from "next/image";
 
 import type { WcinypLocation } from "@/lib/wcinyp/locations";
+import { wcinypStaff } from "@/lib/wcinyp/staff";
+import { formatPhoneGroup, phoneHref } from "@/lib/wcinyp/phones";
 import { cn } from "@/lib/utils";
 import { AspectRatio } from "@/components/shadcn/ui/aspect-ratio";
 import { Badge } from "@/components/shadcn/ui/badge";
@@ -30,6 +32,17 @@ export function DirectoryLocationsList({
     onOpenInMaps,
     onLocationClick,
 }: DirectoryLocationsListProps) {
+    const staffById = React.useMemo(
+        () =>
+            new Map(
+                wcinypStaff.map((member) => [
+                    member.id,
+                    member,
+                ]),
+            ),
+        [],
+    );
+
     const sortedLocations = React.useMemo(
         () =>
             [...locations].sort((a, b) => {
@@ -185,16 +198,66 @@ export function DirectoryLocationsList({
 
                                 {/* Bottom-left: Tel / Fax / PM / PS */}
                                 <div className="flex flex-col justify-end gap-0.5 text-[11px] leading-snug text-muted-foreground">
-                                    <div>
-                                        T: <span className="font-medium text-foreground" />{" "}
-                                        F: <span className="font-medium text-foreground" />
-                                    </div>
-                                    <div>
-                                        PM: <span className="font-medium text-foreground" />
-                                    </div>
-                                    <div>
-                                        PS: <span className="font-medium text-foreground" />
-                                    </div>
+                                    {(() => {
+                                        const phoneLabel = formatPhoneGroup(location.contact?.phone);
+                                        const manager = location.managerStaffId
+                                            ? staffById.get(location.managerStaffId)
+                                            : undefined;
+                                        const specialist =
+                                            location.hasSpecialist && location.specialistStaffId
+                                                ? staffById.get(location.specialistStaffId)
+                                                : undefined;
+
+                                        const primaryDigits = location.contact?.phone?.primary.digits;
+                                        const primaryHref = primaryDigits ? phoneHref(primaryDigits) : "";
+
+                                        return (
+                                            <>
+                                                <div>
+                                                    P:{" "}
+                                                    {phoneLabel ? (
+                                                        primaryHref ? (
+                                                            <a
+                                                                href={primaryHref}
+                                                                className="font-medium text-foreground hover:underline"
+                                                                onClick={(event) => event.stopPropagation()}
+                                                            >
+                                                                {phoneLabel}
+                                                            </a>
+                                                        ) : (
+                                                            <span className="font-medium text-foreground">
+                                                                {phoneLabel}
+                                                            </span>
+                                                        )
+                                                    ) : (
+                                                        <span className="font-medium text-foreground">—</span>
+                                                    )}
+                                                </div>
+                                                <div>
+                                                    PM:{" "}
+                                                    {manager ? (
+                                                        <span className="font-medium text-foreground">
+                                                            {manager.name}
+                                                        </span>
+                                                    ) : (
+                                                        <span className="font-medium text-foreground">—</span>
+                                                    )}
+                                                </div>
+                                                {location.hasSpecialist && (
+                                                    <div>
+                                                        PS:{" "}
+                                                        {specialist ? (
+                                                            <span className="font-medium text-foreground">
+                                                                {specialist.name}
+                                                            </span>
+                                                        ) : (
+                                                            <span className="font-medium text-foreground">—</span>
+                                                        )}
+                                                    </div>
+                                                )}
+                                            </>
+                                        );
+                                    })()}
                                 </div>
 
                                 {/* Bottom-right: modality tags (first row 4, then 3,3) */}

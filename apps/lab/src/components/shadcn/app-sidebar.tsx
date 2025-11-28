@@ -164,6 +164,11 @@ export const appSidebarData = {
       url: "/admin/locations",
       icon: BlocksIcon,
     },
+    {
+      name: "Staff",
+      url: "/admin/staff",
+      icon: BlocksIcon,
+    },
   ],
 }
 

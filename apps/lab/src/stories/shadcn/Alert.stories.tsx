@@ -29,7 +29,7 @@ const meta = {
 type Story = StoryObj<typeof meta>;
 
 export const Default: Story = {
-    render: ({ title, description, variant }) => (
+    render: ({ title, description, variant }: AlertStoryProps) => (
         <Alert variant={variant}>
             <AlertTitle>{title}</AlertTitle>
             <AlertDescription>{description}</AlertDescription>
@@ -51,7 +51,7 @@ export const MutedWithIcon: Story = {
         description: "WCINYP onboarding emails go out every Monday at 9am ET.",
         variant: "muted",
     },
-    render: ({ title, description, variant }) => (
+    render: ({ title, description, variant }: AlertStoryProps) => (
         <Alert variant={variant} icon={ClockFastForward}>
             <AlertTitle>{title}</AlertTitle>
             <AlertDescription>{description}</AlertDescription>
@@ -64,7 +64,7 @@ export const Success: Story = {
         title: "Invite sent",
         description: "New administrators receive a one-time email to finish account setup.",
     },
-    render: ({ title, description }) => (
+    render: ({ title, description }: AlertStoryProps) => (
         <Alert icon={Mail01}>
             <AlertTitle>{title}</AlertTitle>
             <AlertDescription>{description}</AlertDescription>

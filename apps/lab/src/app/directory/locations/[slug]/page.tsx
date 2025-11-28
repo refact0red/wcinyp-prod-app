@@ -17,14 +17,10 @@ import {
 import { Button } from "@/components/shadcn/ui/button";
 import { SidebarInset, SidebarProvider } from "@/components/shadcn/ui/sidebar";
 import { wcinypLocations } from "@/lib/wcinyp/locations";
+import { wcinypStaff } from "@/lib/wcinyp/staff";
+import { formatPhoneGroup, phoneHref } from "@/lib/wcinyp/phones";
 
-type LocationPageProps = {
-    params: {
-        slug: string;
-    };
-};
-
-export function generateMetadata({ params }: LocationPageProps): Metadata {
+export function generateMetadata({ params }: any): Metadata {
     const location = wcinypLocations.find((item) => item.slug === params.slug);
 
     if (!location) {
@@ -39,12 +35,73 @@ export function generateMetadata({ params }: LocationPageProps): Metadata {
     };
 }
 
-export default function LocationPage({ params }: LocationPageProps) {
+export default function LocationPage({ params }: any) {
     const location = wcinypLocations.find((item) => item.slug === params.slug);
 
     if (!location) {
         notFound();
     }
+
+    const staffById = new Map(wcinypStaff.map((member) => [member.id, member]));
+
+    const manager = location.managerStaffId ? staffById.get(location.managerStaffId) : undefined;
+    const specialist =
+        location.hasSpecialist && location.specialistStaffId ? staffById.get(location.specialistStaffId) : undefined;
+
+    const phoneLabel = formatPhoneGroup(location.contact?.phone);
+    const faxLabel = formatPhoneGroup(location.contact?.fax);
+
+    const primaryDigits = location.contact?.phone?.primary.digits;
+    const primaryHref = primaryDigits ? phoneHref(primaryDigits) : "";
+
+    const formatHours = () => {
+        const data = location.hoursOfOperation;
+        if (!data || !data.ranges.length) return "Not specified";
+
+        const dayOrder: Record<string, number> = {
+            Mon: 1,
+            Tue: 2,
+            Wed: 3,
+            Thu: 4,
+            Fri: 5,
+            Sat: 6,
+            Sun: 7,
+        };
+
+        const labelForDays = (days: string[]) => {
+            if (days.length === 7) return "Mon–Sun";
+            const sorted = [...days].sort((a, b) => dayOrder[a] - dayOrder[b]);
+            if (sorted.length === 1) return sorted[0];
+            return `${sorted[0]}–${sorted[sorted.length - 1]}`;
+        };
+
+        const labelForTime = (time: string) => {
+            const [hourStr, minuteStr] = time.split(":");
+            let hour = Number.parseInt(hourStr, 10);
+            const minute = minuteStr ?? "00";
+            const suffix = hour >= 12 ? "pm" : "am";
+            if (hour === 0) {
+                hour = 12;
+            } else if (hour > 12) {
+                hour -= 12;
+            }
+            return `${hour}:${minute}${suffix}`;
+        };
+
+        return data.ranges
+            .map((range) => `${labelForDays(range.days)} ${labelForTime(range.open)}–${labelForTime(range.close)}`)
+            .join(", ");
+    };
+
+    const formatContrastHours = () => {
+        const contrast = location.contrastHours;
+        if (!contrast) return "Not specified";
+        if (contrast.status === "tbd") return "TBD";
+        if (contrast.status === "n/a") return "Contrast available during all open hours";
+        return contrast.value || "Not specified";
+    };
+
+    const notes = location.locationNotes ?? [];
 
     return (
         <SidebarProvider>
@@ -123,20 +180,175 @@ export default function LocationPage({ params }: LocationPageProps) {
                                         </div>
                                     </CardHeader>
                                     <CardContent className="space-y-4 pt-4">
-                                        <div className="space-y-1">
-                                            <h2 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">
-                                                Modalities
-                                            </h2>
-                                            <div className="flex flex-wrap gap-1.5">
-                                                {location.modalities.map((modality) => (
-                                                    <Badge
-                                                        key={modality}
-                                                        variant="outline"
-                                                        className="rounded-full px-2 py-0.5 text-[11px] font-medium"
-                                                    >
-                                                        {modality}
-                                                    </Badge>
-                                                ))}
+                                        <div className="grid gap-4 md:grid-cols-[minmax(0,1.2fr)_minmax(0,1fr)]">
+                                            <div className="space-y-4">
+                                                <div className="space-y-1">
+                                                    <h2 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">
+                                                        Contact & hours
+                                                    </h2>
+                                                    <div className="rounded-lg border border-border/60 bg-muted/40 px-3 py-3 text-sm leading-6">
+                                                        <div>
+                                                            <span className="font-semibold">Phone:</span>{" "}
+                                                            {phoneLabel ? (
+                                                                primaryHref ? (
+                                                                    <a
+                                                                        href={primaryHref}
+                                                                        className="font-medium hover:underline"
+                                                                    >
+                                                                        {phoneLabel}
+                                                                    </a>
+                                                                ) : (
+                                                                    <span className="font-medium">{phoneLabel}</span>
+                                                                )
+                                                            ) : (
+                                                                <span className="text-muted-foreground">Not provided</span>
+                                                            )}
+                                                        </div>
+                                                        <div>
+                                                            <span className="font-semibold">Fax:</span>{" "}
+                                                            {faxLabel ? (
+                                                                <span className="font-medium">{faxLabel}</span>
+                                                            ) : (
+                                                                <span className="text-muted-foreground">Not provided</span>
+                                                            )}
+                                                        </div>
+                                                        <div>
+                                                            <span className="font-semibold">Hours of operation:</span>{" "}
+                                                            <span>{formatHours()}</span>
+                                                        </div>
+                                                        <div>
+                                                            <span className="font-semibold">Contrast hours:</span>{" "}
+                                                            <span>{formatContrastHours()}</span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                <div className="space-y-1">
+                                                    <h2 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">
+                                                        Practice leadership
+                                                    </h2>
+                                                    <div className="rounded-lg border border-border/60 bg-muted/40 px-3 py-3 text-sm leading-6">
+                                                        <div>
+                                                            <span className="font-semibold">Practice manager:</span>{" "}
+                                                            {manager ? (
+                                                                <span className="font-medium">{manager.name}</span>
+                                                            ) : (
+                                                                <span className="text-muted-foreground">
+                                                                    Not assigned
+                                                                </span>
+                                                            )}
+                                                        </div>
+                                                        <div className="ml-4 text-xs text-muted-foreground">
+                                                            {manager?.officePhone && (
+                                                                <div>
+                                                                    Office:{" "}
+                                                                    <span className="font-medium">
+                                                                        {formatPhoneGroup(manager.officePhone)}
+                                                                    </span>
+                                                                </div>
+                                                            )}
+                                                            {manager?.mobilePhone && (
+                                                                <div>
+                                                                    Cell:{" "}
+                                                                    <span className="font-medium">
+                                                                        {formatPhoneGroup(manager.mobilePhone)}
+                                                                    </span>
+                                                                </div>
+                                                            )}
+                                                            {manager?.email && (
+                                                                <div>
+                                                                    Email:{" "}
+                                                                    <a
+                                                                        href={`mailto:${manager.email}`}
+                                                                        className="font-medium hover:underline"
+                                                                    >
+                                                                        {manager.email}
+                                                                    </a>
+                                                                </div>
+                                                            )}
+                                                        </div>
+
+                                                        <div className="mt-2">
+                                                            <span className="font-semibold">Practice specialist:</span>{" "}
+                                                            {location.hasSpecialist ? (
+                                                                specialist ? (
+                                                                    <span className="font-medium">
+                                                                        {specialist.name}
+                                                                    </span>
+                                                                ) : (
+                                                                    <span className="text-muted-foreground">
+                                                                        Not assigned
+                                                                    </span>
+                                                                )
+                                                            ) : (
+                                                                <span className="text-muted-foreground">N/A</span>
+                                                            )}
+                                                        </div>
+                                                        {location.hasSpecialist && specialist && (
+                                                            <div className="ml-4 text-xs text-muted-foreground">
+                                                                {specialist.officePhone && (
+                                                                    <div>
+                                                                        Office:{" "}
+                                                                        <span className="font-medium">
+                                                                            {formatPhoneGroup(specialist.officePhone)}
+                                                                        </span>
+                                                                    </div>
+                                                                )}
+                                                                {specialist.mobilePhone && (
+                                                                    <div>
+                                                                        Cell:{" "}
+                                                                        <span className="font-medium">
+                                                                            {formatPhoneGroup(specialist.mobilePhone)}
+                                                                        </span>
+                                                                    </div>
+                                                                )}
+                                                                {specialist.email && (
+                                                                    <div>
+                                                                        Email:{" "}
+                                                                        <a
+                                                                            href={`mailto:${specialist.email}`}
+                                                                            className="font-medium hover:underline"
+                                                                        >
+                                                                            {specialist.email}
+                                                                        </a>
+                                                                    </div>
+                                                                )}
+                                                            </div>
+                                                        )}
+                                                    </div>
+                                                </div>
+
+                                                {notes.length > 0 && (
+                                                    <div className="space-y-1">
+                                                        <h2 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">
+                                                            Additional notes
+                                                        </h2>
+                                                        <div className="rounded-lg border border-border/60 bg-muted/40 px-3 py-3 text-sm leading-6">
+                                                            <ul className="list-disc space-y-1 pl-4">
+                                                                {notes.map((note) => (
+                                                                    <li key={note.id}>{note.text}</li>
+                                                                ))}
+                                                            </ul>
+                                                        </div>
+                                                    </div>
+                                                )}
+                                            </div>
+
+                                            <div className="space-y-1">
+                                                <h2 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">
+                                                    Modalities
+                                                </h2>
+                                                <div className="flex flex-wrap gap-1.5">
+                                                    {location.modalities.map((modality) => (
+                                                        <Badge
+                                                            key={modality}
+                                                            variant="outline"
+                                                            className="rounded-full px-2 py-0.5 text-[11px] font-medium"
+                                                        >
+                                                            {modality}
+                                                        </Badge>
+                                                    ))}
+                                                </div>
                                             </div>
                                         </div>
                                     </CardContent>

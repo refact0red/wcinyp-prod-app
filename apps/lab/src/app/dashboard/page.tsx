@@ -1,3 +1,6 @@
+/* eslint-disable react/jsx-no-useless-fragment */
+"use client";
+
 import type { Metadata } from "next";
 import { AppSidebar } from "@/components/shadcn/app-sidebar";
 import { ChartAreaInteractive } from "@/components/shadcn/chart-area-interactive";
@@ -9,10 +12,6 @@ import { SidebarInset, SidebarProvider } from "@/components/shadcn/ui/sidebar";
 import { LayoutDashboardIcon, BellIcon, LineChartIcon, BookmarkIcon, CalendarClockIcon, UsersIcon } from "lucide-react";
 
 import data from "./data.json";
-
-export const metadata: Metadata = {
-    title: "Dashboard",
-};
 
 export default function Page() {
   return (

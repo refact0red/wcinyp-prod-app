@@ -257,7 +257,12 @@ export default function DirectoryPage() {
 
   const tabFromUrl = searchParams?.get("tab") ?? undefined;
   const allowedTabs = ["people", "locations", "radiologists", "providers", "npi"] as const;
-  const activeTab = allowedTabs.includes(tabFromUrl as any) ? (tabFromUrl as string) : "people";
+  const activeTab = (allowedTabs.includes(tabFromUrl as any) ? tabFromUrl : "people") as
+    | "people"
+    | "locations"
+    | "radiologists"
+    | "providers"
+    | "npi";
 
   return (
     <SidebarProvider>

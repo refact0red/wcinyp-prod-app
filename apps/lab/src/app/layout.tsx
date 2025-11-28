@@ -2,7 +2,7 @@ import "../styles/globals.css";
 
 import type { Metadata, Viewport } from "next";
 import { Inter } from "next/font/google";
-import React from "react";
+import React, { Suspense } from "react";
 
 import { HistoryProvider } from "@/components/history-context";
 import { ThemeProvider } from "@/components/shadcn/theme-provider";
@@ -39,7 +39,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="en" suppressHydrationWarning>
       <body className={`${inter.variable} bg-background text-foreground antialiased`}>
         <ThemeProvider>
-          <HistoryProvider>{children}</HistoryProvider>
+          <Suspense fallback={null}>
+            <HistoryProvider>{children}</HistoryProvider>
+          </Suspense>
         </ThemeProvider>
       </body>
     </html>
