@@ -1,10 +1,11 @@
 "use client";
 
 import Link from "next/link";
-import { BellIcon, ChevronDownIcon, CreditCardIcon, LogOutIcon, UserCircleIcon } from "lucide-react";
+import { ArrowLeftIcon, ArrowRightIcon, BellIcon, ChevronDownIcon, CreditCardIcon, LogOutIcon, UserCircleIcon } from "lucide-react";
 import { Fragment, useMemo } from "react";
 import { usePathname } from "next/navigation";
 
+import { useScopedHistory } from "@/components/history-context";
 import { appSidebarData } from "@/components/shadcn/app-sidebar";
 import {
     Breadcrumb,
@@ -28,6 +29,7 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from "@/components/shadcn/ui/dropdown-menu";
+import { Button } from "@/components/shadcn/ui/button";
 import { Separator } from "@/components/shadcn/ui/separator";
 import { SidebarTrigger } from "@/components/shadcn/ui/sidebar";
 import { ThemeToggle } from "@/components/shadcn/theme-toggle";
@@ -50,6 +52,37 @@ const breadcrumbNavItems: SiteHeaderBreadcrumb[] = [
     ...appSidebarData.documents.map((item) => ({ label: item.name, href: item.url })),
     ...appSidebarData.admin.map((item) => ({ label: item.name, href: item.url })),
 ];
+
+function HeaderHistoryButtons() {
+    const { canGoBack, canGoForward, goBack, goForward } = useScopedHistory();
+
+    return (
+        <div className="flex items-center gap-1">
+            <Button
+                type="button"
+                variant="ghost"
+                size="icon-sm"
+                aria-label="Go back"
+                title="Back"
+                disabled={!canGoBack}
+                onClick={goBack}
+            >
+                <ArrowLeftIcon className="size-4" />
+            </Button>
+            <Button
+                type="button"
+                variant="ghost"
+                size="icon-sm"
+                aria-label="Go forward"
+                title="Forward"
+                disabled={!canGoForward}
+                onClick={goForward}
+            >
+                <ArrowRightIcon className="size-4" />
+            </Button>
+        </div>
+    );
+}
 
 export function SiteHeader({ title = "Documents", actions, showSidebarToggle = true, breadcrumbs }: SiteHeaderProps) {
     const pathname = usePathname();
@@ -125,6 +158,7 @@ export function SiteHeader({ title = "Documents", actions, showSidebarToggle = t
                     {showSidebarToggle && (
                         <>
                             <SidebarTrigger className="-ml-1" />
+                            <HeaderHistoryButtons />
                             <Separator orientation="vertical" className="mx-2 data-[orientation=vertical]:h-4" />
                         </>
                     )}

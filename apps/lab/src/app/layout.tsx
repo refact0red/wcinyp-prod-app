@@ -4,6 +4,7 @@ import type { Metadata, Viewport } from "next";
 import { Inter } from "next/font/google";
 import React from "react";
 
+import { HistoryProvider } from "@/components/history-context";
 import { ThemeProvider } from "@/components/shadcn/theme-provider";
 
 const inter = Inter({
@@ -37,7 +38,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en" suppressHydrationWarning>
       <body className={`${inter.variable} bg-background text-foreground antialiased`}>
-        <ThemeProvider>{children}</ThemeProvider>
+        <ThemeProvider>
+          <HistoryProvider>{children}</HistoryProvider>
+        </ThemeProvider>
       </body>
     </html>
   );

@@ -87,7 +87,7 @@ export const wcinypLocations: WcinypLocation[] = [
             "PET/MRI",
             "Ultrasound",
             "X-ray",
-            "Image-Guided Breast Biopsy",
+            "Breast Biopsy",
         ],
         maps: {
             placeUrl:
@@ -139,13 +139,7 @@ export const wcinypLocations: WcinypLocation[] = [
         },
         city: "New York",
         state: "NY",
-        modalities: [
-            "CT",
-            "US",
-            "X-ray",
-            "Mammography",
-            "Image-Guided Breast Intervention & Biopsy",
-        ],
+        modalities: ["CT", "US", "X-ray", "Mammography", "Breast Biopsy"],
         maps: {
             placeUrl:
                 "https://www.google.com/maps/place/Weill+Cornell+Imaging+at+NewYork-Presbyterian/@40.7605686,-73.9591669,17z/data=!3m2!4b1!5s0x89c258e7c6a7d603:0x2a12bf5f9a0c36fd!4m6!3m5!1s0x89c258dd5e446aad:0x1070f364c2702b9a!8m2!3d40.7605686!4d-73.9591669!16s%2Fg%2F1tfkx6t3?entry=ttu&g_ep=EgoyMDI1MDEyMi4wIKXMDSoASAFQAw%3D%3D",
@@ -252,7 +246,7 @@ export const wcinypLocations: WcinypLocation[] = [
             "X-ray",
             "Mammography",
             "Bone Density",
-            "Image-Guided Breast Biopsy",
+            "Breast Biopsy",
         ],
         maps: {
             placeUrl:
@@ -284,7 +278,7 @@ export const wcinypLocations: WcinypLocation[] = [
             "X-ray",
             "US",
             "Mammography",
-            "Image-Guided Breast Biopsy",
+            "Breast Biopsy",
         ],
         maps: {
             placeUrl:
