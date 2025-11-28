@@ -31,11 +31,7 @@ export default function DrivePage() {
                 <div className="flex flex-1 flex-col">
                     <div className="container @container/main flex flex-1 flex-col gap-2">
                         <div className="flex flex-col gap-4 py-4 md:gap-6 md:py-6">
-                            <div className="grid gap-6 px-4 lg:grid-cols-[260px_1fr] lg:px-6">
-                                <div className="self-start">
-                                    <DriveSidebar />
-                                </div>
-
+                            <div className="grid gap-6 px-4 lg:grid-cols-[1fr_260px] lg:px-6">
                                 <div className="flex flex-col gap-4">
                                     <Tabs defaultValue="appointment" className="w-full">
                                         <TabsList className="w-fit">
@@ -53,6 +49,10 @@ export default function DrivePage() {
                                             <div className="text-sm text-muted-foreground">No miscellaneous files yet.</div>
                                         </TabsContent>
                                     </Tabs>
+                                </div>
+
+                                <div className="self-start">
+                                    <DriveSidebar />
                                 </div>
                             </div>
                         </div>
