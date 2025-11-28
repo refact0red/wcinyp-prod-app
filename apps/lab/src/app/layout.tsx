@@ -1,9 +1,16 @@
-import "../styles/globals.css"
+import "../styles/globals.css";
 
-import type { Metadata, Viewport } from "next"
-import React from "react"
+import type { Metadata, Viewport } from "next";
+import { Inter } from "next/font/google";
+import React from "react";
 
-import { ThemeProvider } from "@/components/shadcn/theme-provider"
+import { ThemeProvider } from "@/components/shadcn/theme-provider";
+
+const inter = Inter({
+  subsets: ["latin"],
+  display: "swap",
+  variable: "--font-inter",
+});
 
 export const metadata: Metadata = {
   title: {
@@ -19,21 +26,19 @@ export const metadata: Metadata = {
     shortcut: "/favicon.ico?v=3",
     apple: "/icon.png?v=3",
   },
-}
+};
 
 export const viewport: Viewport = {
   themeColor: "#7f56d9",
   colorScheme: "light dark",
-}
+};
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className="bg-background text-foreground">
-        <ThemeProvider>
-          {children}
-        </ThemeProvider>
+      <body className={`${inter.variable} bg-background text-foreground antialiased`}>
+        <ThemeProvider>{children}</ThemeProvider>
       </body>
     </html>
-  )
+  );
 }

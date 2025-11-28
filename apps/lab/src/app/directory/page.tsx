@@ -162,6 +162,10 @@ export default function DirectoryPage() {
         window.open(location.maps.placeUrl, "_blank", "noopener,noreferrer");
     };
 
+    const handleOpenLocationPage = (location: WcinypLocation) => {
+        router.push(`/directory/locations/${location.slug}`);
+    };
+
     const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
         event.preventDefault();
         setError(null);
@@ -232,12 +236,13 @@ export default function DirectoryPage() {
         [result],
     );
 
+    const tabFromUrl = searchParams?.get("tab") ?? undefined;
+
     useEffect(() => {
-        const tabFromUrl = searchParams?.get("tab") ?? undefined;
         const allowedTabs = ["people", "locations", "radiologists", "providers", "npi"] as const;
         const nextTab = allowedTabs.includes(tabFromUrl as any) ? (tabFromUrl as string) : "people";
         setActiveTab(nextTab);
-    }, [searchParams]);
+    }, [tabFromUrl]);
 
     const handleTabChange = (nextTab: string) => {
         setActiveTab(nextTab);
@@ -299,6 +304,7 @@ export default function DirectoryPage() {
                                                 selectedLocationId={selectedLocationId}
                                                 onSelectLocation={setSelectedLocationId}
                                                 onOpenInMaps={handleOpenLocationInMaps}
+                                                onLocationClick={handleOpenLocationPage}
                                             />
                                             <DirectoryLocationsMap
                                                 locations={wcinypLocations}

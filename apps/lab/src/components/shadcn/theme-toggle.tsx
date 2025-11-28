@@ -14,6 +14,22 @@ export function ThemeToggle() {
     setIsMounted(true)
   }, [])
 
+  if (!isMounted) {
+    return (
+      <Button
+        size="icon"
+        className="h-9 w-9 shrink-0 group-data-[collapsible=icon]:opacity-0"
+        variant="outline"
+        type="button"
+        aria-label="Toggle theme"
+        disabled
+      >
+        <SunIcon className="h-4 w-4" aria-hidden="true" />
+        <span className="sr-only">Toggle theme</span>
+      </Button>
+    )
+  }
+
   const currentTheme = theme === "system" ? resolvedTheme : theme
   const isDark = currentTheme === "dark"
 
@@ -35,4 +51,3 @@ export function ThemeToggle() {
     </Button>
   )
 }
-

@@ -28,6 +28,13 @@ import {
   defaultTableState,
 } from "@/components/table/table-config"
 
+// TODO: For browser-only state (localStorage, matchMedia, etc.),
+// keep SSR + initial client render deterministic, then layer
+// persisted state on in useEffect. If we ever want persisted
+// table layout on first paint, consider moving persistence to
+// a server-readable source (e.g. cookies) and feeding it into
+// initialState so SSR and CSR see the same data.
+
 export type PersistableState = Pick<
   TableState,
   | "sorting"
@@ -97,39 +104,72 @@ export function useDataTable<TData>({
   initialState,
   onStateChange,
 }: UseDataTableProps<TData>) {
-  const persisted = React.useMemo(() => readPersistedState(stateKey), [stateKey])
+  const [isPersistenceReady, setIsPersistenceReady] = React.useState(false)
 
   const [sorting, setSorting] = React.useState<SortingState>(
-    persisted?.sorting ?? initialState?.sorting ?? []
+    initialState?.sorting ?? []
   )
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
-    persisted?.columnFilters ?? initialState?.columnFilters ?? []
+    initialState?.columnFilters ?? []
   )
   const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>(
-    persisted?.columnVisibility ?? initialState?.columnVisibility ?? {}
+    initialState?.columnVisibility ?? {}
   )
   const [globalFilter, setGlobalFilter] = React.useState<string>(
-    (persisted?.globalFilter as string | undefined) ??
-      (initialState?.globalFilter as string | undefined) ??
-      ""
+    (initialState?.globalFilter as string | undefined) ?? ""
   )
   const [rowSelection, setRowSelection] = React.useState<RowSelectionState>({})
   const [columnPinning, setColumnPinning] = React.useState<ColumnPinningState>(
-    persisted?.columnPinning ?? initialState?.columnPinning ?? { right: [] }
+    initialState?.columnPinning ?? { right: [] }
   )
   const [columnOrder, setColumnOrder] = React.useState<ColumnOrderState>(
-    persisted?.columnOrder ?? initialState?.columnOrder ?? []
+    initialState?.columnOrder ?? []
   )
   const [columnSizing, setColumnSizing] = React.useState<ColumnSizingState>(
-    persisted?.columnSizing ?? initialState?.columnSizing ?? {}
+    initialState?.columnSizing ?? {}
   )
   const [pagination, setPagination] = React.useState(
-    persisted?.pagination ??
-      initialState?.pagination ?? {
-        pageIndex: defaultTableState.pagination?.pageIndex ?? 0,
-        pageSize: defaultTableState.pagination?.pageSize ?? defaultPageSize,
-      }
+    initialState?.pagination ?? {
+      pageIndex: defaultTableState.pagination?.pageIndex ?? 0,
+      pageSize: defaultTableState.pagination?.pageSize ?? defaultPageSize,
+    }
   )
+
+  React.useEffect(() => {
+    if (!stateKey) {
+      setIsPersistenceReady(true)
+      return
+    }
+
+    const persisted = readPersistedState(stateKey)
+
+    if (persisted) {
+      setSorting(persisted.sorting ?? initialState?.sorting ?? [])
+      setColumnFilters(persisted.columnFilters ?? initialState?.columnFilters ?? [])
+      setColumnVisibility(
+        persisted.columnVisibility ?? initialState?.columnVisibility ?? {}
+      )
+      setGlobalFilter(
+        (persisted.globalFilter as string | undefined) ??
+          (initialState?.globalFilter as string | undefined) ??
+          ""
+      )
+      setColumnPinning(
+        persisted.columnPinning ?? initialState?.columnPinning ?? { right: [] }
+      )
+      setColumnOrder(persisted.columnOrder ?? initialState?.columnOrder ?? [])
+      setColumnSizing(persisted.columnSizing ?? initialState?.columnSizing ?? {})
+      setPagination(
+        persisted.pagination ??
+          initialState?.pagination ?? {
+            pageIndex: defaultTableState.pagination?.pageIndex ?? 0,
+            pageSize: defaultTableState.pagination?.pageSize ?? defaultPageSize,
+          }
+      )
+    }
+
+    setIsPersistenceReady(true)
+  }, [stateKey])
 
   const resetState = React.useCallback(() => {
     setSorting(initialState?.sorting ?? [])
@@ -152,7 +192,7 @@ export function useDataTable<TData>({
   }, [initialState, stateKey])
 
   React.useEffect(() => {
-    if (!stateKey) return
+    if (!stateKey || !isPersistenceReady) return
     const value: PersistableState = {
       sorting,
       columnFilters,
@@ -166,6 +206,7 @@ export function useDataTable<TData>({
     writePersistedState(stateKey, value)
   }, [
     stateKey,
+    isPersistenceReady,
     sorting,
     columnFilters,
     columnVisibility,

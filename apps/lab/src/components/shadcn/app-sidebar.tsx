@@ -34,7 +34,7 @@ import {
   SidebarMenuItem,
 } from "@/components/shadcn/ui/sidebar"
 
-const data = {
+export const appSidebarData = {
   user: {
     name: "Neo",
     email: "taa001@med.cornell.edu",
@@ -56,11 +56,6 @@ const data = {
       title: "Manual",
       url: "/manual",
       icon: BookIcon,
-    },
-    {
-      title: "Team",
-      url: "#",
-      icon: UsersIcon,
     },
   ],
   navClouds: [
@@ -154,6 +149,11 @@ const data = {
       url: "#",
       icon: CircleUserRoundIcon,
     },
+    {
+      name: "Team",
+      url: "#",
+      icon: CircleUserRoundIcon,
+    },
   ],
   admin: [
     {
@@ -222,13 +222,13 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         </SidebarMenu>
       </SidebarHeader>
       <SidebarContent>
-        <NavMain items={data.navMain} />
-        <NavDocuments label="Experimental" items={data.documents} />
-        <NavDocuments label="Admin" items={data.admin} />
-        <NavSecondary items={data.navSecondary} className="mt-auto" />
+        <NavMain items={appSidebarData.navMain} />
+        <NavDocuments label="Experimental" items={appSidebarData.documents} />
+        <NavDocuments label="Admin" items={appSidebarData.admin} />
+        <NavSecondary items={appSidebarData.navSecondary} className="mt-auto" />
       </SidebarContent>
       <SidebarFooter>
-        <NavUser user={data.user} />
+        <NavUser user={appSidebarData.user} />
       </SidebarFooter>
     </Sidebar>
   )

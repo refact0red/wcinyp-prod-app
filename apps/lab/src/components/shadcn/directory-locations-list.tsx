@@ -13,13 +13,13 @@ import {
     CardHeader,
     CardTitle,
 } from "@/components/shadcn/ui/card";
-import { Button } from "@/components/shadcn/ui/button";
 
 export type DirectoryLocationsListProps = {
     locations: WcinypLocation[];
     selectedLocationId?: string | null;
     onSelectLocation?: (id: string) => void;
     onOpenInMaps?: (location: WcinypLocation) => void;
+    onLocationClick?: (location: WcinypLocation) => void;
 };
 
 export function DirectoryLocationsList({
@@ -27,6 +27,7 @@ export function DirectoryLocationsList({
     selectedLocationId,
     onSelectLocation,
     onOpenInMaps,
+    onLocationClick,
 }: DirectoryLocationsListProps) {
     const sortedLocations = React.useMemo(
         () =>
@@ -47,13 +48,17 @@ export function DirectoryLocationsList({
     }
 
     return (
-        <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
             {sortedLocations.map((location) => {
                 const isSelected = location.id === selectedLocationId;
 
                 const handleSelect = () => {
-                    if (!onSelectLocation) return;
-                    onSelectLocation(location.id);
+                    if (onSelectLocation) {
+                        onSelectLocation(location.id);
+                    }
+                    if (onLocationClick) {
+                        onLocationClick(location);
+                    }
                 };
 
                 const handleKeyDown: React.KeyboardEventHandler<HTMLDivElement> = (event) => {
@@ -61,12 +66,6 @@ export function DirectoryLocationsList({
                         event.preventDefault();
                         handleSelect();
                     }
-                };
-
-                const handleOpenInMaps: React.MouseEventHandler<HTMLButtonElement> = (event) => {
-                    event.stopPropagation();
-                    if (!onOpenInMaps) return;
-                    onOpenInMaps(location);
                 };
 
                 return (
@@ -82,23 +81,14 @@ export function DirectoryLocationsList({
                             isSelected && "border-primary bg-primary/5 shadow-md",
                         )}
                     >
-                        <CardHeader className="flex flex-col gap-3 border-b border-border/40 pb-4 md:flex-row md:items-start">
-                            <div className="relative h-40 w-full overflow-hidden rounded-lg border border-border/40 bg-muted md:h-32 md:w-40 lg:w-48">
-                                <Image
-                                    src={location.image.src}
-                                    alt={location.image.alt}
-                                    fill
-                                    sizes="(min-width: 1024px) 192px, (min-width: 768px) 160px, 100vw"
-                                    className="object-cover transition duration-300 group-hover:scale-[1.03]"
-                                />
-                            </div>
+                        <CardHeader className="flex flex-col gap-2 pb-3 md:flex-row md:items-start">
                             <div className="flex flex-1 flex-col gap-1">
-                                <div className="flex items-start gap-2">
-                                    <div className="flex-1">
-                                        <CardTitle className="text-base font-semibold leading-snug">
-                                            {location.name}
-                                        </CardTitle>
-                                        <CardDescription className="mt-1 text-xs leading-snug">
+                                <CardTitle className="text-base font-semibold leading-snug">
+                                    {location.name}
+                                </CardTitle>
+                                <CardDescription className="mt-1 text-xs leading-snug">
+                                    {onOpenInMaps ? (
+                                        <LocationMapsLink location={location} onOpenInMaps={onOpenInMaps}>
                                             {location.address.line1}
                                             {location.address.line2 && (
                                                 <>
@@ -115,20 +105,40 @@ export function DirectoryLocationsList({
                                             <br />
                                             {location.city}, {location.state}
                                             {location.zip ? ` ${location.zip}` : ""}
-                                        </CardDescription>
-                                    </div>
-                                    <div className="flex items-end">
-                                        <Badge
-                                            variant="outline"
-                                            className="whitespace-nowrap rounded-full px-2 py-0.5 text-[11px] font-medium uppercase tracking-wide"
-                                        >
-                                            {location.region}
-                                        </Badge>
-                                    </div>
-                                </div>
+                                        </LocationMapsLink>
+                                    ) : (
+                                        <>
+                                            {location.address.line1}
+                                            {location.address.line2 && (
+                                                <>
+                                                    <br />
+                                                    {location.address.line2}
+                                                </>
+                                            )}
+                                            {location.address.crossStreets && (
+                                                <>
+                                                    <br />
+                                                    {location.address.crossStreets}
+                                                </>
+                                            )}
+                                            <br />
+                                            {location.city}, {location.state}
+                                            {location.zip ? ` ${location.zip}` : ""}
+                                        </>
+                                    )}
+                                </CardDescription>
+                            </div>
+                            <div className="relative h-32 w-full overflow-hidden rounded-lg border border-border/40 bg-muted md:h-28 md:w-40 lg:h-32 lg:w-44">
+                                <Image
+                                    src={location.image.src}
+                                    alt={location.image.alt}
+                                    fill
+                                    sizes="(min-width: 1024px) 192px, (min-width: 768px) 160px, 100vw"
+                                    className="object-cover transition duration-300 group-hover:scale-[1.03]"
+                                />
                             </div>
                         </CardHeader>
-                        <CardContent className="flex flex-col gap-3 pt-4">
+                        <CardContent className="flex flex-col gap-2 pt-3">
                             <div className="flex flex-wrap gap-1.5">
                                 {location.modalities.map((modality) => (
                                     <Badge
@@ -140,19 +150,6 @@ export function DirectoryLocationsList({
                                     </Badge>
                                 ))}
                             </div>
-                            {onOpenInMaps && (
-                                <div className="flex justify-end">
-                                    <Button
-                                        type="button"
-                                        variant="ghost"
-                                        size="sm"
-                                        className="h-7 px-2 text-xs"
-                                        onClick={handleOpenInMaps}
-                                    >
-                                        View in Maps
-                                    </Button>
-                                </div>
-                            )}
                         </CardContent>
                     </Card>
                 );
@@ -160,3 +157,28 @@ export function DirectoryLocationsList({
         </div>
     );
 }
+
+type LocationMapsLinkProps = {
+    location: WcinypLocation;
+    onOpenInMaps: (location: WcinypLocation) => void;
+    children: React.ReactNode;
+};
+
+const LocationMapsLink = ({ location, onOpenInMaps, children }: LocationMapsLinkProps) => {
+    const handleClick: React.MouseEventHandler<HTMLAnchorElement> = (event) => {
+        event.stopPropagation();
+        onOpenInMaps(location);
+    };
+
+    return (
+        <a
+            href={location.maps.placeUrl}
+            target="_blank"
+            rel="noreferrer noopener"
+            onClick={handleClick}
+            className="inline-block text-xs leading-snug text-primary underline-offset-4 hover:underline"
+        >
+            {children}
+        </a>
+    );
+};
