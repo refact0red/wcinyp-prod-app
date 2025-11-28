@@ -5,6 +5,7 @@ import Image from "next/image";
 
 import type { WcinypLocation } from "@/lib/wcinyp/locations";
 import { cn } from "@/lib/utils";
+import { AspectRatio } from "@/components/shadcn/ui/aspect-ratio";
 import { Badge } from "@/components/shadcn/ui/badge";
 import {
     Card,
@@ -128,15 +129,15 @@ export function DirectoryLocationsList({
                                     )}
                                 </CardDescription>
                             </div>
-                            <div className="relative h-32 w-full overflow-hidden rounded-lg border border-border/40 bg-muted md:h-28 md:w-40 lg:h-32 lg:w-44">
+                            <AspectRatio ratio={3 / 1} className="w-full max-h-32 overflow-hidden rounded-lg border border-border/40 bg-muted md:w-40 lg:w-44">
                                 <Image
                                     src={location.image.src}
                                     alt={location.image.alt}
                                     fill
-                                    sizes="(min-width: 1024px) 192px, (min-width: 768px) 160px, 100vw"
+                                    sizes="(min-width: 1024px) 176px, (min-width: 768px) 160px, 100vw"
                                     className="object-cover transition duration-300 group-hover:scale-[1.03]"
                                 />
-                            </div>
+                            </AspectRatio>
                         </CardHeader>
                         <CardContent className="flex flex-col gap-2 pt-3">
                             <div className="flex flex-wrap gap-1.5">

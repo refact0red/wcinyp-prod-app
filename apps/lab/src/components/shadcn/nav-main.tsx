@@ -42,8 +42,6 @@ import {
   useSidebar,
 } from "@/components/shadcn/ui/sidebar"
 
-import { ThemeToggle } from "@/components/shadcn/theme-toggle"
-
 export function NavMain({
   items,
 }: {
@@ -101,7 +99,6 @@ export function NavMain({
                 <SearchIcon />
                 <span>Search</span>
               </SidebarMenuButton>
-              <ThemeToggle />
             </SidebarMenuItem>
           </SidebarMenu>
           <SidebarMenu>

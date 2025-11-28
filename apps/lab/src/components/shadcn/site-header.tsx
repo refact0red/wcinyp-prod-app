@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { ChevronDownIcon } from "lucide-react";
+import { BellIcon, ChevronDownIcon, CreditCardIcon, LogOutIcon, UserCircleIcon } from "lucide-react";
 import { Fragment, useMemo } from "react";
 import { usePathname } from "next/navigation";
 
@@ -15,13 +15,22 @@ import {
     BreadcrumbSeparator,
 } from "@/components/shadcn/ui/breadcrumb";
 import {
+    Avatar,
+    AvatarFallback,
+    AvatarImage,
+} from "@/components/shadcn/ui/avatar";
+import {
     DropdownMenu,
     DropdownMenuContent,
+    DropdownMenuGroup,
     DropdownMenuItem,
+    DropdownMenuLabel,
+    DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from "@/components/shadcn/ui/dropdown-menu";
 import { Separator } from "@/components/shadcn/ui/separator";
 import { SidebarTrigger } from "@/components/shadcn/ui/sidebar";
+import { ThemeToggle } from "@/components/shadcn/theme-toggle";
 import { wcinypLocations } from "@/lib/wcinyp/locations";
 
 type SiteHeaderBreadcrumb = {
@@ -160,7 +169,58 @@ export function SiteHeader({ title = "Documents", actions, showSidebarToggle = t
                         </BreadcrumbList>
                     </Breadcrumb>
                 </div>
-                {actions ? <div className="flex items-center gap-2">{actions}</div> : null}
+                <div className="flex items-center gap-2">
+                    {actions ? <div className="flex items-center gap-2">{actions}</div> : null}
+                    <ThemeToggle />
+                    <DropdownMenu>
+                        <DropdownMenuTrigger className="inline-flex items-center justify-center rounded-full outline-none ring-offset-background focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2">
+                            <Avatar className="h-8 w-8">
+                                <AvatarImage src={appSidebarData.user.avatar} alt={appSidebarData.user.name} />
+                                <AvatarFallback>
+                                    {appSidebarData.user.initials}
+                                </AvatarFallback>
+                            </Avatar>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent className="min-w-56 rounded-lg" align="end" sideOffset={4}>
+                            <DropdownMenuLabel className="p-0 font-normal">
+                                <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
+                                    <Avatar className="h-8 w-8">
+                                        <AvatarImage src={appSidebarData.user.avatar} alt={appSidebarData.user.name} />
+                                        <AvatarFallback>
+                                            {appSidebarData.user.initials}
+                                        </AvatarFallback>
+                                    </Avatar>
+                                    <div className="grid flex-1 text-left text-sm leading-tight">
+                                        <span className="truncate font-medium">{appSidebarData.user.name}</span>
+                                        <span className="truncate text-xs text-muted-foreground">
+                                            {appSidebarData.user.email}
+                                        </span>
+                                    </div>
+                                </div>
+                            </DropdownMenuLabel>
+                            <DropdownMenuSeparator />
+                            <DropdownMenuGroup>
+                                <DropdownMenuItem>
+                                    <UserCircleIcon className="mr-2 h-4 w-4" />
+                                    Account
+                                </DropdownMenuItem>
+                                <DropdownMenuItem>
+                                    <CreditCardIcon className="mr-2 h-4 w-4" />
+                                    Billing
+                                </DropdownMenuItem>
+                                <DropdownMenuItem>
+                                    <BellIcon className="mr-2 h-4 w-4" />
+                                    Notifications
+                                </DropdownMenuItem>
+                            </DropdownMenuGroup>
+                            <DropdownMenuSeparator />
+                            <DropdownMenuItem>
+                                <LogOutIcon className="mr-2 h-4 w-4" />
+                                Log out
+                            </DropdownMenuItem>
+                        </DropdownMenuContent>
+                    </DropdownMenu>
+                </div>
             </div>
         </header>
     );

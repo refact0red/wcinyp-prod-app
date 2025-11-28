@@ -2,7 +2,7 @@
 
 import * as React from "react"
 import { ColumnDef, flexRender } from "@tanstack/react-table"
-import { CheckIcon, ClipboardIcon, MoreVerticalIcon } from "lucide-react"
+import { CheckIcon, ClipboardIcon, MoreVerticalIcon, PlusIcon } from "lucide-react"
 
 import type { DirectoryPerson } from "@/app/directory/data"
 import { directoryPeople } from "@/app/directory/data"
@@ -190,7 +190,17 @@ export function DirectoryTable() {
   const normalize = (value?: string) => value?.trim() ?? ""
 
   const isDirty = React.useMemo(() => {
-    if (!editingPerson) return false
+    if (!editingPerson) {
+      return (
+        normalize(formState.name) !== "" ||
+        normalize(formState.title) !== "" ||
+        normalize(formState.team) !== "" ||
+        normalize(formState.officePhone) !== "" ||
+        normalize(formState.mobilePhone) !== "" ||
+        normalize(formState.email) !== ""
+      )
+    }
+
     return (
       normalize(formState.name) !== normalize(editingPerson.name) ||
       normalize(formState.title) !== normalize(editingPerson.title) ||
@@ -238,6 +248,11 @@ export function DirectoryTable() {
     [editingPersonId, resetFormState]
   )
 
+  const handleCreate = React.useCallback(() => {
+    resetFormState()
+    setIsSheetOpen(true)
+  }, [resetFormState])
+
   const attemptCloseSheet = React.useCallback(() => {
     if (isDirty) {
       const confirmed =
@@ -264,25 +279,43 @@ export function DirectoryTable() {
 
   const handleSave = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault()
-    if (!editingPerson) return
 
     const name = formState.name.trim()
-    const team = formState.team.trim() || editingPerson.team
+    const team = formState.team.trim() || (editingPerson?.team ?? "")
     if (!name || !team) return
 
-    const updatedPerson: DirectoryPerson = {
-      ...editingPerson,
-      name,
-      title: formState.title.trim(),
-      team,
-      officePhone: formState.officePhone.trim() || undefined,
-      mobilePhone: formState.mobilePhone.trim() || undefined,
-      email: formState.email.trim(),
+    if (editingPerson) {
+      const updatedPerson: DirectoryPerson = {
+        ...editingPerson,
+        name,
+        title: formState.title.trim(),
+        team,
+        officePhone: formState.officePhone.trim() || undefined,
+        mobilePhone: formState.mobilePhone.trim() || undefined,
+        email: formState.email.trim(),
+      }
+
+      setPeople((prev) =>
+        prev.map((person) => (person.id === editingPerson.id ? updatedPerson : person))
+      )
+    } else {
+      const nextId =
+        people.length > 0 ? Math.max(...people.map((person) => person.id)) + 1 : 1
+
+      const newPerson: DirectoryPerson = {
+        id: nextId,
+        name,
+        title: formState.title.trim(),
+        team,
+        officePhone: formState.officePhone.trim() || undefined,
+        mobilePhone: formState.mobilePhone.trim() || undefined,
+        email: formState.email.trim(),
+        status: "Active",
+      }
+
+      setPeople((prev) => [...prev, newPerson])
     }
 
-    setPeople((prev) =>
-      prev.map((person) => (person.id === editingPerson.id ? updatedPerson : person))
-    )
     setIsSheetOpen(false)
     resetFormState()
   }
@@ -430,6 +463,12 @@ export function DirectoryTable() {
           filters={toolbarFilters}
           searchPlaceholder="Search by name, email, or team"
           onReset={resetState}
+          rightSlot={
+            <Button size="sm" className="gap-2" onClick={handleCreate}>
+              <PlusIcon className="size-4" />
+              Add person
+            </Button>
+          }
         />
         <BulkActionsBar
           table={table}
@@ -490,8 +529,12 @@ export function DirectoryTable() {
       <Sheet open={isSheetOpen} onOpenChange={handleSheetOpenChange}>
         <SheetContent side="right" className="flex flex-col sm:max-w-md">
           <SheetHeader>
-            <SheetTitle>Edit contact</SheetTitle>
-            <SheetDescription>Update this person&apos;s details.</SheetDescription>
+            <SheetTitle>{editingPerson ? "Edit contact" : "Add person"}</SheetTitle>
+            <SheetDescription>
+              {editingPerson
+                ? "Update this person\u2019s details."
+                : "Create a new person in the directory."}
+            </SheetDescription>
           </SheetHeader>
 
           <div className="flex-1 overflow-y-auto px-4 pr-5">

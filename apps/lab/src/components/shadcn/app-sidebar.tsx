@@ -23,11 +23,9 @@ import {
 import { NavDocuments } from "@/components/shadcn/nav-documents"
 import { NavMain } from "@/components/shadcn/nav-main"
 import { NavSecondary } from "@/components/shadcn/nav-secondary"
-import { NavUser } from "@/components/shadcn/nav-user"
 import {
   Sidebar,
   SidebarContent,
-  SidebarFooter,
   SidebarHeader,
   SidebarMenu,
   SidebarMenuButton,
@@ -227,9 +225,6 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         <NavDocuments label="Admin" items={appSidebarData.admin} />
         <NavSecondary items={appSidebarData.navSecondary} className="mt-auto" />
       </SidebarContent>
-      <SidebarFooter>
-        <NavUser user={appSidebarData.user} />
-      </SidebarFooter>
     </Sidebar>
   )
 }

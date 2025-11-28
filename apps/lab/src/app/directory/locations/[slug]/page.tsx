@@ -4,13 +4,15 @@ import { notFound } from "next/navigation";
 
 import { AppSidebar } from "@/components/shadcn/app-sidebar";
 import { SiteHeader } from "@/components/shadcn/site-header";
+import { DirectorySubHeader } from "@/components/shadcn/directory-subheader";
+import { AspectRatio } from "@/components/shadcn/ui/aspect-ratio";
 import { Badge } from "@/components/shadcn/ui/badge";
 import {
-    Card,
-    CardContent,
-    CardDescription,
-    CardHeader,
-    CardTitle,
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
 } from "@/components/shadcn/ui/card";
 import { Button } from "@/components/shadcn/ui/button";
 import { SidebarInset, SidebarProvider } from "@/components/shadcn/ui/sidebar";
@@ -49,13 +51,17 @@ export default function LocationPage({ params }: LocationPageProps) {
             <AppSidebar variant="inset" />
             <SidebarInset>
                 <SiteHeader title="Directory" />
+                <DirectorySubHeader activeTab="locations" />
                 <div className="flex flex-1 flex-col">
                     <div className="container @container/main flex flex-1 flex-col gap-2">
                         <div className="flex flex-col gap-4 py-4 md:gap-6 md:py-6">
                             <div className="px-4 lg:px-6">
                                 <Card className="overflow-hidden border-border/70 bg-card">
                                     <CardHeader className="flex flex-col gap-4 border-b border-border/40 pb-4 md:flex-row md:items-start">
-                                        <div className="relative h-48 w-full overflow-hidden rounded-lg border border-border/40 bg-muted md:h-40 md:w-64 lg:h-56 lg:w-80">
+                                        <AspectRatio
+                                            ratio={16 / 9}
+                                            className="w-full overflow-hidden rounded-lg border border-border/40 bg-muted md:w-64 lg:w-80"
+                                        >
                                             <Image
                                                 src={location.image.src}
                                                 alt={location.image.alt}
@@ -63,7 +69,7 @@ export default function LocationPage({ params }: LocationPageProps) {
                                                 sizes="(min-width: 1024px) 320px, (min-width: 768px) 256px, 100vw"
                                                 className="object-cover"
                                             />
-                                        </div>
+                                        </AspectRatio>
                                         <div className="flex flex-1 flex-col gap-3">
                                             <div className="flex flex-wrap items-center gap-2">
                                                 <CardTitle className="text-xl font-semibold leading-snug">
@@ -138,4 +144,3 @@ export default function LocationPage({ params }: LocationPageProps) {
         </SidebarProvider>
     );
 }
-
