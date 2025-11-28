@@ -28,6 +28,7 @@ export type WcinypLocation = {
     id: string;
     slug: string;
     shortCode: string;
+    akaShortCode?: string;
     name: string;
     region: WcinypRegion;
     borough: WcinypBorough;
@@ -45,6 +46,7 @@ export const wcinypLocations: WcinypLocation[] = [
         id: "weill-greenberg-center",
         slug: "weill-greenberg-center",
         shortCode: "WGC",
+        akaShortCode: "WGC",
         name: "Weill Greenberg Center",
         region: "Upper East Side",
         borough: "Manhattan",
@@ -55,7 +57,7 @@ export const wcinypLocations: WcinypLocation[] = [
         city: "New York",
         state: "NY",
         zip: "10021",
-        modalities: ["MRI", "PET/CT", "PET/MRI", "X-ray", "Bone Density"],
+        modalities: ["MRI", "PET/CT", "PET/MRI", "X-ray", "DEXA"],
         maps: {
             placeUrl:
                 "https://www.google.com/maps/place/Weill+Cornell+Imaging+at+NewYork-Presbyterian/@40.7656066,-73.9553663,16z/data=!3m2!4b1!5s0x89c258c28300f92f:0x98caab33b7319027!4m6!3m5!1s0x89c258c3fae07c13:0xeb6bdd4f382dda97!8m2!3d40.7656066!4d-73.9553663!16s%2Fg%2F1trpm378?entry=ttu&g_ep=EgoyMDI1MDEyMi4wIKXMDSoASAFQAw%3D%3D",
@@ -71,6 +73,7 @@ export const wcinypLocations: WcinypLocation[] = [
         id: "david-h-koch-center",
         slug: "david-h-koch-center",
         shortCode: "DHK",
+        akaShortCode: "DHK",
         name: "David H. Koch Center",
         region: "Upper East Side",
         borough: "Manhattan",
@@ -85,7 +88,7 @@ export const wcinypLocations: WcinypLocation[] = [
             "MRI",
             "PET/CT",
             "PET/MRI",
-            "Ultrasound",
+            "US",
             "X-ray",
             "Breast Biopsy",
         ],
@@ -104,17 +107,17 @@ export const wcinypLocations: WcinypLocation[] = [
         id: "starr-pavillion",
         slug: "starr-pavillion",
         shortCode: "STARR",
+        akaShortCode: "STARR",
         name: "Starr Pavillion",
         region: "Upper East Side",
         borough: "Manhattan",
         address: {
-            line1: "520 East 70th St",
-            line2: "Ground Fl",
-            crossStreets: "(Between York Ave & the East River)",
+            line1: "520 East 70th St, Ground Fl",
+            line2: "(Between York Ave & the East River)",
         },
         city: "New York",
         state: "NY",
-        modalities: ["CT", "US", "X-ray", "Fluoroscopy"],
+        modalities: ["CT", "US", "X-ray", "Fluoro"],
         maps: {
             placeUrl:
                 "https://www.google.com/maps/place/Weill+Cornell+Imaging+at+NewYork-Presbyterian/@40.764821,-73.953756,17z/data=!3m2!4b1!5s0x89c26008e1f0fb33:0xc56f88e705174ce3!4m6!3m5!1s0x89c25973e3c28d93:0xfbb6e271e3c211c4!8m2!3d40.764821!4d-73.953756!16s%2Fg%2F11j24g7rnp?entry=ttu&g_ep=EgoyMDI1MDEyMi4wIKXMDSoASAFQAw%3D%3D",
@@ -130,6 +133,7 @@ export const wcinypLocations: WcinypLocation[] = [
         id: "iris-cantor-womens-health-center",
         slug: "iris-cantor-womens-health-center",
         shortCode: "ICWHC",
+        akaShortCode: "E61ST",
         name: "Iris Cantor Women’s Health Center",
         region: "Midtown",
         borough: "Manhattan",
@@ -139,7 +143,7 @@ export const wcinypLocations: WcinypLocation[] = [
         },
         city: "New York",
         state: "NY",
-        modalities: ["CT", "US", "X-ray", "Mammography", "Breast Biopsy"],
+        modalities: ["CT", "US", "X-ray", "Mammo", "Breast Biopsy"],
         maps: {
             placeUrl:
                 "https://www.google.com/maps/place/Weill+Cornell+Imaging+at+NewYork-Presbyterian/@40.7605686,-73.9591669,17z/data=!3m2!4b1!5s0x89c258e7c6a7d603:0x2a12bf5f9a0c36fd!4m6!3m5!1s0x89c258dd5e446aad:0x1070f364c2702b9a!8m2!3d40.7605686!4d-73.9591669!16s%2Fg%2F1tfkx6t3?entry=ttu&g_ep=EgoyMDI1MDEyMi4wIKXMDSoASAFQAw%3D%3D",
@@ -155,6 +159,7 @@ export const wcinypLocations: WcinypLocation[] = [
         id: "midtown-east",
         slug: "midtown-east",
         shortCode: "ME",
+        akaShortCode: "E55TH",
         name: "Midtown East",
         region: "Midtown",
         borough: "Manhattan",
@@ -180,6 +185,7 @@ export const wcinypLocations: WcinypLocation[] = [
         id: "hudson-yards",
         slug: "hudson-yards",
         shortCode: "HY",
+        akaShortCode: "SPIRAL",
         name: "Hudson Yards",
         region: "Midtown",
         borough: "Manhattan",
@@ -205,6 +211,7 @@ export const wcinypLocations: WcinypLocation[] = [
         id: "upper-west-side",
         slug: "upper-west-side",
         shortCode: "UWS",
+        akaShortCode: "BROADWAY",
         name: "Upper West Side",
         region: "Upper West Side",
         borough: "Manhattan",
@@ -214,7 +221,7 @@ export const wcinypLocations: WcinypLocation[] = [
         },
         city: "New York",
         state: "NY",
-        modalities: ["CT", "MRI", "US", "X-ray", "Bone Density"],
+        modalities: ["CT", "MRI", "US", "X-ray", "DEXA"],
         maps: {
             placeUrl:
                 "https://www.google.com/maps/place/Weill+Cornell+Imaging+at+NewYork-Presbyterian/@40.7870473,-73.9803248,17z/data=!3m2!4b1!5s0x89c258868e4dcba9:0x567c9f73f622b6bc!4m5!3m4!1s0x89c258868fc32fdf:0xf14c7abd456dbf5e!8m2!3d40.7870473!4d-73.9781361",
@@ -230,6 +237,7 @@ export const wcinypLocations: WcinypLocation[] = [
         id: "lower-manhattan",
         slug: "lower-manhattan",
         shortCode: "LM",
+        akaShortCode: "BEEKMAN",
         name: "Lower Manhattan",
         region: "Lower Manhattan",
         borough: "Manhattan",
@@ -244,8 +252,8 @@ export const wcinypLocations: WcinypLocation[] = [
             "MRI",
             "US",
             "X-ray",
-            "Mammography",
-            "Bone Density",
+            "Mammo",
+            "DEXA",
             "Breast Biopsy",
         ],
         maps: {
@@ -263,6 +271,7 @@ export const wcinypLocations: WcinypLocation[] = [
         id: "long-island-city",
         slug: "long-island-city",
         shortCode: "LIC",
+        akaShortCode: "LIC",
         name: "Long Island City",
         region: "Long Island City",
         borough: "Queens",
@@ -277,7 +286,7 @@ export const wcinypLocations: WcinypLocation[] = [
             "MRI",
             "X-ray",
             "US",
-            "Mammography",
+            "Mammo",
             "Breast Biopsy",
         ],
         maps: {

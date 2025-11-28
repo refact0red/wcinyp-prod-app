@@ -71,22 +71,27 @@ export default function LocationPage({ params }: LocationPageProps) {
                                             />
                                         </AspectRatio>
                                         <div className="flex flex-1 flex-col gap-3">
-                                            <div className="flex flex-wrap items-center gap-2">
-                                                <CardTitle className="text-xl font-semibold leading-snug">
-                                                    {location.name}
-                                                </CardTitle>
-                                                <Badge
-                                                    variant="outline"
-                                                    className="whitespace-nowrap rounded-full px-2 py-0.5 text-[11px] font-medium uppercase tracking-wide"
-                                                >
-                                                    {location.region}
-                                                </Badge>
-                                                <Badge
-                                                    variant="outline"
-                                                    className="whitespace-nowrap rounded-full px-2 py-0.5 text-[11px] font-medium uppercase tracking-wide"
-                                                >
-                                                    {location.borough}
-                                                </Badge>
+                                            <div className="flex flex-col gap-2">
+                                                <div className="text-4xl font-semibold leading-none tracking-tight text-foreground">
+                                                    {(location.akaShortCode ?? location.shortCode).toUpperCase()}
+                                                </div>
+                                                <div className="flex flex-wrap items-center gap-2">
+                                                    <CardTitle className="text-xl font-semibold leading-snug">
+                                                        {location.name}
+                                                    </CardTitle>
+                                                    <Badge
+                                                        variant="outline"
+                                                        className="whitespace-nowrap rounded-full px-2 py-0.5 text-[11px] font-medium uppercase tracking-wide"
+                                                    >
+                                                        {location.region}
+                                                    </Badge>
+                                                    <Badge
+                                                        variant="outline"
+                                                        className="whitespace-nowrap rounded-full px-2 py-0.5 text-[11px] font-medium uppercase tracking-wide"
+                                                    >
+                                                        {location.borough}
+                                                    </Badge>
+                                                </div>
                                             </div>
                                             <CardDescription className="text-sm leading-snug">
                                                 <div>{location.address.line1}</div>

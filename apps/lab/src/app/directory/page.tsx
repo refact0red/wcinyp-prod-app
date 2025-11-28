@@ -27,7 +27,7 @@ const CmsNppesRegistryLink = () => (
     href={CMS_NPPES_REGISTRY_URL}
     target="_blank"
     rel="noreferrer noopener"
-    className="inline-flex items-center gap-1 text-primary underline-offset-4 hover:underline"
+    className="inline-flex items-center gap-1 text-primary font-medium underline-offset-4 hover:underline"
   >
     CMS NPPES Registry
     <ExternalLink className="size-3" aria-hidden="true" />
@@ -306,7 +306,7 @@ export default function DirectoryPage() {
                       <CardHeader className="pb-4">
                         <CardTitle>NPI Lookup</CardTitle>
                         <CardDescription>
-                          Search the <CmsNppesRegistryLink /> by NPI. Blank cells reflect missing CMS data.
+                          Search the <CmsNppesRegistryLink /> by NPI.
                         </CardDescription>
                       </CardHeader>
                       <CardContent>
