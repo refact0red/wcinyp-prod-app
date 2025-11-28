@@ -19,13 +19,15 @@ export const metadata: Metadata = {
     template: "WCINYP / %s",
   },
   description: "WCINYP labs dashboard",
+  // TODO: Replace /icon.png with a PNG export of the black sidebar-style logo to match favicon.svg.
   icons: {
     icon: [
+      { url: "/favicon.svg?v=4", type: "image/svg+xml" },
       { url: "/icon.png?v=3" },
       { url: "/favicon.ico?v=3" },
     ],
-    shortcut: "/favicon.ico?v=3",
-    apple: "/icon.png?v=3",
+    shortcut: "/favicon.svg?v=4",
+    apple: "/favicon.svg?v=4",
   },
 };
 

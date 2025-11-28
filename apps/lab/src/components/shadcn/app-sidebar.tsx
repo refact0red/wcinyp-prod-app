@@ -217,7 +217,9 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
               className="data-[slot=sidebar-menu-button]:!p-1.5"
             >
               <a href="#">
-                <WciLogoIcon className="h-5 w-5" />
+                <span className="inline-flex">
+                  <WciLogoIcon className="h-6 w-6" />
+                </span>
                 <span className="text-base font-semibold">Weill Cornell Imaging</span>
               </a>
             </SidebarMenuButton>
