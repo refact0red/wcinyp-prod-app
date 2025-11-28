@@ -3,18 +3,20 @@
 import * as React from "react";
 
 import type { WcinypLocation } from "@/lib/wcinyp/locations";
+import { cn } from "@/lib/utils";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/shadcn/ui/card";
 
 export type DirectoryLocationsMapProps = {
     locations: WcinypLocation[];
     selectedLocationId?: string | null;
     onSelectLocation?: (id: string) => void;
+    size?: "default" | "expanded";
 };
 
 const ALL_LOCATIONS_EMBED_URL =
     "https://www.google.com/maps/d/embed?mid=1mvf1EJzbPJ7yEJcUZqaQnvi18XYfyKE&ehbc=2E312F";
 
-export function DirectoryLocationsMap(_: DirectoryLocationsMapProps) {
+export function DirectoryLocationsMap({ size = "default" }: DirectoryLocationsMapProps) {
     const embedUrl = ALL_LOCATIONS_EMBED_URL;
 
     // TODO: In the future, replace this static My Maps embed with a Google Maps JS API implementation that:
@@ -29,7 +31,12 @@ export function DirectoryLocationsMap(_: DirectoryLocationsMapProps) {
                 <CardTitle className="text-base font-semibold">Map view</CardTitle>
             </CardHeader>
             <CardContent className="pt-0">
-                <div className="relative h-64 w-full overflow-hidden rounded-md border border-border/60 bg-muted md:h-80">
+                <div
+                    className={cn(
+                        "relative w-full overflow-hidden rounded-md border border-border/60 bg-muted",
+                        size === "expanded" ? "h-[420px] md:h-[520px]" : "h-64 md:h-80",
+                    )}
+                >
                     <iframe
                         title="WCINYP locations map"
                         src={embedUrl}

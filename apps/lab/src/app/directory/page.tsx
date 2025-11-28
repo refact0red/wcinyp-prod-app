@@ -2,23 +2,34 @@
 
 import { useMemo, useState, type FormEvent } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { ExternalLink, Loader2, Search } from "lucide-react";
+import { ExternalLink, IdCardIcon, Loader2, MapIcon, Search } from "lucide-react";
 
 import { AppSidebar } from "@/components/shadcn/app-sidebar";
 import { Alert, AlertDescription, AlertTitle } from "@/components/shadcn/alert";
 import { DirectoryLocationsList } from "@/components/shadcn/directory-locations-list";
 import { DirectoryLocationsMap } from "@/components/shadcn/directory-locations-map";
 import { DirectoryTable } from "@/components/shadcn/directory-table";
-import { SiteHeader } from "@/components/shadcn/site-header";
 import { DirectorySubHeader } from "@/components/shadcn/directory-subheader";
+import { SiteHeader } from "@/components/shadcn/site-header";
 import { Button } from "@/components/shadcn/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/shadcn/ui/card";
 import { Input } from "@/components/shadcn/ui/input";
 import { Label } from "@/components/shadcn/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/shadcn/ui/select";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/shadcn/ui/table";
 import { SidebarInset, SidebarProvider } from "@/components/shadcn/ui/sidebar";
+import { ToggleGroup, ToggleGroupItem } from "@/components/shadcn/ui/toggle-group";
 import type { NormalizedAddress, NormalizedNpiRecord, NpiLookupError, NpiLookupResponse } from "@/app/npi-lookup/types";
 import { wcinypLocations, type WcinypLocation } from "@/lib/wcinyp/locations";
+
+type DirectoryTab = "people" | "locations" | "radiologists" | "providers" | "npi";
+type LocationsView = "cards" | "map";
 
 const CMS_NPPES_REGISTRY_URL = "https://npiregistry.cms.hhs.gov/";
 
@@ -164,6 +175,76 @@ const TableSection = ({ title, columns, rows, emptyMessage }: TableSectionProps)
   </Card>
 );
 
+type LocationsViewToolbarProps = {
+  activeView: LocationsView;
+  availableModalities: string[];
+  selectedModality?: string;
+  onViewChange: (view: LocationsView) => void;
+  onModalityChange: (value?: string) => void;
+};
+
+const LocationsViewToolbar = ({
+  activeView,
+  availableModalities,
+  selectedModality,
+  onViewChange,
+  onModalityChange,
+}: LocationsViewToolbarProps) => {
+  if (!availableModalities.length) return null;
+
+  return (
+    <div className="flex h-11 shrink-0 items-center border-b bg-background/95 px-4 backdrop-blur supports-[backdrop-filter]:bg-background/80 lg:px-6">
+      <div className="flex w-full items-center gap-4">
+        <div className="flex items-center gap-3">
+          <ToggleGroup
+            type="single"
+            value={activeView}
+            onValueChange={(value) => {
+              if (!value) return;
+              onViewChange(value as LocationsView);
+            }}
+            variant="outline"
+            size="sm"
+            spacing={0}
+          >
+            <ToggleGroupItem value="cards">
+              <IdCardIcon className="mr-1 size-3.5" />
+              <span className="text-xs font-medium">Cards view</span>
+            </ToggleGroupItem>
+            <ToggleGroupItem value="map">
+              <MapIcon className="mr-1 size-3.5" />
+              <span className="text-xs font-medium">Map view</span>
+            </ToggleGroupItem>
+          </ToggleGroup>
+          {activeView === "cards" ? (
+            <div className="ml-4 flex items-center gap-2 border-l border-border/80 pl-4 text-xs">
+              <span className="font-medium text-muted-foreground">Modalities</span>
+              <Select
+                value={selectedModality ?? "all"}
+                onValueChange={(value) => {
+                  onModalityChange(value === "all" ? undefined : value);
+                }}
+              >
+                <SelectTrigger size="sm" className="min-w-[10rem]">
+                  <SelectValue placeholder="All modalities" />
+                </SelectTrigger>
+                <SelectContent align="start">
+                  <SelectItem value="all">All modalities</SelectItem>
+                  {availableModalities.map((modality) => (
+                    <SelectItem key={modality} value={modality}>
+                      {modality}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          ) : null}
+        </div>
+      </div>
+    </div>
+  );
+};
+
 export default function DirectoryPage() {
   const router = useRouter();
   const pathname = usePathname();
@@ -256,13 +337,51 @@ export default function DirectoryPage() {
   );
 
   const tabFromUrl = searchParams?.get("tab") ?? undefined;
-  const allowedTabs = ["people", "locations", "radiologists", "providers", "npi"] as const;
-  const activeTab = (allowedTabs.includes(tabFromUrl as any) ? tabFromUrl : "people") as
-    | "people"
-    | "locations"
-    | "radiologists"
-    | "providers"
-    | "npi";
+  const allowedTabs: DirectoryTab[] = ["people", "locations", "radiologists", "providers", "npi"];
+  const activeTab: DirectoryTab = allowedTabs.includes(tabFromUrl as DirectoryTab) ? (tabFromUrl as DirectoryTab) : "people";
+
+  const viewFromUrl = searchParams?.get("view") ?? undefined;
+  const allowedViews: LocationsView[] = ["cards", "map"];
+  const activeLocationsView: LocationsView =
+    activeTab === "locations" && viewFromUrl && allowedViews.includes(viewFromUrl as LocationsView)
+      ? (viewFromUrl as LocationsView)
+      : "cards";
+
+  const allModalities = useMemo(
+    () =>
+      Array.from(
+        new Set(
+          wcinypLocations.flatMap((location) => location.modalities)
+        )
+      ).sort((a, b) => a.localeCompare(b)),
+    []
+  );
+
+  const [selectedModality, setSelectedModality] = useState<string | undefined>(undefined);
+
+  const filteredLocations = useMemo(
+    () =>
+      selectedModality
+        ? wcinypLocations.filter((location) => location.modalities.includes(selectedModality))
+        : wcinypLocations,
+    [selectedModality]
+  );
+
+  const handleChangeLocationsView = (view: LocationsView) => {
+    if (view === activeLocationsView) return;
+
+    const params = new URLSearchParams(searchParams?.toString());
+    params.set("tab", "locations");
+
+    if (view === "cards") {
+      params.delete("view");
+    } else {
+      params.set("view", view);
+    }
+
+    const query = params.toString();
+    router.push(`${pathname}${query ? `?${query}` : ""}`);
+  };
 
   return (
     <SidebarProvider>
@@ -270,6 +389,15 @@ export default function DirectoryPage() {
       <SidebarInset>
         <SiteHeader title="Directory" />
         <DirectorySubHeader activeTab={activeTab} />
+        {activeTab === "locations" && (
+          <LocationsViewToolbar
+            activeView={activeLocationsView}
+            availableModalities={allModalities}
+            selectedModality={selectedModality}
+            onViewChange={handleChangeLocationsView}
+            onModalityChange={setSelectedModality}
+          />
+        )}
         <div className="flex flex-1 flex-col">
           <div className="container @container/main flex flex-1 flex-col gap-2">
             <div className="flex flex-col gap-4 py-4 md:gap-6 md:py-6">
@@ -280,22 +408,32 @@ export default function DirectoryPage() {
                   </div>
                 )}
 
-                {activeTab === "locations" && (
-                  <div className="mt-4 space-y-4">
-                    <DirectoryLocationsList
-                      locations={wcinypLocations}
-                      selectedLocationId={selectedLocationId}
-                      onSelectLocation={setSelectedLocationId}
-                      onOpenInMaps={handleOpenLocationInMaps}
-                      onLocationClick={handleOpenLocationPage}
-                    />
-                    <DirectoryLocationsMap
-                      locations={wcinypLocations}
-                      selectedLocationId={selectedLocationId}
-                      onSelectLocation={setSelectedLocationId}
-                    />
-                  </div>
-                )}
+                {activeTab === "locations" &&
+                  (activeLocationsView === "cards" ? (
+                    <div className="mt-4">
+                      <DirectoryLocationsList
+                        locations={filteredLocations}
+                        selectedLocationId={selectedLocationId}
+                        onSelectLocation={setSelectedLocationId}
+                        onOpenInMaps={handleOpenLocationInMaps}
+                        onLocationClick={handleOpenLocationPage}
+                        emptyMessage={
+                          selectedModality
+                            ? "No locations match the selected modality."
+                            : "No locations available yet."
+                        }
+                      />
+                    </div>
+                  ) : (
+                    <div className="mt-4">
+                      <DirectoryLocationsMap
+                        locations={wcinypLocations}
+                        selectedLocationId={selectedLocationId}
+                        onSelectLocation={setSelectedLocationId}
+                        size="expanded"
+                      />
+                    </div>
+                  ))}
 
                 {activeTab === "radiologists" && (
                   <div className="mt-4 text-sm text-muted-foreground">No radiologists yet.</div>

@@ -23,6 +23,7 @@ export type DirectoryLocationsListProps = {
     onSelectLocation?: (id: string) => void;
     onOpenInMaps?: (location: WcinypLocation) => void;
     onLocationClick?: (location: WcinypLocation) => void;
+    emptyMessage?: string;
 };
 
 export function DirectoryLocationsList({
@@ -31,6 +32,7 @@ export function DirectoryLocationsList({
     onSelectLocation,
     onOpenInMaps,
     onLocationClick,
+    emptyMessage,
 }: DirectoryLocationsListProps) {
     const staffById = React.useMemo(
         () =>
@@ -56,7 +58,7 @@ export function DirectoryLocationsList({
     if (!sortedLocations.length) {
         return (
             <div className="rounded-lg border border-dashed border-muted-foreground/40 bg-muted/30 px-4 py-6 text-sm text-muted-foreground">
-                No locations available yet.
+                {emptyMessage ?? "No locations available yet."}
             </div>
         );
     }
