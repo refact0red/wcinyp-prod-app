@@ -2,6 +2,9 @@
 
 This is an official Untitled UI starter kit for Next.js. Kickstart your Untitled UI project with Next.js in seconds.
 
+> [!NOTE]
+> The “main” app has been moved to `refact0red/archive-untitled-wcinyp`. This repo now contains the `lab` app only.
+
 ## Project context (WCINYP)
 
 This repository is customized for Weill Cornell Imaging at New York Presbyterian (WCINYP). It powers an internal “supertool” for administrators to manage people across WCINYP—surfacing contact info, roles, and tags to keep teams aligned. Any copy or features should assume an internal admin audience rather than public-facing users.
