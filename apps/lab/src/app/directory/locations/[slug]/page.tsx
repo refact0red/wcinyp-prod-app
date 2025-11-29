@@ -54,6 +54,11 @@ export default function LocationPage({ params }: any) {
     const primaryDigits = location.contact?.phone?.primary.digits;
     const primaryHref = primaryDigits ? phoneHref(primaryDigits) : "";
 
+    // TODO: Use isInternalExtension/getInternalExtensionCode to visually distinguish internal-dial
+    // WCINYP numbers (646962**** -> 7-digit 962****) in this location detail view. This should be
+    // ubiquitous across phone surfaces, and we should maintain a curated list of all numbers that
+    // actually support the 7-digit shortcut.
+
     const formatHours = () => {
         const data = location.hoursOfOperation;
         if (!data || !data.ranges.length) return "Not specified";

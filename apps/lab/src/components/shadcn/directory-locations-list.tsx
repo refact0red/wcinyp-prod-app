@@ -213,6 +213,10 @@ export function DirectoryLocationsList({
                                         const primaryDigits = location.contact?.phone?.primary.digits;
                                         const primaryHref = primaryDigits ? phoneHref(primaryDigits) : "";
 
+                                        // TODO: Use isInternalExtension/getInternalExtensionCode here to style
+                                        // WCINYP internal-dial phone numbers (e.g. 646962**** -> 7-digit 962****)
+                                        // on location cards. This should be ubiquitous across the app and we should
+                                        // maintain a list of all internal numbers that support the 7-digit shortcut.
                                         return (
                                             <>
                                                 <div>
