@@ -26,6 +26,10 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { ToggleGroup, ToggleGroupItem } from "@/components/shadcn/ui/toggle-group";
 import type { NormalizedAddress, NormalizedNpiRecord, NpiLookupError, NpiLookupResponse } from "@/app/npi-lookup/types";
 import { wcinypLocations, type WcinypLocation } from "@/lib/wcinyp/locations";
+import { DirectoryRadiologistsGrid } from "@/components/shadcn/directory-radiologists-grid";
+import { DirectoryRadiologistsToolbar } from "@/components/shadcn/directory-radiologists-toolbar";
+import { wcinypRadiologists, type WcinypRadiologist } from "@/lib/wcinyp/radiologists";
+import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from "@/components/shadcn/ui/sheet";
 
 type DirectoryTab = "people" | "locations" | "radiologists" | "providers" | "npi";
 type LocationsView = "cards" | "map";
@@ -250,11 +254,27 @@ export default function DirectoryPage() {
   const pathname = usePathname();
   const searchParams = useSearchParams();
 
+  // TODO: Extract the ad-hoc editing patterns on this page (radiologist sheet,
+  // NPI lookup states, etc.) into more standardized editing components and
+  // workflows, including consistent use of Sonner toasts for feedback on save
+  // / error, so admin-like flows feel uniform across the lab app.
+
   const [npiInput, setNpiInput] = useState("");
   const [result, setResult] = useState<NormalizedNpiRecord | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [selectedLocationId, setSelectedLocationId] = useState<string | null>(null);
+  const [radiologists, setRadiologists] = useState<WcinypRadiologist[]>(wcinypRadiologists);
+  const [radiologistSearch, setRadiologistSearch] = useState("");
+  const [radiologistSpecialty, setRadiologistSpecialty] = useState<string | undefined>(undefined);
+  const [isRadiologistSheetOpen, setIsRadiologistSheetOpen] = useState(false);
+  const [selectedRadiologistId, setSelectedRadiologistId] = useState<string | null>(null);
+  const [editingRadiologistId, setEditingRadiologistId] = useState<string | null>(null);
+  const [radiologistForm, setRadiologistForm] = useState({
+    name: "",
+    profileUrl: "",
+    specialties: "",
+  });
 
   const handleOpenLocationInMaps = (location: WcinypLocation) => {
     if (typeof window === "undefined") return;
@@ -360,6 +380,105 @@ export default function DirectoryPage() {
 
   const [selectedModality, setSelectedModality] = useState<string | undefined>(undefined);
 
+  const allRadiologistSpecialties = useMemo(
+    () =>
+      Array.from(
+        new Set(
+          radiologists.flatMap((rad) => rad.specialties)
+        )
+      ).sort((a, b) => a.localeCompare(b)),
+    [radiologists]
+  );
+
+  const filteredRadiologists = useMemo(() => {
+    const term = radiologistSearch.trim().toLowerCase();
+
+    return radiologists.filter((rad) => {
+      if (term) {
+        const inName = rad.name.toLowerCase().includes(term);
+        const inSpecialty = rad.specialties.some((spec) => spec.toLowerCase().includes(term));
+        if (!inName && !inSpecialty) return false;
+      }
+
+      if (radiologistSpecialty && !rad.specialties.includes(radiologistSpecialty)) {
+        return false;
+      }
+
+      return true;
+    });
+  }, [radiologists, radiologistSearch, radiologistSpecialty]);
+
+  const canEditRadiologist =
+    !!selectedRadiologistId && filteredRadiologists.some((rad) => rad.id === selectedRadiologistId);
+
+  const handleOpenAddRadiologist = () => {
+    setEditingRadiologistId(null);
+    setRadiologistForm({
+      name: "",
+      profileUrl: "",
+      specialties: "",
+    });
+    setIsRadiologistSheetOpen(true);
+  };
+
+  const handleSaveRadiologist = (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+
+    const name = radiologistForm.name.trim();
+    if (!name) return;
+
+    const slugify = (value: string) =>
+      value
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, "-")
+        .replace(/^-+|-+$/g, "") || "radiologist";
+
+    const id = editingRadiologistId ?? slugify(name);
+
+    const specialties = radiologistForm.specialties
+      .split(",")
+      .map((value) => value.trim())
+      .filter(Boolean) as WcinypRadiologist["specialties"];
+
+    const newRadiologist: WcinypRadiologist = {
+      id,
+      name,
+      profileUrl: radiologistForm.profileUrl.trim(),
+      headshot: {
+        src: "/images/radiologists/placeholder.jpg",
+        alt: name,
+      },
+      specialties,
+      hasHeadshot: false,
+    };
+
+    setRadiologists((current) => {
+      const exists = current.some((rad) => rad.id === id);
+      if (exists) {
+        return current.map((rad) => (rad.id === id ? newRadiologist : rad));
+      }
+      return [...current, newRadiologist];
+    });
+
+    setSelectedRadiologistId(id);
+    setEditingRadiologistId(null);
+    setIsRadiologistSheetOpen(false);
+  };
+
+  const handleOpenEditRadiologist = () => {
+    if (!selectedRadiologistId) return;
+    const rad = radiologists.find((item) => item.id === selectedRadiologistId);
+    if (!rad) return;
+
+    setEditingRadiologistId(rad.id);
+    setRadiologistForm({
+      name: rad.name,
+      profileUrl: rad.profileUrl ?? "",
+      specialties: rad.specialties.join(", "),
+    });
+    setIsRadiologistSheetOpen(true);
+  };
+
   const filteredLocations = useMemo(
     () =>
       selectedModality
@@ -395,12 +514,67 @@ export default function DirectoryPage() {
       />
     ) : null;
 
+  const placeholderToolbar = (
+    <div className="flex h-11 shrink-0 items-center border-b bg-background/95 px-4 backdrop-blur supports-[backdrop-filter]:bg-background/80 lg:px-6" />
+  );
+
+  const npiToolbar =
+    activeTab === "npi" ? (
+      <div className="flex h-11 shrink-0 items-center border-b bg-background/95 px-4 backdrop-blur supports-[backdrop-filter]:bg-background/80 lg:px-6">
+        <form onSubmit={handleSubmit} className="flex w-full items-center gap-3">
+          <div className="relative w-full max-w-xs">
+            <Search className="text-muted-foreground absolute left-3 top-1/2 size-4 -translate-y-1/2" />
+            <Input
+              id="npi-input"
+              value={npiInput}
+              onChange={(event) => setNpiInput(event.target.value)}
+              placeholder="Enter 10-digit NPI"
+              inputMode="numeric"
+              pattern="\d{10}"
+              maxLength={10}
+              className="h-8 w-full pl-9 text-sm"
+            />
+          </div>
+          <Button type="submit" disabled={isLoading} className="h-8 gap-2 px-3 text-sm">
+            {isLoading ? (
+              <>
+                <Loader2 className="size-4 animate-spin" />
+                Looking up NPI…
+              </>
+            ) : (
+              <>
+                <Search className="size-4" />
+                Search
+              </>
+            )}
+          </Button>
+        </form>
+      </div>
+    ) : null;
+
   let toolbar: React.ReactNode = null;
 
   if (activeTab === "locations") {
     toolbar = locationsToolbar;
   } else if (activeTab === "people") {
     toolbar = <DirectoryPeopleToolbar />;
+  } else if (activeTab === "npi") {
+    toolbar = npiToolbar;
+  } else if (activeTab === "radiologists") {
+    toolbar = (
+      <DirectoryRadiologistsToolbar
+        search={radiologistSearch}
+        onSearchChange={setRadiologistSearch}
+        specialties={allRadiologistSpecialties}
+        selectedSpecialty={radiologistSpecialty}
+        onSpecialtyChange={setRadiologistSpecialty}
+        onAddRadiologist={handleOpenAddRadiologist}
+        onEditRadiologist={handleOpenEditRadiologist}
+        canEditRadiologist={canEditRadiologist}
+      />
+    );
+  } else if (activeTab === "providers" || activeTab === "wcinyp") {
+    toolbar = placeholderToolbar;
   }
 
   const layout: "standard" | "flush" = activeTab === "people" ? "flush" : "standard";
@@ -414,9 +588,7 @@ export default function DirectoryPage() {
         layout={layout}
       >
         {activeTab === "wcinyp" && (
-          <div className="px-4 lg:px-6 text-sm text-muted-foreground">
-            WCINYP overview coming soon.
-          </div>
+          <div className="px-4 lg:px-6 text-sm text-muted-foreground">WCINYP overview coming soon.</div>
         )}
 
         {activeTab === "people" && <DirectoryTable />}
@@ -449,7 +621,18 @@ export default function DirectoryPage() {
           ))}
 
         {activeTab === "radiologists" && (
-          <div className="px-4 lg:px-6 text-sm text-muted-foreground">No radiologists yet.</div>
+          <div className="px-4 lg:px-6">
+            <DirectoryRadiologistsGrid
+              radiologists={filteredRadiologists}
+              selectedRadiologistId={selectedRadiologistId}
+              onSelectRadiologist={setSelectedRadiologistId}
+              emptyMessage={
+                radiologistSearch || radiologistSpecialty
+                  ? "No radiologists match the current search or specialty."
+                  : "No radiologists available yet."
+              }
+            />
+          </div>
         )}
 
         {activeTab === "providers" && (
@@ -457,46 +640,13 @@ export default function DirectoryPage() {
         )}
 
         {activeTab === "npi" && (
-          <div className="px-4 lg:px-6 flex flex-col gap-4">
-            <Card>
-              <CardHeader className="pb-4">
-                <CardTitle>NPI Lookup</CardTitle>
-                <CardDescription>
-                  Search the <CmsNppesRegistryLink /> by NPI.
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <form onSubmit={handleSubmit} className="flex flex-col gap-4 md:flex-row md:items-end">
-                  <div className="flex-1 space-y-2">
-                    <Label htmlFor="npi-input">NPI number</Label>
-                    <Input
-                      id="npi-input"
-                      value={npiInput}
-                      onChange={(event) => setNpiInput(event.target.value)}
-                      placeholder="Enter 10-digit NPI"
-                      inputMode="numeric"
-                      pattern="\d{10}"
-                      maxLength={10}
-                    />
-                  </div>
-                  <div className="flex flex-col gap-2 md:flex-row md:items-center">
-                    <Button type="submit" disabled={isLoading} className="gap-2">
-                      {isLoading ? (
-                        <>
-                          <Loader2 className="size-4 animate-spin" />
-                          Looking up NPI…
-                        </>
-                      ) : (
-                        <>
-                          <Search className="size-4" />
-                          Search
-                        </>
-                      )}
-                    </Button>
-                  </div>
-                </form>
-              </CardContent>
-            </Card>
+          <div className="flex flex-col gap-6 px-4 lg:px-6">
+            <div className="mt-8 flex min-h-[320px] flex-col items-center justify-center gap-3 text-center">
+              <Search className="size-24 text-muted-foreground/80" aria-hidden="true" />
+              <p className="text-sm text-muted-foreground">
+                Search the <CmsNppesRegistryLink />.
+              </p>
+            </div>
 
             {error && (
               <Alert variant="destructive">
@@ -543,6 +693,70 @@ export default function DirectoryPage() {
           </div>
         )}
       </LabShell>
+
+      <Sheet open={isRadiologistSheetOpen} onOpenChange={setIsRadiologistSheetOpen}>
+        <SheetContent side="right" className="flex flex-col sm:max-w-md">
+          <SheetHeader>
+            <SheetTitle>{editingRadiologistId ? "Edit radiologist" : "Add radiologist"}</SheetTitle>
+            <SheetDescription>
+              Add a radiologist to this lab view. Changes here are not yet persisted to WCINYP production data.
+            </SheetDescription>
+          </SheetHeader>
+
+          <form
+            id="radiologist-form"
+            className="mt-6 flex-1 space-y-4 overflow-y-auto px-4 pb-4 pr-5"
+            onSubmit={handleSaveRadiologist}
+          >
+            <div className="space-y-1.5">
+              <Label htmlFor="radiologist-name">Name</Label>
+              <Input
+                id="radiologist-name"
+                value={radiologistForm.name}
+                onChange={(event) => setRadiologistForm((current) => ({ ...current, name: event.target.value }))}
+                placeholder="Full name, e.g. Jane Doe, M.D."
+                required
+              />
+            </div>
+
+            <div className="space-y-1.5">
+              <Label htmlFor="radiologist-profile-url">Profile URL</Label>
+              <Input
+                id="radiologist-profile-url"
+                type="url"
+                value={radiologistForm.profileUrl}
+                onChange={(event) =>
+                  setRadiologistForm((current) => ({ ...current, profileUrl: event.target.value }))
+                }
+                placeholder="https://weillcornell.org/example"
+              />
+            </div>
+
+            <div className="space-y-1.5">
+              <Label htmlFor="radiologist-specialties">Specialties</Label>
+              <Input
+                id="radiologist-specialties"
+                value={radiologistForm.specialties}
+                onChange={(event) =>
+                  setRadiologistForm((current) => ({ ...current, specialties: event.target.value }))
+                }
+                placeholder="Comma-separated, e.g. Breast Imaging, Abdominal Imaging"
+              />
+            </div>
+          </form>
+
+          <div className="border-t bg-card/80 px-4 pb-4 pt-3 backdrop-blur">
+            <div className="flex flex-col gap-2">
+              <Button type="submit" form="radiologist-form">
+                {editingRadiologistId ? "Save changes" : "Add radiologist"}
+              </Button>
+              <Button type="button" variant="outline" onClick={() => setIsRadiologistSheetOpen(false)}>
+                Close
+              </Button>
+            </div>
+          </div>
+        </SheetContent>
+      </Sheet>
     </DirectoryPeopleProvider>
   );
 }
