@@ -15,6 +15,7 @@ import { Button } from "@/components/shadcn/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/shadcn/ui/card";
 import { Input } from "@/components/shadcn/ui/input";
 import { Label } from "@/components/shadcn/ui/label";
+import { Badge } from "@/components/shadcn/ui/badge";
 import {
   Select,
   SelectContent,
@@ -29,11 +30,16 @@ import { wcinypLocations, type WcinypLocation } from "@/lib/wcinyp/locations";
 import { DirectoryRadiologistsGrid } from "@/components/shadcn/directory-radiologists-grid";
 import { DirectoryRadiologistsToolbar } from "@/components/shadcn/directory-radiologists-toolbar";
 import { wcinypRadiologists, type WcinypRadiologist } from "@/lib/wcinyp/radiologists";
+import { wcinypProviders, type WcinypProvider } from "@/lib/wcinyp/providers";
+import { wcinypProviderCommonMistakes, type WcinypProviderCommonMistake } from "@/lib/wcinyp/provider-common-mistakes";
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from "@/components/shadcn/ui/sheet";
+import { Tabs, TabsList, TabsTrigger } from "@/components/shadcn/ui/tabs";
+import { StaticTable } from "@/components/table/static-table";
 
 type DirectoryTab = "people" | "locations" | "radiologists" | "providers" | "npi";
 type LocationsView = "cards" | "map";
 type DirectoryTabWithHome = DirectoryTab | "wcinyp";
+type ProvidersView = "database" | "common-mistakes";
 
 const CMS_NPPES_REGISTRY_URL = "https://npiregistry.cms.hhs.gov/";
 
@@ -179,6 +185,139 @@ const TableSection = ({ title, columns, rows, emptyMessage }: TableSectionProps)
   </Card>
 );
 
+type ProvidersSectionProps = {
+  title: string;
+  providers: WcinypProvider[];
+};
+
+const ProvidersSection = ({ title, providers }: ProvidersSectionProps) => {
+  if (!providers.length) return null;
+
+  return (
+    <section className="space-y-3">
+      <h2 className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">{title}</h2>
+      <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
+        {providers.map((provider) => {
+          const isVerified = provider.verificationStatus === "verified";
+          const verificationLabel = isVerified ? "Verified" : "Unverified";
+          const isRetired = provider.status === "retired";
+
+          return (
+            <Card
+              key={provider.id}
+              className={`h-full${isRetired ? " opacity-60" : ""}`}
+            >
+              <CardHeader className="pb-3">
+                <div className="mb-1 flex flex-wrap gap-1">
+                  <Badge
+                    variant={isVerified ? "secondary" : "outline"}
+                    className="text-[11px] font-medium"
+                  >
+                    {verificationLabel}
+                  </Badge>
+                  {provider.status && (
+                    <Badge variant="outline" className="text-[11px] font-normal uppercase tracking-wide">
+                      {provider.status}
+                    </Badge>
+                  )}
+                  {provider.tags?.map((tag) => (
+                    <Badge key={tag} variant="outline" className="text-[11px] font-normal">
+                      {tag}
+                    </Badge>
+                  ))}
+                </div>
+                <CardTitle className="text-sm leading-snug">{provider.name}</CardTitle>
+                {(provider.affiliation || provider.specialties || provider.clinicians?.length) && (
+                  <CardDescription className="space-y-1 text-xs leading-relaxed">
+                    {provider.affiliation && <div>{provider.affiliation}</div>}
+                    {provider.specialties && <div>{provider.specialties}</div>}
+                    {provider.clinicians?.length ? (
+                      <div className="text-[11px] text-muted-foreground">
+                        {provider.clinicians.join(" • ")}
+                      </div>
+                    ) : null}
+                  </CardDescription>
+                )}
+              </CardHeader>
+              <CardContent>
+                <p className="whitespace-pre-line text-xs leading-relaxed text-muted-foreground">
+                  {provider.notes}
+                </p>
+              </CardContent>
+            </Card>
+          );
+        })}
+      </div>
+    </section>
+  );
+};
+
+type ProvidersCommonMistakesSectionProps = {
+  items: WcinypProviderCommonMistake[];
+};
+
+const ProvidersCommonMistakesSection = ({ items }: ProvidersCommonMistakesSectionProps) => {
+  if (!items.length) return null;
+
+  return (
+    <section className="space-y-4">
+      <StaticTable
+        title="Common provider selection mistakes"
+        description={
+          "Review this list and verify providers by full name and office information. The common provider is usually the correct option.\nUse NPI and office details to confirm the correct ordering provider before scheduling or updating orders."
+        }
+      >
+        <Table className="w-full">
+          <TableHeader>
+            <TableRow>
+              <TableHead className="text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">
+                Common provider
+              </TableHead>
+              <TableHead className="text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">
+                Mistaken provider
+              </TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {items.map((row) => (
+              <TableRow key={row.id} className="align-top">
+                <TableCell className="space-y-1 text-sm leading-snug">
+                  <div className="font-medium text-foreground">{row.commonName}</div>
+                  <div className="text-xs text-muted-foreground">
+                    NPI:{" "}
+                    <a
+                      href={`${CMS_NPPES_REGISTRY_URL}registry/search-results-table?number=${row.commonNpi}`}
+                      target="_blank"
+                      rel="noreferrer noopener"
+                      className="text-primary underline-offset-2 hover:underline"
+                    >
+                      {row.commonNpi}
+                    </a>
+                  </div>
+                </TableCell>
+                <TableCell className="space-y-1 text-sm leading-snug">
+                  <div className="font-medium text-foreground">{row.mistakenName}</div>
+                  <div className="text-xs text-muted-foreground">
+                    NPI:{" "}
+                    <a
+                      href={`${CMS_NPPES_REGISTRY_URL}registry/search-results-table?number=${row.mistakenNpi}`}
+                      target="_blank"
+                      rel="noreferrer noopener"
+                      className="text-primary underline-offset-2 hover:underline"
+                    >
+                      {row.mistakenNpi}
+                    </a>
+                  </div>
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </StaticTable>
+    </section>
+  );
+};
+
 type LocationsViewToolbarProps = {
   activeView: LocationsView;
   availableModalities: string[];
@@ -275,6 +414,7 @@ export default function DirectoryPage() {
     profileUrl: "",
     specialties: "",
   });
+  const [providersView, setProvidersView] = useState<ProvidersView>("database");
 
   const handleOpenLocationInMaps = (location: WcinypLocation) => {
     if (typeof window === "undefined") return;
@@ -573,11 +713,32 @@ export default function DirectoryPage() {
         canEditRadiologist={canEditRadiologist}
       />
     );
-  } else if (activeTab === "providers" || activeTab === "wcinyp") {
+  } else if (activeTab === "providers") {
+    toolbar = (
+      <div className="flex h-11 shrink-0 items-center border-b bg-background/95 px-4 backdrop-blur supports-[backdrop-filter]:bg-background/80 lg:px-6">
+        <Tabs
+          value={providersView}
+          onValueChange={(value) => {
+            if (!value) return;
+            setProvidersView(value as ProvidersView);
+          }}
+          className="w-full max-w-xs"
+        >
+          <TabsList>
+            <TabsTrigger value="database">Provider database</TabsTrigger>
+            <TabsTrigger value="common-mistakes">Common mistakes</TabsTrigger>
+          </TabsList>
+        </Tabs>
+      </div>
+    );
+  } else if (activeTab === "wcinyp") {
     toolbar = placeholderToolbar;
   }
 
-  const layout: "standard" | "flush" = activeTab === "people" ? "flush" : "standard";
+  const layout: "standard" | "flush" =
+    activeTab === "people" || (activeTab === "providers" && providersView === "common-mistakes")
+      ? "flush"
+      : "standard";
 
   return (
     <DirectoryPeopleProvider>
@@ -635,9 +796,47 @@ export default function DirectoryPage() {
           </div>
         )}
 
-        {activeTab === "providers" && (
-          <div className="px-4 lg:px-6 text-sm text-muted-foreground">No providers yet.</div>
-        )}
+        {activeTab === "providers" &&
+          (providersView === "database" ? (
+            <div className="flex flex-col gap-6 px-4 lg:px-6">
+              <div className="mt-4 text-sm text-muted-foreground">
+                External clinics and providers with WCINYP-specific ordering and contact notes.
+              </div>
+
+              <ProvidersSection
+                title="Clinics and programs"
+                providers={wcinypProviders.filter(
+                  (provider) =>
+                    provider.entityType === "clinic" &&
+                    provider.status !== "retired" &&
+                    provider.status !== "departed"
+                )}
+              />
+
+              <ProvidersSection
+                title="Individual providers"
+                providers={wcinypProviders.filter(
+                  (provider) =>
+                    provider.entityType === "individual" &&
+                    (!provider.status || provider.status === "active")
+                )}
+              />
+
+              <ProvidersSection
+                title="Retired or departed"
+                providers={wcinypProviders.filter(
+                  (provider) => provider.status === "retired" || provider.status === "departed"
+                )}
+              />
+
+              <ProvidersSection
+                title="Unresolved / to confirm"
+                providers={wcinypProviders.filter((provider) => provider.status === "unresolved")}
+              />
+            </div>
+          ) : (
+            <ProvidersCommonMistakesSection items={wcinypProviderCommonMistakes} />
+          ))}
 
         {activeTab === "npi" && (
           <div className="flex flex-col gap-6 px-4 lg:px-6">
