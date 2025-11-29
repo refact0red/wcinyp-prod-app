@@ -1,8 +1,6 @@
 import type { Metadata } from "next";
-import { AppSidebar } from "@/components/shadcn/app-sidebar";
-import { SiteHeader } from "@/components/shadcn/site-header";
+import { LabShell } from "@/components/shadcn/lab-shell";
 import { SiteSubHeader } from "@/components/shadcn/site-subheader";
-import { SidebarInset, SidebarProvider } from "@/components/shadcn/ui/sidebar";
 
 export const metadata: Metadata = {
     title: "Manual",
@@ -10,10 +8,9 @@ export const metadata: Metadata = {
 
 export default function ManualPage() {
     return (
-        <SidebarProvider>
-            <AppSidebar variant="inset" />
-            <SidebarInset>
-                <SiteHeader title="Manual" />
+        <LabShell
+            title="Manual"
+            ribbon={
                 <SiteSubHeader
                     items={[
                         { label: "WCINYP", current: true },
@@ -28,12 +25,13 @@ export default function ManualPage() {
                         { label: "WGC" },
                     ]}
                 />
-                <div className="flex flex-1 flex-col">
-                    <div className="container @container/main flex flex-1 flex-col gap-2">
-                        <div className="flex flex-1 flex-col py-4 md:py-6" />
-                    </div>
+            }
+        >
+            <div className="flex flex-1 flex-col">
+                <div className="container @container/main flex flex-1 flex-col gap-2">
+                    <div className="flex flex-1 flex-col py-4 md:py-6" />
                 </div>
-            </SidebarInset>
-        </SidebarProvider>
+            </div>
+        </LabShell>
     );
 }

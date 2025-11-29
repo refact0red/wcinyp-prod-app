@@ -1,11 +1,50 @@
 "use client";
 
 import { usePathname, useSearchParams } from "next/navigation";
-import { HospitalIcon, IdCardIcon, RadiationIcon, StethoscopeIcon, UsersIcon } from "lucide-react";
+import { Building2Icon, HospitalIcon, IdCardIcon, RadiationIcon, StethoscopeIcon, UsersIcon } from "lucide-react";
 
 import { SiteSubHeader } from "@/components/shadcn/site-subheader";
 
-export type DirectorySubHeaderTab = "people" | "locations" | "radiologists" | "providers" | "npi";
+export const directoryTabs = [
+  {
+    id: "wcinyp",
+    label: "WCINYP",
+    icon: Building2Icon,
+    href: "/directory?tab=wcinyp",
+  },
+  {
+    id: "people",
+    label: "People",
+    icon: UsersIcon,
+    href: "/directory?tab=people",
+  },
+  {
+    id: "locations",
+    label: "Locations",
+    icon: HospitalIcon,
+    href: "/directory?tab=locations",
+  },
+  {
+    id: "radiologists",
+    label: "Radiologists",
+    icon: RadiationIcon,
+    href: "/directory?tab=radiologists",
+  },
+  {
+    id: "providers",
+    label: "Providers",
+    icon: StethoscopeIcon,
+    href: "/directory?tab=providers",
+  },
+  {
+    id: "npi",
+    label: "NPI Lookup",
+    icon: IdCardIcon,
+    href: "/directory?tab=npi",
+  },
+] as const;
+
+export type DirectorySubHeaderTab = (typeof directoryTabs)[number]["id"];
 
 type DirectorySubHeaderProps = {
   activeTab?: DirectorySubHeaderTab;
@@ -16,9 +55,9 @@ export function DirectorySubHeader({ activeTab: activeTabProp }: DirectorySubHea
   const searchParams = useSearchParams();
 
   const tabFromUrl = searchParams?.get("tab") ?? undefined;
-  const allowedTabs: DirectorySubHeaderTab[] = ["people", "locations", "radiologists", "providers", "npi"];
+  const allowedTabs: DirectorySubHeaderTab[] = directoryTabs.map((tab) => tab.id);
 
-  let active: DirectorySubHeaderTab = activeTabProp ?? "people";
+  let active: DirectorySubHeaderTab = activeTabProp ?? "wcinyp";
 
   if (!activeTabProp) {
     if (pathname?.startsWith("/directory/locations/")) {
@@ -28,39 +67,12 @@ export function DirectorySubHeader({ activeTab: activeTabProp }: DirectorySubHea
     }
   }
 
-  const items = [
-    {
-      label: "People",
-      icon: UsersIcon,
-      href: "/directory",
-      current: active === "people",
-    },
-    {
-      label: "Locations",
-      icon: HospitalIcon,
-      href: "/directory?tab=locations",
-      current: active === "locations",
-    },
-    {
-      label: "Radiologists",
-      icon: RadiationIcon,
-      href: "/directory?tab=radiologists",
-      current: active === "radiologists",
-    },
-    {
-      label: "Providers",
-      icon: StethoscopeIcon,
-      href: "/directory?tab=providers",
-      current: active === "providers",
-    },
-    {
-      label: "NPI Lookup",
-      icon: IdCardIcon,
-      href: "/directory?tab=npi",
-      current: active === "npi",
-    },
-  ];
+  const items = directoryTabs.map((tab) => ({
+    label: tab.label,
+    icon: tab.icon,
+    href: tab.href,
+    current: active === tab.id,
+  }));
 
   return <SiteSubHeader items={items} />;
 }
-

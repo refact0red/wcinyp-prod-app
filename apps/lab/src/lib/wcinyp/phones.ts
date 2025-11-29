@@ -23,6 +23,24 @@ export type WcinypPhoneGroup = {
 
 const sanitizeDigits = (value: string) => value.replace(/[^\d]/g, "");
 
+// WCINYP internal-dial prefix for full external numbers that can be dialed
+// internally using a 7-digit code (e.g. 646-962-4704 -> 9624704).
+const INTERNAL_EXTENSION_PREFIX = "646962";
+
+export const isInternalExtension = (value: string | WcinypPhoneNumber): boolean => {
+    const digits = typeof value === "string" ? value : value.digits;
+    const cleaned = sanitizeDigits(digits);
+    return cleaned.length === 10 && cleaned.startsWith(INTERNAL_EXTENSION_PREFIX);
+};
+
+export const getInternalExtensionCode = (value: string | WcinypPhoneNumber): string | null => {
+    if (!isInternalExtension(value)) return null;
+    const digits = typeof value === "string" ? value : value.digits;
+    const cleaned = sanitizeDigits(digits);
+    // 6469624704 -> "9624704"
+    return cleaned.slice(-7);
+};
+
 export const createPhoneNumber = (value: string): WcinypPhoneNumber => ({
     digits: sanitizeDigits(value),
 });
@@ -63,4 +81,3 @@ export const phoneHref = (digits: string): string => {
     const cleaned = sanitizeDigits(digits);
     return cleaned ? `tel:${cleaned}` : "";
 };
-

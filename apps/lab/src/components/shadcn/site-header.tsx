@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { ArrowLeftIcon, ArrowRightIcon, BellIcon, ChevronDownIcon, CreditCardIcon, LogOutIcon, UserCircleIcon } from "lucide-react";
+import { ArrowLeftIcon, ArrowRightIcon, BellIcon, ChevronDownIcon, CreditCardIcon, HelpCircleIcon, LogOutIcon, SettingsIcon, UserCircleIcon } from "lucide-react";
 import { Fragment, useMemo } from "react";
 import { usePathname } from "next/navigation";
 
@@ -45,6 +45,7 @@ type SiteHeaderProps = {
     actions?: React.ReactNode;
     showSidebarToggle?: boolean;
     breadcrumbs?: SiteHeaderBreadcrumb[];
+    showBreadcrumbs?: boolean;
 };
 
 const breadcrumbNavItems: SiteHeaderBreadcrumb[] = [
@@ -84,11 +85,17 @@ function HeaderHistoryButtons() {
     );
 }
 
-export function SiteHeader({ title = "Documents", actions, showSidebarToggle = true, breadcrumbs }: SiteHeaderProps) {
+export function SiteHeader({
+    title = "Documents",
+    actions,
+    showSidebarToggle = true,
+    breadcrumbs,
+    showBreadcrumbs = true,
+}: SiteHeaderProps) {
     const pathname = usePathname();
 
     const computedBreadcrumbs = useMemo<SiteHeaderBreadcrumb[]>(() => {
-        if (!pathname) return [];
+        if (!showBreadcrumbs || !pathname) return [];
 
         const formatSegment = (segment: string) =>
             segment
@@ -146,9 +153,13 @@ export function SiteHeader({ title = "Documents", actions, showSidebarToggle = t
         }
 
         return crumbs;
-    }, [pathname]);
+    }, [pathname, showBreadcrumbs]);
 
-    const resolvedBreadcrumbs = breadcrumbs && breadcrumbs.length > 0 ? breadcrumbs : computedBreadcrumbs;
+    const resolvedBreadcrumbs = showBreadcrumbs
+        ? breadcrumbs && breadcrumbs.length > 0
+            ? breadcrumbs
+            : computedBreadcrumbs
+        : [];
     const isLocationDetail = pathname?.startsWith("/directory/locations/") ?? false;
 
     return (
@@ -162,46 +173,50 @@ export function SiteHeader({ title = "Documents", actions, showSidebarToggle = t
                             <Separator orientation="vertical" className="mx-2 data-[orientation=vertical]:h-4" />
                         </>
                     )}
-                    <Breadcrumb>
-                        <BreadcrumbList>
-                            {resolvedBreadcrumbs.map((crumb, index) => {
-                                const isLast = index === resolvedBreadcrumbs.length - 1;
-                                const isLocationDropdown =
-                                    isLocationDetail && isLast && crumb.href?.startsWith("/directory/locations/");
+                    {showBreadcrumbs ? (
+                        <Breadcrumb>
+                            <BreadcrumbList>
+                                {resolvedBreadcrumbs.map((crumb, index) => {
+                                    const isLast = index === resolvedBreadcrumbs.length - 1;
+                                    const isLocationDropdown =
+                                        isLocationDetail && isLast && crumb.href?.startsWith("/directory/locations/");
 
-                                return (
-                                    <Fragment key={`${crumb.label}-${index}`}>
-                                        <BreadcrumbItem>
-                                            {isLocationDropdown ? (
-                                                <DropdownMenu>
-                                                    <DropdownMenuTrigger className="flex items-center gap-1 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-3.5">
+                                    return (
+                                        <Fragment key={`${crumb.label}-${index}`}>
+                                            <BreadcrumbItem>
+                                                {isLocationDropdown ? (
+                                                    <DropdownMenu>
+                                                        <DropdownMenuTrigger className="flex items-center gap-1 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-3.5">
+                                                            {crumb.label}
+                                                            <ChevronDownIcon />
+                                                        </DropdownMenuTrigger>
+                                                        <DropdownMenuContent align="start">
+                                                            {wcinypLocations.map((location) => (
+                                                                <DropdownMenuItem key={location.id} asChild>
+                                                                    <Link href={`/directory/locations/${location.slug}`}>
+                                                                        {location.name}
+                                                                    </Link>
+                                                                </DropdownMenuItem>
+                                                            ))}
+                                                        </DropdownMenuContent>
+                                                    </DropdownMenu>
+                                                ) : isLast ? (
+                                                    <BreadcrumbPage>{crumb.label}</BreadcrumbPage>
+                                                ) : (
+                                                    <BreadcrumbLink href={crumb.href || "#"}>
                                                         {crumb.label}
-                                                        <ChevronDownIcon />
-                                                    </DropdownMenuTrigger>
-                                                    <DropdownMenuContent align="start">
-                                                        {wcinypLocations.map((location) => (
-                                                            <DropdownMenuItem key={location.id} asChild>
-                                                                <Link href={`/directory/locations/${location.slug}`}>
-                                                                    {location.name}
-                                                                </Link>
-                                                            </DropdownMenuItem>
-                                                        ))}
-                                                    </DropdownMenuContent>
-                                                </DropdownMenu>
-                                            ) : isLast ? (
-                                                <BreadcrumbPage>{crumb.label}</BreadcrumbPage>
-                                            ) : (
-                                                <BreadcrumbLink href={crumb.href || "#"}>
-                                                    {crumb.label}
-                                                </BreadcrumbLink>
-                                            )}
-                                        </BreadcrumbItem>
-                                        {!isLast && <BreadcrumbSeparator />}
-                                    </Fragment>
-                                );
-                            })}
-                        </BreadcrumbList>
-                    </Breadcrumb>
+                                                    </BreadcrumbLink>
+                                                )}
+                                            </BreadcrumbItem>
+                                            {!isLast && <BreadcrumbSeparator />}
+                                        </Fragment>
+                                    );
+                                })}
+                            </BreadcrumbList>
+                        </Breadcrumb>
+                    ) : (
+                        <div className="text-sm font-semibold leading-none text-foreground">{title}</div>
+                    )}
                 </div>
                 <div className="flex items-center gap-2">
                     {actions ? <div className="flex items-center gap-2">{actions}</div> : null}
@@ -245,6 +260,14 @@ export function SiteHeader({ title = "Documents", actions, showSidebarToggle = t
                                 <DropdownMenuItem>
                                     <BellIcon className="mr-2 h-4 w-4" />
                                     Notifications
+                                </DropdownMenuItem>
+                                <DropdownMenuItem>
+                                    <SettingsIcon className="mr-2 h-4 w-4" />
+                                    Settings
+                                </DropdownMenuItem>
+                                <DropdownMenuItem>
+                                    <HelpCircleIcon className="mr-2 h-4 w-4" />
+                                    Get Help
                                 </DropdownMenuItem>
                             </DropdownMenuGroup>
                             <DropdownMenuSeparator />

@@ -4,13 +4,13 @@ import { useMemo, useState, type FormEvent } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { ExternalLink, IdCardIcon, Loader2, MapIcon, Search } from "lucide-react";
 
-import { AppSidebar } from "@/components/shadcn/app-sidebar";
 import { Alert, AlertDescription, AlertTitle } from "@/components/shadcn/alert";
 import { DirectoryLocationsList } from "@/components/shadcn/directory-locations-list";
 import { DirectoryLocationsMap } from "@/components/shadcn/directory-locations-map";
-import { DirectoryTable } from "@/components/shadcn/directory-table";
+import { DirectoryPeopleProvider, DirectoryTable } from "@/components/shadcn/directory-table";
+import { DirectoryPeopleToolbar } from "@/components/shadcn/directory-people-toolbar";
 import { DirectorySubHeader } from "@/components/shadcn/directory-subheader";
-import { SiteHeader } from "@/components/shadcn/site-header";
+import { LabShell } from "@/components/shadcn/lab-shell";
 import { Button } from "@/components/shadcn/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/shadcn/ui/card";
 import { Input } from "@/components/shadcn/ui/input";
@@ -23,13 +23,13 @@ import {
   SelectValue,
 } from "@/components/shadcn/ui/select";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/shadcn/ui/table";
-import { SidebarInset, SidebarProvider } from "@/components/shadcn/ui/sidebar";
 import { ToggleGroup, ToggleGroupItem } from "@/components/shadcn/ui/toggle-group";
 import type { NormalizedAddress, NormalizedNpiRecord, NpiLookupError, NpiLookupResponse } from "@/app/npi-lookup/types";
 import { wcinypLocations, type WcinypLocation } from "@/lib/wcinyp/locations";
 
 type DirectoryTab = "people" | "locations" | "radiologists" | "providers" | "npi";
 type LocationsView = "cards" | "map";
+type DirectoryTabWithHome = DirectoryTab | "wcinyp";
 
 const CMS_NPPES_REGISTRY_URL = "https://npiregistry.cms.hhs.gov/";
 
@@ -337,8 +337,9 @@ export default function DirectoryPage() {
   );
 
   const tabFromUrl = searchParams?.get("tab") ?? undefined;
-  const allowedTabs: DirectoryTab[] = ["people", "locations", "radiologists", "providers", "npi"];
-  const activeTab: DirectoryTab = allowedTabs.includes(tabFromUrl as DirectoryTab) ? (tabFromUrl as DirectoryTab) : "people";
+  const allowedTabs: DirectoryTabWithHome[] = ["wcinyp", "people", "locations", "radiologists", "providers", "npi"];
+  const activeTab: DirectoryTabWithHome =
+    allowedTabs.includes(tabFromUrl as DirectoryTabWithHome) ? (tabFromUrl as DirectoryTabWithHome) : "wcinyp";
 
   const viewFromUrl = searchParams?.get("view") ?? undefined;
   const allowedViews: LocationsView[] = ["cards", "map"];
@@ -383,157 +384,165 @@ export default function DirectoryPage() {
     router.push(`${pathname}${query ? `?${query}` : ""}`);
   };
 
+  const locationsToolbar =
+    activeTab === "locations" ? (
+      <LocationsViewToolbar
+        activeView={activeLocationsView}
+        availableModalities={allModalities}
+        selectedModality={selectedModality}
+        onViewChange={handleChangeLocationsView}
+        onModalityChange={setSelectedModality}
+      />
+    ) : null;
+
+  let toolbar: React.ReactNode = null;
+
+  if (activeTab === "locations") {
+    toolbar = locationsToolbar;
+  } else if (activeTab === "people") {
+    toolbar = <DirectoryPeopleToolbar />;
+  }
+
+  const layout: "standard" | "flush" = activeTab === "people" ? "flush" : "standard";
+
   return (
-    <SidebarProvider>
-      <AppSidebar variant="inset" />
-      <SidebarInset>
-        <SiteHeader title="Directory" />
-        <DirectorySubHeader activeTab={activeTab} />
-        {activeTab === "locations" && (
-          <LocationsViewToolbar
-            activeView={activeLocationsView}
-            availableModalities={allModalities}
-            selectedModality={selectedModality}
-            onViewChange={handleChangeLocationsView}
-            onModalityChange={setSelectedModality}
-          />
-        )}
-        <div className="flex flex-1 flex-col">
-          <div className="container @container/main flex flex-1 flex-col gap-2">
-            <div className="flex flex-col gap-4 py-4 md:gap-6 md:py-6">
-              <div className="px-4 lg:px-6">
-                {activeTab === "people" && (
-                  <div className="mt-4">
-                    <DirectoryTable />
-                  </div>
-                )}
-
-                {activeTab === "locations" &&
-                  (activeLocationsView === "cards" ? (
-                    <div className="mt-4">
-                      <DirectoryLocationsList
-                        locations={filteredLocations}
-                        selectedLocationId={selectedLocationId}
-                        onSelectLocation={setSelectedLocationId}
-                        onOpenInMaps={handleOpenLocationInMaps}
-                        onLocationClick={handleOpenLocationPage}
-                        emptyMessage={
-                          selectedModality
-                            ? "No locations match the selected modality."
-                            : "No locations available yet."
-                        }
-                      />
-                    </div>
-                  ) : (
-                    <div className="mt-4">
-                      <DirectoryLocationsMap
-                        locations={wcinypLocations}
-                        selectedLocationId={selectedLocationId}
-                        onSelectLocation={setSelectedLocationId}
-                        size="expanded"
-                      />
-                    </div>
-                  ))}
-
-                {activeTab === "radiologists" && (
-                  <div className="mt-4 text-sm text-muted-foreground">No radiologists yet.</div>
-                )}
-
-                {activeTab === "providers" && (
-                  <div className="mt-4 text-sm text-muted-foreground">No providers yet.</div>
-                )}
-
-                {activeTab === "npi" && (
-                  <div className="mt-4 flex flex-col gap-4">
-                    <Card>
-                      <CardHeader className="pb-4">
-                        <CardTitle>NPI Lookup</CardTitle>
-                        <CardDescription>
-                          Search the <CmsNppesRegistryLink /> by NPI.
-                        </CardDescription>
-                      </CardHeader>
-                      <CardContent>
-                        <form onSubmit={handleSubmit} className="flex flex-col gap-4 md:flex-row md:items-end">
-                          <div className="flex-1 space-y-2">
-                            <Label htmlFor="npi-input">NPI number</Label>
-                            <Input
-                              id="npi-input"
-                              value={npiInput}
-                              onChange={(event) => setNpiInput(event.target.value)}
-                              placeholder="Enter 10-digit NPI"
-                              inputMode="numeric"
-                              pattern="\d{10}"
-                              maxLength={10}
-                            />
-                          </div>
-                          <div className="flex flex-col gap-2 md:flex-row md:items-center">
-                            <Button type="submit" disabled={isLoading} className="gap-2">
-                              {isLoading ? (
-                                <>
-                                  <Loader2 className="size-4 animate-spin" />
-                                  Looking up NPI…
-                                </>
-                              ) : (
-                                <>
-                                  <Search className="size-4" />
-                                  Search
-                                </>
-                              )}
-                            </Button>
-                          </div>
-                        </form>
-                      </CardContent>
-                    </Card>
-
-                    {error && (
-                      <Alert variant="destructive">
-                        <AlertTitle>Unable to complete lookup</AlertTitle>
-                        <AlertDescription>{error}</AlertDescription>
-                      </Alert>
-                    )}
-
-                    {result && (
-                      <div className="flex flex-col gap-4">
-                        <SummaryCard record={result} />
-                        <DetailsTable record={result} />
-
-                        <TableSection
-                          title="Taxonomy"
-                          columns={["Primary Taxonomy", "Selected Taxonomy", "State", "License Number"]}
-                          rows={taxonomyRows}
-                          emptyMessage="No taxonomy information on file from CMS."
-                        />
-
-                        <TableSection
-                          title="Other Identifiers"
-                          columns={["Issuer", "State", "Number", "Other Issuer"]}
-                          rows={identifierRows}
-                          emptyMessage="No identifiers on file from CMS."
-                        />
-
-                        <TableSection
-                          title="Health Information Exchange Endpoints"
-                          columns={[
-                            "Endpoint Type",
-                            "Endpoint",
-                            "Endpoint Description",
-                            "Use",
-                            "Content Type",
-                            "Affiliation",
-                            "Endpoint Location",
-                          ]}
-                          rows={endpointRows}
-                          emptyMessage="No endpoints on file from CMS."
-                        />
-                      </div>
-                    )}
-                  </div>
-                )}
-              </div>
-            </div>
+    <DirectoryPeopleProvider>
+      <LabShell
+        title="Directory"
+        ribbon={<DirectorySubHeader activeTab={activeTab} />}
+        toolbar={toolbar}
+        layout={layout}
+      >
+        {activeTab === "wcinyp" && (
+          <div className="px-4 lg:px-6 text-sm text-muted-foreground">
+            WCINYP overview coming soon.
           </div>
-        </div>
-      </SidebarInset>
-    </SidebarProvider>
+        )}
+
+        {activeTab === "people" && <DirectoryTable />}
+
+        {activeTab === "locations" &&
+          (activeLocationsView === "cards" ? (
+            <div className="px-4 lg:px-6">
+              <DirectoryLocationsList
+                locations={filteredLocations}
+                selectedLocationId={selectedLocationId}
+                onSelectLocation={setSelectedLocationId}
+                onOpenInMaps={handleOpenLocationInMaps}
+                onLocationClick={handleOpenLocationPage}
+                emptyMessage={
+                  selectedModality
+                    ? "No locations match the selected modality."
+                    : "No locations available yet."
+                }
+              />
+            </div>
+          ) : (
+            <div className="px-4 lg:px-6">
+              <DirectoryLocationsMap
+                locations={wcinypLocations}
+                selectedLocationId={selectedLocationId}
+                onSelectLocation={setSelectedLocationId}
+                size="expanded"
+              />
+            </div>
+          ))}
+
+        {activeTab === "radiologists" && (
+          <div className="px-4 lg:px-6 text-sm text-muted-foreground">No radiologists yet.</div>
+        )}
+
+        {activeTab === "providers" && (
+          <div className="px-4 lg:px-6 text-sm text-muted-foreground">No providers yet.</div>
+        )}
+
+        {activeTab === "npi" && (
+          <div className="px-4 lg:px-6 flex flex-col gap-4">
+            <Card>
+              <CardHeader className="pb-4">
+                <CardTitle>NPI Lookup</CardTitle>
+                <CardDescription>
+                  Search the <CmsNppesRegistryLink /> by NPI.
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <form onSubmit={handleSubmit} className="flex flex-col gap-4 md:flex-row md:items-end">
+                  <div className="flex-1 space-y-2">
+                    <Label htmlFor="npi-input">NPI number</Label>
+                    <Input
+                      id="npi-input"
+                      value={npiInput}
+                      onChange={(event) => setNpiInput(event.target.value)}
+                      placeholder="Enter 10-digit NPI"
+                      inputMode="numeric"
+                      pattern="\d{10}"
+                      maxLength={10}
+                    />
+                  </div>
+                  <div className="flex flex-col gap-2 md:flex-row md:items-center">
+                    <Button type="submit" disabled={isLoading} className="gap-2">
+                      {isLoading ? (
+                        <>
+                          <Loader2 className="size-4 animate-spin" />
+                          Looking up NPI…
+                        </>
+                      ) : (
+                        <>
+                          <Search className="size-4" />
+                          Search
+                        </>
+                      )}
+                    </Button>
+                  </div>
+                </form>
+              </CardContent>
+            </Card>
+
+            {error && (
+              <Alert variant="destructive">
+                <AlertTitle>Unable to complete lookup</AlertTitle>
+                <AlertDescription>{error}</AlertDescription>
+              </Alert>
+            )}
+
+            {result && (
+              <div className="flex flex-col gap-4">
+                <SummaryCard record={result} />
+                <DetailsTable record={result} />
+
+                <TableSection
+                  title="Taxonomy"
+                  columns={["Primary Taxonomy", "Selected Taxonomy", "State", "License Number"]}
+                  rows={taxonomyRows}
+                  emptyMessage="No taxonomy information on file from CMS."
+                />
+
+                <TableSection
+                  title="Other Identifiers"
+                  columns={["Issuer", "State", "Number", "Other Issuer"]}
+                  rows={identifierRows}
+                  emptyMessage="No identifiers on file from CMS."
+                />
+
+                <TableSection
+                  title="Health Information Exchange Endpoints"
+                  columns={[
+                    "Endpoint Type",
+                    "Endpoint",
+                    "Endpoint Description",
+                    "Use",
+                    "Content Type",
+                    "Affiliation",
+                    "Endpoint Location",
+                  ]}
+                  rows={endpointRows}
+                  emptyMessage="No endpoints on file from CMS."
+                />
+              </div>
+            )}
+          </div>
+        )}
+      </LabShell>
+    </DirectoryPeopleProvider>
   );
 }

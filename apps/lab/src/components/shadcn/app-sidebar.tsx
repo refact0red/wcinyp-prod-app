@@ -14,15 +14,12 @@ import {
   FileCodeIcon,
   FileIcon,
   FileTextIcon,
-  HelpCircleIcon,
   LayoutDashboardIcon,
-  SettingsIcon,
   UsersIcon,
 } from "lucide-react"
 
 import { NavDocuments } from "@/components/shadcn/nav-documents"
 import { NavMain } from "@/components/shadcn/nav-main"
-import { NavSecondary } from "@/components/shadcn/nav-secondary"
 import {
   Sidebar,
   SidebarContent,
@@ -30,6 +27,7 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
+  SidebarRail,
 } from "@/components/shadcn/ui/sidebar"
 
 export const appSidebarData = {
@@ -105,16 +103,6 @@ export const appSidebarData = {
     },
   ],
   navSecondary: [
-    {
-      title: "Settings",
-      url: "#",
-      icon: SettingsIcon,
-    },
-    {
-      title: "Get Help",
-      url: "#",
-      icon: HelpCircleIcon,
-    },
   ],
   documents: [
     {
@@ -208,7 +196,7 @@ function WciLogoIcon(props: React.SVGProps<SVGSVGElement>) {
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   return (
-    <Sidebar collapsible="offcanvas" {...props}>
+    <Sidebar collapsible="icon" variant="sidebar" className="border-0" {...props}>
       <SidebarHeader>
         <SidebarMenu>
           <SidebarMenuItem>
@@ -230,8 +218,8 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         <NavMain items={appSidebarData.navMain} />
         <NavDocuments label="Experimental" items={appSidebarData.documents} />
         <NavDocuments label="Admin" items={appSidebarData.admin} />
-        <NavSecondary items={appSidebarData.navSecondary} className="mt-auto" />
       </SidebarContent>
+      <SidebarRail />
     </Sidebar>
   )
 }

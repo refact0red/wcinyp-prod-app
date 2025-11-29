@@ -1,16 +1,13 @@
 "use client"
 
 import * as React from "react"
-import { ColumnDef, flexRender } from "@tanstack/react-table"
+import { ColumnDef, Table, flexRender } from "@tanstack/react-table"
 import { CheckIcon, ClipboardIcon, MoreVerticalIcon, PlusIcon } from "lucide-react"
 
 import type { DirectoryPerson } from "@/app/directory/data"
 import { directoryPeople } from "@/app/directory/data"
-import { BulkActionsBar } from "@/components/table/bulk-actions-bar"
 import { EmptyState } from "@/components/table/empty-state"
-import { TablePagination } from "@/components/table/table-pagination"
 import { TableShell } from "@/components/table/table-shell"
-import { TableToolbar, type ToolbarFilter } from "@/components/table/table-toolbar"
 import { useDataTable } from "@/components/table/use-data-table"
 import { Avatar, AvatarFallback } from "@/components/shadcn/ui/avatar"
 import { Badge } from "@/components/shadcn/ui/badge"
@@ -35,7 +32,7 @@ import {
   SheetTitle,
 } from "@/components/shadcn/ui/sheet"
 import {
-  Table,
+  Table as ShadcnTable,
   TableBody,
   TableCell,
   TableHead,
@@ -43,6 +40,7 @@ import {
   TableRow,
 } from "@/components/shadcn/ui/table"
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/shadcn/ui/tooltip"
+import { withSaveToast } from "@/components/shadcn/use-save-toast"
 
 type PersonFormState = {
   name: string
@@ -159,7 +157,44 @@ const renderPhone = (value?: string) => {
   )
 }
 
-export function DirectoryTable() {
+type TeamOption = {
+  value: string
+  label: string
+}
+
+type DirectoryPeopleContextValue = {
+  table: Table<DirectoryPerson>
+  teamOptions: TeamOption[]
+  resetState: () => void
+  openCreatePerson: () => void
+  isSheetOpen: boolean
+  handleSheetOpenChange: (open: boolean) => void
+  editingPerson: DirectoryPerson | null
+  formState: PersonFormState
+  updateField: (field: keyof PersonFormState) => (value: string) => void
+  handleSave: (event: React.FormEvent<HTMLFormElement>) => Promise<void> | void
+  canSubmit: boolean
+  attemptCloseSheet: () => void
+}
+
+const DirectoryPeopleContext =
+  React.createContext<DirectoryPeopleContextValue | undefined>(undefined)
+
+export function useDirectoryPeopleContext() {
+  const context = React.useContext(DirectoryPeopleContext)
+  if (!context) {
+    throw new Error(
+      "useDirectoryPeopleContext must be used within a DirectoryPeopleProvider"
+    )
+  }
+  return context
+}
+
+export function DirectoryPeopleProvider({
+  children,
+}: {
+  children: React.ReactNode
+}) {
   const [people, setPeople] = React.useState<DirectoryPerson[]>(directoryPeople)
   const [formState, setFormState] = React.useState<PersonFormState>(emptyFormState)
   const [editingPersonId, setEditingPersonId] = React.useState<number | null>(null)
@@ -211,23 +246,6 @@ export function DirectoryTable() {
     )
   }, [editingPerson, formState])
 
-  const teamOptions = React.useMemo<ToolbarFilter<DirectoryPerson>["options"]>(() => {
-    return Array.from(new Set(people.map((person) => person.team)))
-      .sort((a, b) => a.localeCompare(b))
-      .map((value) => ({ value, label: value }))
-  }, [people])
-
-  const toolbarFilters = React.useMemo<ToolbarFilter<DirectoryPerson>[]>(
-    () => [
-      {
-        columnId: "team",
-        label: "Team",
-        options: teamOptions,
-      },
-    ],
-    [teamOptions]
-  )
-
   const handleEdit = React.useCallback((person: DirectoryPerson) => {
     setEditingPersonId(person.id)
     setIsSheetOpen(true)
@@ -247,11 +265,6 @@ export function DirectoryTable() {
     },
     [editingPersonId, resetFormState]
   )
-
-  const handleCreate = React.useCallback(() => {
-    resetFormState()
-    setIsSheetOpen(true)
-  }, [resetFormState])
 
   const attemptCloseSheet = React.useCallback(() => {
     if (isDirty) {
@@ -277,48 +290,71 @@ export function DirectoryTable() {
     (field: keyof PersonFormState) => (value: string) =>
       setFormState((prev) => ({ ...prev, [field]: value }))
 
-  const handleSave = (event: React.FormEvent<HTMLFormElement>) => {
+  const handleSave = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault()
 
     const name = formState.name.trim()
     const team = formState.team.trim() || (editingPerson?.team ?? "")
     if (!name || !team) return
 
-    if (editingPerson) {
-      const updatedPerson: DirectoryPerson = {
-        ...editingPerson,
-        name,
-        title: formState.title.trim(),
-        team,
-        officePhone: formState.officePhone.trim() || undefined,
-        mobilePhone: formState.mobilePhone.trim() || undefined,
-        email: formState.email.trim(),
+    const savePromise = Promise.resolve().then(() => {
+      if (editingPerson) {
+        const updatedPerson: DirectoryPerson = {
+          ...editingPerson,
+          name,
+          title: formState.title.trim(),
+          team,
+          officePhone: formState.officePhone.trim() || undefined,
+          mobilePhone: formState.mobilePhone.trim() || undefined,
+          email: formState.email.trim(),
+        }
+
+        setPeople((prev) =>
+          prev.map((person) => (person.id === editingPerson.id ? updatedPerson : person))
+        )
+        return updatedPerson
+      } else {
+        const nextId =
+          people.length > 0 ? Math.max(...people.map((person) => person.id)) + 1 : 1
+
+        const newPerson: DirectoryPerson = {
+          id: nextId,
+          name,
+          title: formState.title.trim(),
+          team,
+          officePhone: formState.officePhone.trim() || undefined,
+          mobilePhone: formState.mobilePhone.trim() || undefined,
+          email: formState.email.trim(),
+          status: "Active",
+        }
+
+        setPeople((prev) => [...prev, newPerson])
+        return newPerson
       }
+    })
 
-      setPeople((prev) =>
-        prev.map((person) => (person.id === editingPerson.id ? updatedPerson : person))
-      )
-    } else {
-      const nextId =
-        people.length > 0 ? Math.max(...people.map((person) => person.id)) + 1 : 1
-
-      const newPerson: DirectoryPerson = {
-        id: nextId,
-        name,
-        title: formState.title.trim(),
-        team,
-        officePhone: formState.officePhone.trim() || undefined,
-        mobilePhone: formState.mobilePhone.trim() || undefined,
-        email: formState.email.trim(),
-        status: "Active",
-      }
-
-      setPeople((prev) => [...prev, newPerson])
-    }
+    await withSaveToast(savePromise, {
+      pending: editingPerson ? "Updating person…" : "Adding person…",
+      success: editingPerson ? "Person updated" : "Person added",
+      error: "Unable to save person",
+    })
 
     setIsSheetOpen(false)
     resetFormState()
   }
+
+  const canSubmit = React.useMemo(() => {
+    const name = formState.name.trim()
+    const team = (formState.team || editingPerson?.team || "").trim()
+    return Boolean(name && team)
+  }, [editingPerson?.team, formState.name, formState.team])
+
+  const teamOptions = React.useMemo<TeamOption[]>(() => {
+    return Array.from(new Set(people.map((person) => person.team)))
+      .filter(Boolean)
+      .sort((a, b) => a.localeCompare(b))
+      .map((value) => ({ value, label: value }))
+  }, [people])
 
   const columns = React.useMemo<ColumnDef<DirectoryPerson>[]>(
     () => [
@@ -455,76 +491,109 @@ export function DirectoryTable() {
     table.resetRowSelection()
   }, [people, table])
 
+  const openCreatePerson = React.useCallback(() => {
+    resetFormState()
+    setIsSheetOpen(true)
+  }, [resetFormState])
+
+  const contextValue = React.useMemo<DirectoryPeopleContextValue>(
+    () => ({
+      table,
+      teamOptions,
+      resetState,
+      openCreatePerson,
+      isSheetOpen,
+      handleSheetOpenChange,
+      editingPerson,
+      formState,
+      updateField,
+      handleSave,
+      canSubmit,
+      attemptCloseSheet,
+    }),
+    [
+      table,
+      teamOptions,
+      resetState,
+      openCreatePerson,
+      isSheetOpen,
+      handleSheetOpenChange,
+      editingPerson,
+      formState,
+      updateField,
+      handleSave,
+      canSubmit,
+      attemptCloseSheet,
+    ]
+  )
+
+  return (
+    <DirectoryPeopleContext.Provider value={contextValue}>
+      {children}
+    </DirectoryPeopleContext.Provider>
+  )
+}
+
+export function DirectoryTable() {
+  const {
+    table,
+    isSheetOpen,
+    handleSheetOpenChange,
+    editingPerson,
+    formState,
+    updateField,
+    handleSave,
+    canSubmit,
+    attemptCloseSheet,
+  } = useDirectoryPeopleContext()
+
   return (
     <>
-      <div className="overflow-hidden rounded-lg border bg-card">
-        <TableToolbar
-          table={table}
-          filters={toolbarFilters}
-          searchPlaceholder="Search by name, email, or team"
-          onReset={resetState}
-          rightSlot={
-            <Button size="sm" className="gap-2" onClick={handleCreate}>
-              <PlusIcon className="size-4" />
-              Add person
-            </Button>
-          }
-        />
-        <BulkActionsBar
-          table={table}
-          actions={
-            <Button variant="secondary" size="sm">
-              Message
-            </Button>
-          }
-        />
-        <TableShell withBorder={false}>
-          <Table className="[&_td]:py-3 [&_th]:py-3">
-            <TableHeader className="bg-muted/40">
-              {table.getHeaderGroups().map((headerGroup) => (
-                <TableRow key={headerGroup.id}>
-                  {headerGroup.headers.map((header) => (
-                    <TableHead key={header.id} colSpan={header.colSpan}>
-                      {header.isPlaceholder
-                        ? null
-                        : flexRender(
-                            header.column.columnDef.header,
-                            header.getContext()
-                          )}
-                    </TableHead>
-                  ))}
-                </TableRow>
-              ))}
-            </TableHeader>
-            <TableBody>
-              {table.getRowModel().rows.map((row) => (
-                <TableRow
-                  key={row.id}
-                  data-state={row.getIsSelected() && "selected"}
-                  className="hover:bg-muted/30"
-                >
-                  {row.getVisibleCells().map((cell) => (
-                    <TableCell key={cell.id}>
-                      {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                    </TableCell>
-                  ))}
-                </TableRow>
-              ))}
-              {!table.getRowModel().rows.length && (
-                <TableRow>
-                  <TableCell colSpan={table.getAllColumns().length}>
-                    <EmptyState
-                      title="No people"
-                      description="Try adjusting your search or filters."
-                    />
+      <TableShell withBorder={false} className="rounded-none border-none">
+        <ShadcnTable className="[&_td]:py-3 [&_th]:py-3">
+          <TableHeader className="bg-muted/40">
+            {table.getHeaderGroups().map((headerGroup) => (
+              <TableRow key={headerGroup.id}>
+                {headerGroup.headers.map((header) => (
+                  <TableHead key={header.id} colSpan={header.colSpan}>
+                    {header.isPlaceholder
+                      ? null
+                      : flexRender(
+                          header.column.columnDef.header,
+                          header.getContext()
+                        )}
+                  </TableHead>
+                ))}
+              </TableRow>
+            ))}
+          </TableHeader>
+          <TableBody>
+            {table.getRowModel().rows.map((row) => (
+              <TableRow
+                key={row.id}
+                data-state={row.getIsSelected() && "selected"}
+                className="hover:bg-muted/30"
+              >
+                {row.getVisibleCells().map((cell) => (
+                  <TableCell key={cell.id}>
+                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
                   </TableCell>
-                </TableRow>
-              )}
-            </TableBody>
-          </Table>
-        </TableShell>
-        <TablePagination table={table} />
-      </div>
+                ))}
+              </TableRow>
+            ))}
+            {!table.getRowModel().rows.length && (
+              <TableRow>
+                <TableCell colSpan={table.getAllColumns().length}>
+                  <EmptyState
+                    title="No people"
+                    description="Try adjusting your search or filters."
+                  />
+                </TableCell>
+              </TableRow>
+            )}
+          </TableBody>
+        </ShadcnTable>
+      </TableShell>
 
       <Sheet open={isSheetOpen} onOpenChange={handleSheetOpenChange}>
         <SheetContent side="right" className="flex flex-col sm:max-w-md">
@@ -618,8 +687,8 @@ export function DirectoryTable() {
 
           <div className="border-t bg-card/80 px-4 pb-4 pt-3 backdrop-blur">
             <div className="flex flex-col gap-2">
-              <Button type="submit" form="person-form" disabled={!editingPerson}>
-                Save changes
+              <Button type="submit" form="person-form" disabled={!canSubmit}>
+                {editingPerson ? "Save changes" : "Add person"}
               </Button>
               <Button type="button" variant="outline" onClick={attemptCloseSheet}>
                 Close

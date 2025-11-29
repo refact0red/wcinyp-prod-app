@@ -5,19 +5,14 @@ import Link from "next/link"
 import { usePathname, useRouter } from "next/navigation"
 import {
   FolderIcon,
-  HospitalIcon,
-  IdCardIcon,
-  MailIcon,
   MoreHorizontalIcon,
-  RadiationIcon,
   SearchIcon,
   ShareIcon,
-  StethoscopeIcon,
-  UsersIcon,
   type LucideIcon,
 } from "lucide-react"
 
 import { Button } from "@/components/shadcn/ui/button"
+import { directoryTabs } from "@/components/shadcn/directory-subheader"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -130,26 +125,12 @@ export function NavMain({
                       side={isMobile ? "bottom" : "right"}
                       align={isMobile ? "end" : "start"}
                     >
-                      <DropdownMenuItem onClick={() => handleNavigate("/directory?tab=people")}>
-                        <UsersIcon className="mr-2 h-4 w-4" />
-                        <span>People</span>
-                      </DropdownMenuItem>
-                      <DropdownMenuItem onClick={() => handleNavigate("/directory?tab=locations")}>
-                        <HospitalIcon className="mr-2 h-4 w-4" />
-                        <span>Locations</span>
-                      </DropdownMenuItem>
-                      <DropdownMenuItem onClick={() => handleNavigate("/directory?tab=radiologists")}>
-                        <RadiationIcon className="mr-2 h-4 w-4" />
-                        <span>Radiologists</span>
-                      </DropdownMenuItem>
-                      <DropdownMenuItem onClick={() => handleNavigate("/directory?tab=providers")}>
-                        <StethoscopeIcon className="mr-2 h-4 w-4" />
-                        <span>Providers</span>
-                      </DropdownMenuItem>
-                      <DropdownMenuItem onClick={() => handleNavigate("/directory?tab=npi")}>
-                        <IdCardIcon className="mr-2 h-4 w-4" />
-                        <span>NPI Lookup</span>
-                      </DropdownMenuItem>
+                      {directoryTabs.map((tab) => (
+                        <DropdownMenuItem key={tab.id} onClick={() => handleNavigate(tab.href)}>
+                          <tab.icon className="mr-2 h-4 w-4" />
+                          <span>{tab.label}</span>
+                        </DropdownMenuItem>
+                      ))}
                     </DropdownMenuContent>
                   </DropdownMenu>
                 ) : (
