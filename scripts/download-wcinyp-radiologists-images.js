@@ -6,24 +6,9 @@ const https = require("https");
 const http = require("http");
 
 const rootDir = process.cwd();
-const radiologistsFile = path.join(
-  rootDir,
-  "apps",
-  "lab",
-  "src",
-  "lib",
-  "wcinyp",
-  "radiologists.ts"
-);
+const radiologistsFile = path.join(rootDir, "src", "lib", "wcinyp", "radiologists.ts");
 
-const outputDir = path.join(
-  rootDir,
-  "apps",
-  "lab",
-  "public",
-  "images",
-  "radiologists"
-);
+const outputDir = path.join(rootDir, "public", "images", "radiologists");
 
 function parseRadiologists(fileContents) {
   const matches = [];

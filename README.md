@@ -3,7 +3,7 @@
 This is an official Untitled UI starter kit for Next.js. Kickstart your Untitled UI project with Next.js in seconds.
 
 > [!NOTE]
-> The “main” app has been moved to `refact0red/archive-untitled-wcinyp`. This repo now contains the `lab` app only.
+> The “main” app has been moved to `refact0red/archive-untitled-wcinyp`. This repo now contains the `lab` app only at the repo root (no workspaces) and uses Bun for package management.
 
 ## Project context (WCINYP)
 
@@ -19,34 +19,16 @@ Built with React 19.1, Tailwind CSS v4.1, TypeScript 5.8, and React Aria, Untitl
 
 ## Getting started
 
-First, run the development server:
+Install dependencies with Bun, then start the development server (Next runs on port 4000):
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+bun install
+bun run dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:4000](http://localhost:4000) with your browser to see the result.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
-
-## Storybook
-
-Run component previews at [http://localhost:6006](http://localhost:6006):
-
-```bash
-pnpm storybook
-```
-
-- Stories live in `src/stories/untitledui` (Untitled UI) and `src/stories/shadcn` (Shadcn-inspired primitives).
-- Global Tailwind v4 styles, fonts, and light/dark themes are loaded from `.storybook/preview.tsx`; switch themes from the Storybook toolbar.
-- Use `pnpm build-storybook` to create a static build for sharing.
-- Shadcn-style `Card` and `Alert` components live in `src/components/shadcn` and reuse the same tokens as the rest of the kit.
+You can start editing the page by modifying `src/app/page.tsx`. The page auto-updates as you edit the file.
 
 ## Resources
 

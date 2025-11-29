@@ -2,18 +2,18 @@
 
 ## Current setup
 
-- **Main app**
-  - Uses `next/font/google` to load **Inter** as the primary UI font via `--font-inter` (`apps/main/src/app/layout.tsx:1`).
-  - Defines typography tokens in `@theme` (`apps/main/src/styles/theme.css:1`), including:
+- **Main app (archived in `refact0red/archive-untitled-wcinyp`)**
+  - Uses `next/font/google` to load **Inter** as the primary UI font via `--font-inter` (`src/app/layout.tsx:1`).
+  - Defines typography tokens in `@theme` (`src/styles/theme.css:1`), including:
     - `--font-body` / `--font-display`: `var(--font-inter, "Inter"), -apple-system, "Segoe UI", Roboto, Arial, sans-serif`.
     - `--font-mono`: `ui-monospace, "Roboto Mono", SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace`.
-  - Uses opinionated prose/heading styles in `apps/main/src/styles/typography.css`.
+  - Uses opinionated prose/heading styles in `src/styles/typography.css`.
 
 - **Labs app**
-  - Now also uses `next/font/google` Inter, exposed as `--font-inter` in `apps/lab/src/app/layout.tsx:1`.
+  - Now also uses `next/font/google` Inter, exposed as `--font-inter` in `src/app/layout.tsx:1`.
   - `html, body` use:
-    - `font-family: var(--font-inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji");` (`apps/lab/src/styles/globals.css:43`).
-  - Colors/radius/sidebar tokens follow shadcn/tweakcn’s OKLCH setup (`apps/lab/src/styles/globals.css:1`).
+    - `font-family: var(--font-inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji");` (`src/styles/globals.css:43`).
+  - Colors/radius/sidebar tokens follow shadcn/tweakcn’s OKLCH setup (`src/styles/globals.css:1`).
 
 ## Inter font characteristics
 
@@ -54,9 +54,9 @@ There is no official pairing list on the Inter site or Google Fonts specimen, bu
 ### 2. Global font application
 
 - Labs currently applies Inter via:
-  - `const inter = Inter({ subsets: ["latin"], display: "swap", variable: "--font-inter" });` (`apps/lab/src/app/layout.tsx:4`).
-  - `<body className={`${inter.variable} bg-background text-foreground antialiased`}>` (`apps/lab/src/app/layout.tsx:26`).
-  - `html, body { font-family: var(--font-inter, system-ui, ...); }` (`apps/lab/src/styles/globals.css:43`).
+  - `const inter = Inter({ subsets: ["latin"], display: "swap", variable: "--font-inter" });` (`src/app/layout.tsx:4`).
+  - `<body className={`${inter.variable} bg-background text-foreground antialiased`}>` (`src/app/layout.tsx:26`).
+  - `html, body { font-family: var(--font-inter, system-ui, ...); }` (`src/styles/globals.css:43`).
 
 This ensures:
 
@@ -98,4 +98,3 @@ These would then be wired into Tailwind’s `fontFamily` config (for `font-sans`
 - Revisit this document whenever we:
   - Add new language support (may require different font subsets or families).
   - Adjust heading/body scales or letter-spacing.
-
