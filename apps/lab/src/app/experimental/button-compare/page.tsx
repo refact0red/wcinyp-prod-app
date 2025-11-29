@@ -4,6 +4,9 @@ import { Button } from "@/components/shadcn/ui/button";
 
 type Vars = React.CSSProperties;
 
+// TODO: Remove this experimental page once the outline button opacity issue is resolved.
+// The globals.css opacity defaults and ui/button outline override were kept but did not
+// fully address the visual mismatch; keep this page for side-by-side verification until fixed.
 const neutralVars: Vars = {
   // Neutral preset from shadcn docs (current app tokens).
   "--background": "oklch(1 0 0)",

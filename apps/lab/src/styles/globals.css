@@ -43,6 +43,7 @@
         --sidebar-ring: oklch(0.708 0 0);
     }
 
+    /* TODO(inter): See apps/lab/typography-research.md for research on ideal serif/mono pairings and final font token decisions. */
     html,
     body {
         font-family:
