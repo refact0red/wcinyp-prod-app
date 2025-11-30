@@ -14,7 +14,7 @@ export const directoryTabs = [
   },
   {
     id: "people",
-    label: "People",
+    label: "Staff",
     icon: UsersIcon,
     href: "/directory?tab=people",
   },

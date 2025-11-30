@@ -2,11 +2,12 @@
 
 import { useMemo, useState, type FormEvent } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { ExternalLink, IdCardIcon, Loader2, MapIcon, Search } from "lucide-react";
+import { ExternalLink, IdCardIcon, Loader2, MapIcon, Rows3Icon, Search } from "lucide-react";
 
 import { Alert, AlertDescription, AlertTitle } from "@/components/shadcn/alert";
 import { DirectoryLocationsList } from "@/components/shadcn/directory-locations-list";
 import { DirectoryLocationsMap } from "@/components/shadcn/directory-locations-map";
+import { DirectoryLocationsTable } from "@/components/shadcn/directory-locations-table";
 import { DirectoryPeopleProvider, DirectoryTable } from "@/components/shadcn/directory-table";
 import { DirectoryPeopleToolbar } from "@/components/shadcn/directory-people-toolbar";
 import { DirectorySubHeader } from "@/components/shadcn/directory-subheader";
@@ -35,9 +36,10 @@ import { wcinypProviderCommonMistakes, type WcinypProviderCommonMistake } from "
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from "@/components/shadcn/ui/sheet";
 import { Tabs, TabsList, TabsTrigger } from "@/components/shadcn/ui/tabs";
 import { StaticTable } from "@/components/table/static-table";
+import { cn } from "@/lib/utils";
 
 type DirectoryTab = "people" | "locations" | "radiologists" | "providers" | "npi";
-type LocationsView = "cards" | "map";
+type LocationsView = "cards" | "list" | "map";
 type DirectoryTabWithHome = DirectoryTab | "wcinyp";
 type ProvidersView = "database" | "common-mistakes";
 
@@ -350,16 +352,35 @@ const LocationsViewToolbar = ({
             size="sm"
             spacing={0}
           >
-            <ToggleGroupItem value="cards">
-              <IdCardIcon className="mr-1 size-3.5" />
-              <span className="text-xs font-medium">Cards view</span>
+            <ToggleGroupItem
+              value="list"
+              aria-label="List view"
+              title="List view"
+              className="gap-2 px-3"
+            >
+              <Rows3Icon className="size-4" />
+              <span className="text-xs font-medium">List</span>
             </ToggleGroupItem>
-            <ToggleGroupItem value="map">
-              <MapIcon className="mr-1 size-3.5" />
-              <span className="text-xs font-medium">Map view</span>
+            <ToggleGroupItem
+              value="cards"
+              aria-label="Card view"
+              title="Card view"
+              className="gap-2 px-3"
+            >
+              <IdCardIcon className="size-4" />
+              <span className="text-xs font-medium">Card</span>
+            </ToggleGroupItem>
+            <ToggleGroupItem
+              value="map"
+              aria-label="Map view"
+              title="Map view"
+              className="gap-2 px-3"
+            >
+              <MapIcon className="size-4" />
+              <span className="text-xs font-medium">Map</span>
             </ToggleGroupItem>
           </ToggleGroup>
-          {activeView === "cards" ? (
+          {activeView !== "map" ? (
             <div className="ml-4 flex items-center gap-2 border-l border-border/80 pl-4 text-xs">
               <span className="font-medium text-muted-foreground">Modalities</span>
               <Select
@@ -502,7 +523,7 @@ export default function DirectoryPage() {
     allowedTabs.includes(tabFromUrl as DirectoryTabWithHome) ? (tabFromUrl as DirectoryTabWithHome) : "wcinyp";
 
   const viewFromUrl = searchParams?.get("view") ?? undefined;
-  const allowedViews: LocationsView[] = ["cards", "map"];
+  const allowedViews: LocationsView[] = ["cards", "list", "map"];
   const activeLocationsView: LocationsView =
     activeTab === "locations" && viewFromUrl && allowedViews.includes(viewFromUrl as LocationsView)
       ? (viewFromUrl as LocationsView)
@@ -736,7 +757,9 @@ export default function DirectoryPage() {
   }
 
   const layout: "standard" | "flush" =
-    activeTab === "people" || (activeTab === "providers" && providersView === "common-mistakes")
+    activeTab === "people" ||
+    (activeTab === "providers" && providersView === "common-mistakes") ||
+    (activeTab === "locations" && (activeLocationsView === "map" || activeLocationsView === "list"))
       ? "flush"
       : "standard";
 
@@ -754,9 +777,44 @@ export default function DirectoryPage() {
 
         {activeTab === "people" && <DirectoryTable />}
 
-        {activeTab === "locations" &&
-          (activeLocationsView === "cards" ? (
-            <div className="px-4 lg:px-6">
+        {activeTab === "locations" && (
+          <div
+            className={cn(
+              "px-4 lg:px-6",
+              activeLocationsView === "map" || activeLocationsView === "list"
+                ? "flex flex-1 min-h-0 flex-col gap-0 py-4 md:py-6"
+                : undefined
+            )}
+          >
+            {activeLocationsView === "map" ? (
+              <div className="flex flex-1 min-h-0">
+                <DirectoryLocationsMap
+                  locations={wcinypLocations}
+                  selectedLocationId={selectedLocationId}
+                  onSelectLocation={setSelectedLocationId}
+                  size="expanded"
+                  variant="plain"
+                  fullHeight
+                  className="h-full min-h-[320px]"
+                />
+              </div>
+            ) : activeLocationsView === "list" ? (
+              <div className="flex flex-1 min-h-0">
+                <DirectoryLocationsTable
+                  locations={filteredLocations}
+                  selectedLocationId={selectedLocationId}
+                  onSelectLocation={setSelectedLocationId}
+                  onOpenInMaps={handleOpenLocationInMaps}
+                  onLocationClick={handleOpenLocationPage}
+                  emptyMessage={
+                    selectedModality
+                      ? "No locations match the selected modality."
+                      : "No locations available yet."
+                  }
+                  variant="plain"
+                />
+              </div>
+            ) : (
               <DirectoryLocationsList
                 locations={filteredLocations}
                 selectedLocationId={selectedLocationId}
@@ -769,17 +827,9 @@ export default function DirectoryPage() {
                     : "No locations available yet."
                 }
               />
-            </div>
-          ) : (
-            <div className="px-4 lg:px-6">
-              <DirectoryLocationsMap
-                locations={wcinypLocations}
-                selectedLocationId={selectedLocationId}
-                onSelectLocation={setSelectedLocationId}
-                size="expanded"
-              />
-            </div>
-          ))}
+            )}
+          </div>
+        )}
 
         {activeTab === "radiologists" && (
           <div className="px-4 lg:px-6">
