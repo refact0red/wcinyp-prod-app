@@ -61,6 +61,70 @@ type UseDataTableProps<TData> = {
   onStateChange?: (state: PersistableState) => void
 }
 
+type TableStateShape = PersistableState & {
+  rowSelection: RowSelectionState
+}
+
+type TableAction =
+  | {
+      type: "set"
+      key: keyof TableStateShape
+      updater: React.SetStateAction<TableStateShape[keyof TableStateShape]>
+    }
+  | { type: "hydrate"; payload: PersistableState | null; initialState?: Partial<TableState> }
+  | { type: "reset"; initialState?: Partial<TableState> }
+
+function resolveUpdater<T>(updater: React.SetStateAction<T>, prev: T): T {
+  return typeof updater === "function" ? (updater as (value: T) => T)(prev) : updater
+}
+
+function buildState({
+  initialState,
+  persisted,
+}: {
+  initialState?: Partial<TableState>
+  persisted?: PersistableState | null
+}): TableStateShape {
+  return {
+    sorting: persisted?.sorting ?? initialState?.sorting ?? [],
+    columnFilters: persisted?.columnFilters ?? initialState?.columnFilters ?? [],
+    columnVisibility: persisted?.columnVisibility ?? initialState?.columnVisibility ?? {},
+    globalFilter:
+      (persisted?.globalFilter as string | undefined) ??
+      (initialState?.globalFilter as string | undefined) ??
+      "",
+    pagination:
+      persisted?.pagination ??
+      initialState?.pagination ?? {
+        pageIndex: defaultTableState.pagination?.pageIndex ?? 0,
+        pageSize: defaultTableState.pagination?.pageSize ?? defaultPageSize,
+      },
+    columnPinning: persisted?.columnPinning ?? initialState?.columnPinning ?? { right: [] },
+    columnOrder: persisted?.columnOrder ?? initialState?.columnOrder ?? [],
+    columnSizing: persisted?.columnSizing ?? initialState?.columnSizing ?? {},
+    rowSelection: {},
+  }
+}
+
+function tableStateReducer(
+  state: TableStateShape,
+  action: TableAction
+): TableStateShape {
+  switch (action.type) {
+    case "hydrate":
+      return buildState({ initialState: action.initialState, persisted: action.payload })
+    case "reset":
+      return buildState({ initialState: action.initialState })
+    case "set":
+      return {
+        ...state,
+        [action.key]: resolveUpdater(action.updater, state[action.key]),
+      }
+    default:
+      return state
+  }
+}
+
 function readPersistedState(key?: string): PersistableState | null {
   if (!key || typeof window === "undefined") return null
   try {
@@ -103,175 +167,78 @@ export function useDataTable<TData>({
   initialState,
   onStateChange,
 }: UseDataTableProps<TData>) {
-  const [isPersistenceReady, setIsPersistenceReady] = React.useState(false)
+  const [hasMounted, setHasMounted] = React.useState(false)
+  const [hasHydrated, setHasHydrated] = React.useState(!stateKey)
 
-  const [sorting, setSorting] = React.useState<SortingState>(
-    initialState?.sorting ?? []
-  )
-  const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
-    initialState?.columnFilters ?? []
-  )
-  const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>(
-    initialState?.columnVisibility ?? {}
-  )
-  const [globalFilter, setGlobalFilter] = React.useState<string>(
-    (initialState?.globalFilter as string | undefined) ?? ""
-  )
-  const [rowSelection, setRowSelection] = React.useState<RowSelectionState>({})
-  const [columnPinning, setColumnPinning] = React.useState<ColumnPinningState>(
-    initialState?.columnPinning ?? { right: [] }
-  )
-  const [columnOrder, setColumnOrder] = React.useState<ColumnOrderState>(
-    initialState?.columnOrder ?? []
-  )
-  const [columnSizing, setColumnSizing] = React.useState<ColumnSizingState>(
-    initialState?.columnSizing ?? {}
-  )
-  const [pagination, setPagination] = React.useState(
-    initialState?.pagination ?? {
-      pageIndex: defaultTableState.pagination?.pageIndex ?? 0,
-      pageSize: defaultTableState.pagination?.pageSize ?? defaultPageSize,
-    }
+  const [tableState, dispatch] = React.useReducer(
+    tableStateReducer,
+    buildState({ initialState })
   )
 
   React.useEffect(() => {
-    if (!stateKey) {
-      setIsPersistenceReady(true)
+    setHasMounted(true)
+  }, [])
+
+  React.useEffect(() => {
+    if (!stateKey || !hasMounted) {
+      setHasHydrated(true)
       return
     }
 
     const persisted = readPersistedState(stateKey)
-
     if (persisted) {
-      setSorting(persisted.sorting ?? initialState?.sorting ?? [])
-      setColumnFilters(persisted.columnFilters ?? initialState?.columnFilters ?? [])
-      setColumnVisibility(
-        persisted.columnVisibility ?? initialState?.columnVisibility ?? {}
-      )
-      setGlobalFilter(
-        (persisted.globalFilter as string | undefined) ??
-          (initialState?.globalFilter as string | undefined) ??
-          ""
-      )
-      setColumnPinning(
-        persisted.columnPinning ?? initialState?.columnPinning ?? { right: [] }
-      )
-      setColumnOrder(persisted.columnOrder ?? initialState?.columnOrder ?? [])
-      setColumnSizing(persisted.columnSizing ?? initialState?.columnSizing ?? {})
-      setPagination(
-        persisted.pagination ??
-          initialState?.pagination ?? {
-            pageIndex: defaultTableState.pagination?.pageIndex ?? 0,
-            pageSize: defaultTableState.pagination?.pageSize ?? defaultPageSize,
-          }
-      )
+      dispatch({ type: "hydrate", payload: persisted, initialState })
     }
-
-    setIsPersistenceReady(true)
-  }, [stateKey])
+    setHasHydrated(true)
+  }, [stateKey, hasMounted, initialState])
 
   const resetState = React.useCallback(() => {
-    setSorting(initialState?.sorting ?? [])
-    setColumnFilters(initialState?.columnFilters ?? [])
-    setColumnVisibility(initialState?.columnVisibility ?? {})
-    setGlobalFilter(
-      (initialState?.globalFilter as string | undefined) ?? ""
-    )
-    setColumnPinning(initialState?.columnPinning ?? { right: [] })
-    setColumnOrder(initialState?.columnOrder ?? [])
-    setColumnSizing(initialState?.columnSizing ?? {})
-    setPagination(
-      initialState?.pagination ?? {
-        pageIndex: defaultTableState.pagination?.pageIndex ?? 0,
-        pageSize: defaultTableState.pagination?.pageSize ?? defaultPageSize,
-      }
-    )
-    setRowSelection({})
+    dispatch({ type: "reset", initialState })
     clearPersistedState(stateKey)
   }, [initialState, stateKey])
 
   React.useEffect(() => {
-    if (!stateKey || !isPersistenceReady) return
-    const value: PersistableState = {
-      sorting,
-      columnFilters,
-      columnVisibility,
-      globalFilter,
-      pagination,
-      columnPinning,
-      columnOrder,
-      columnSizing,
-    }
-    writePersistedState(stateKey, value)
-  }, [
-    stateKey,
-    isPersistenceReady,
-    sorting,
-    columnFilters,
-    columnVisibility,
-    globalFilter,
-    pagination,
-    columnPinning,
-    columnOrder,
-    columnSizing,
-  ])
+    if (!stateKey || !hasHydrated) return
+    const { rowSelection, ...persistable } = tableState
+    writePersistedState(stateKey, persistable)
+  }, [stateKey, hasHydrated, tableState])
 
   React.useEffect(() => {
     if (!onStateChange) return
-    onStateChange({
-      sorting,
-      columnFilters,
-      columnVisibility,
-      globalFilter,
-      pagination,
-      columnPinning,
-      columnOrder,
-      columnSizing,
-    })
-  }, [
-    onStateChange,
-    sorting,
-    columnFilters,
-    columnVisibility,
-    globalFilter,
-    pagination,
-    columnPinning,
-    columnOrder,
-    columnSizing,
-  ])
+    const { rowSelection, ...persistable } = tableState
+    onStateChange(persistable)
+  }, [onStateChange, tableState])
 
   const table = useReactTable({
     data,
     columns,
-    state: {
-      sorting,
-      columnFilters,
-      columnVisibility,
-      globalFilter,
-      rowSelection,
-      columnPinning,
-      columnOrder,
-      columnSizing,
-      pagination,
-    },
+    state: tableState,
     defaultColumn: defaultColumnSizing,
     columnResizeMode: defaultColumnResizeMode,
     enableRowSelection,
     enableColumnResizing: true,
-    onSortingChange: setSorting,
-    onColumnFiltersChange: setColumnFilters,
-    onColumnVisibilityChange: setColumnVisibility,
-    onGlobalFilterChange: setGlobalFilter,
-    onRowSelectionChange: setRowSelection,
-    onColumnPinningChange: setColumnPinning,
-    onColumnOrderChange: setColumnOrder,
-    onColumnSizingChange: setColumnSizing,
-  onPaginationChange: setPagination,
-  getCoreRowModel: getCoreRowModel(),
-  getFilteredRowModel: getFilteredRowModel(),
-  getSortedRowModel: getSortedRowModel(),
-  getFacetedRowModel: getFacetedRowModel(),
-  getFacetedUniqueValues: getFacetedUniqueValues(),
+    onSortingChange: (updater) => dispatch({ type: "set", key: "sorting", updater }),
+    onColumnFiltersChange: (updater) =>
+      dispatch({ type: "set", key: "columnFilters", updater }),
+    onColumnVisibilityChange: (updater) =>
+      dispatch({ type: "set", key: "columnVisibility", updater }),
+    onGlobalFilterChange: (updater) =>
+      dispatch({ type: "set", key: "globalFilter", updater }),
+    onRowSelectionChange: (updater) =>
+      dispatch({ type: "set", key: "rowSelection", updater }),
+    onColumnPinningChange: (updater) =>
+      dispatch({ type: "set", key: "columnPinning", updater }),
+    onColumnOrderChange: (updater) =>
+      dispatch({ type: "set", key: "columnOrder", updater }),
+    onColumnSizingChange: (updater) =>
+      dispatch({ type: "set", key: "columnSizing", updater }),
+    onPaginationChange: (updater) =>
+      dispatch({ type: "set", key: "pagination", updater }),
+    getCoreRowModel: getCoreRowModel(),
+    getFilteredRowModel: getFilteredRowModel(),
+    getSortedRowModel: getSortedRowModel(),
+    getFacetedRowModel: getFacetedRowModel(),
+    getFacetedUniqueValues: getFacetedUniqueValues(),
     manualPagination,
     manualSorting,
     manualFiltering,

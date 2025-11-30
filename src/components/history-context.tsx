@@ -1,6 +1,14 @@
-﻿"use client";
+"use client";
 
-import React, { createContext, useContext, useEffect, useMemo, useRef, useState } from "react";
+import React, {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useReducer,
+  useRef,
+} from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 
 import { appSidebarData } from "@/components/shadcn/app-sidebar";
@@ -9,6 +17,15 @@ type HistoryEntry = {
   path: string;
   root: string | null;
 };
+
+type HistoryState = {
+  entries: HistoryEntry[];
+  index: number;
+};
+
+type HistoryAction =
+  | { type: "push"; entry: HistoryEntry }
+  | { type: "setIndex"; index: number };
 
 type HistoryContextValue = {
   canGoBack: boolean;
@@ -42,16 +59,44 @@ function getRootForPath(path: string): string | null {
   return bestMatch;
 }
 
+const initialHistoryState: HistoryState = {
+  entries: [],
+  index: -1,
+};
+
+function historyReducer(state: HistoryState, action: HistoryAction): HistoryState {
+  switch (action.type) {
+    case "push": {
+      const currentEntry = state.index >= 0 ? state.entries[state.index] : undefined;
+      if (currentEntry && currentEntry.path === action.entry.path) {
+        return state;
+      }
+
+      const nextEntries = state.entries.slice(0, state.index + 1);
+      nextEntries.push(action.entry);
+
+      return {
+        entries: nextEntries,
+        index: nextEntries.length - 1,
+      };
+    }
+    case "setIndex":
+      return {
+        ...state,
+        index: action.index,
+      };
+    default:
+      return state;
+  }
+}
+
 export function HistoryProvider({ children }: { children: React.ReactNode }) {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
 
-  const [entries, setEntries] = useState<HistoryEntry[]>([]);
-  const [index, setIndex] = useState<number>(-1);
-
+  const [state, dispatch] = useReducer(historyReducer, initialHistoryState);
   const isNavigatingRef = useRef(false);
-  const indexRef = useRef<number>(-1);
 
   const search = searchParams?.toString() ?? "";
 
@@ -66,70 +111,54 @@ export function HistoryProvider({ children }: { children: React.ReactNode }) {
       return;
     }
 
-    setEntries((prev) => {
-      const currentIndex = indexRef.current;
-      const currentEntry = currentIndex >= 0 ? prev[currentIndex] : undefined;
-
-      if (currentEntry && currentEntry.path === currentPath) {
-        return prev;
-      }
-
-      const nextEntries = prev.slice(0, currentIndex + 1);
-      nextEntries.push({ path: currentPath, root });
-
-      const nextIndex = nextEntries.length - 1;
-      indexRef.current = nextIndex;
-      setIndex(nextIndex);
-
-      return nextEntries;
-    });
+    dispatch({ type: "push", entry: { path: currentPath, root } });
   }, [pathname, search]);
 
   const canGoBack = useMemo(() => {
-    if (index <= 0 || !entries[index]) return false;
+    if (state.index <= 0 || !state.entries[state.index]) return false;
 
-    const currentRoot = entries[index].root;
-    const previousEntry = entries[index - 1];
+    const currentRoot = state.entries[state.index].root;
+    const previousEntry = state.entries[state.index - 1];
 
     if (!previousEntry) return false;
 
     return previousEntry.root === currentRoot && !!previousEntry.path;
-  }, [entries, index]);
+  }, [state.entries, state.index]);
 
   const canGoForward = useMemo(() => {
-    if (index < 0) return false;
+    if (state.index < 0) return false;
 
-    const currentEntry = entries[index];
-    const nextEntry = entries[index + 1];
+    const currentEntry = state.entries[state.index];
+    const nextEntry = state.entries[state.index + 1];
 
     if (!currentEntry || !nextEntry) return false;
 
     return nextEntry.root === currentEntry.root && !!nextEntry.path;
-  }, [entries, index]);
+  }, [state.entries, state.index]);
 
-  const goBack = () => {
-    if (!canGoBack || index <= 0) return;
+  const goBack = useCallback(() => {
+    if (!canGoBack || state.index <= 0) return;
 
-    const target = entries[index - 1];
+    const targetIndex = state.index - 1;
+    const target = state.entries[targetIndex];
     if (!target || !target.path) return;
 
     isNavigatingRef.current = true;
-    indexRef.current = index - 1;
-    setIndex(index - 1);
+    dispatch({ type: "setIndex", index: targetIndex });
     router.push(target.path);
-  };
+  }, [canGoBack, router, state.entries, state.index]);
 
-  const goForward = () => {
+  const goForward = useCallback(() => {
     if (!canGoForward) return;
 
-    const target = entries[index + 1];
+    const targetIndex = state.index + 1;
+    const target = state.entries[targetIndex];
     if (!target || !target.path) return;
 
     isNavigatingRef.current = true;
-    indexRef.current = index + 1;
-    setIndex(index + 1);
+    dispatch({ type: "setIndex", index: targetIndex });
     router.push(target.path);
-  };
+  }, [canGoForward, router, state.entries, state.index]);
 
   const value = useMemo(
     () => ({
@@ -138,7 +167,7 @@ export function HistoryProvider({ children }: { children: React.ReactNode }) {
       goBack,
       goForward,
     }),
-    [canGoBack, canGoForward]
+    [canGoBack, canGoForward, goBack, goForward]
   );
 
   return <HistoryContext.Provider value={value}>{children}</HistoryContext.Provider>;

@@ -255,9 +255,21 @@ export function DriveTableProvider({
     },
   })
 
+  const hasMountedRef = React.useRef(false)
+  const previousModeRef = React.useRef<DriveMode>(mode)
+
   React.useEffect(() => {
-    resetState()
-  }, [mode, resetState, files])
+    if (!hasMountedRef.current) {
+      hasMountedRef.current = true
+      previousModeRef.current = mode
+      return
+    }
+
+    if (previousModeRef.current !== mode) {
+      resetState()
+      previousModeRef.current = mode
+    }
+  }, [mode, resetState])
 
   const value = React.useMemo(
     () => ({ table, resetState, mode }),
