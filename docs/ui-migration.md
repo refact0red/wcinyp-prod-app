@@ -21,3 +21,11 @@ Source: Hostinger VPS overview (copied locally as `docs/assets/sandbox-hostinger
 - Icon rail (Drive, Directory) with matching row cadence to the sidebar panel.
 - Sidebar panel with larger list rows and per-item icons; no chevrons or descriptions.
 - Content area on a light grey canvas with floating cards, clear hierarchy (title + breadcrumb), and action buttons inline.
+
+## Migration plan (single app)
+- Keep the single Next app and iterate in `/sandbox` as the UI lab.
+- Extract shell primitives (top bar, icon rail, sidebar panel, card canvas, tokens) for reuse across real pages.
+- Keep stubbed data aligned to production contracts/types so wiring is a swap, not a rewrite.
+- Add a feature flag/param to mount the new shell around selected production pages for internal users first.
+- Pilot wrapping a small set of pages (e.g., Drive list, Directory) to validate navigation and search flow.
+- Iterate polish and performance; when stable, flip the flag to make the new shell default and retire the legacy nav.
