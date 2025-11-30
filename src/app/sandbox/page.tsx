@@ -1,26 +1,31 @@
 "use client";
 
 import type { ComponentType } from "react";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 import {
     Activity,
     BarChart2,
+    ClipboardList,
+    CloudIcon,
     ChevronRight,
     Cloud,
+    FileTextIcon,
     HardDriveIcon,
+    LayersIcon,
     ListChecks,
     MapPinIcon,
     MessageSquareIcon,
     Search,
     Share2Icon,
     Shield,
-    StarIcon,
     TagIcon,
     Upload,
     UserRound,
     UsersIcon,
+    WorkflowIcon,
 } from "lucide-react";
+import { usePathname, useRouter } from "next/navigation";
 
 import { cn } from "@/lib/utils";
 
@@ -32,8 +37,14 @@ type RailItem = {
     icon: ComponentType<{ className?: string }>;
 };
 
+type DrivePanelId = "documents" | "packets" | "handouts" | "automations" | "public-drive";
+type DirectoryPanelId = "people" | "locations" | "teams" | "tags" | "feedback";
+type PanelItemId = DrivePanelId | DirectoryPanelId;
+
 type PanelItem = {
+    id: PanelItemId;
     title: string;
+    path: string;
     icon: ComponentType<{ className?: string }>;
     status?: string;
 };
@@ -45,19 +56,24 @@ const railItems: RailItem[] = [
 
 const panelItems: Record<RailItemId, PanelItem[]> = {
     drive: [
-        { title: "Overview", status: "", icon: HardDriveIcon },
-        { title: "Recent", status: "", icon: Activity },
-        { title: "Favorites", status: "", icon: StarIcon },
-        { title: "Uploads", status: "2", icon: Upload },
-        { title: "Sharing", status: "", icon: Share2Icon },
+        { id: "documents", title: "Documents", path: "/sandbox/drive/documents", status: "", icon: FileTextIcon },
+        { id: "packets", title: "Packets", path: "/sandbox/drive/packets", status: "", icon: LayersIcon },
+        { id: "handouts", title: "Handouts", path: "/sandbox/drive/handouts", status: "", icon: ClipboardList },
+        { id: "automations", title: "Automations", path: "/sandbox/drive/automations", status: "", icon: WorkflowIcon },
+        { id: "public-drive", title: "Public Drive", path: "/sandbox/drive/public-drive", status: "", icon: CloudIcon },
     ],
     directory: [
-        { title: "People", status: "284", icon: UsersIcon },
-        { title: "Locations", status: "32", icon: MapPinIcon },
-        { title: "Teams", status: "9", icon: UserRound },
-        { title: "Tags", status: "", icon: TagIcon },
-        { title: "Feedback", status: "6", icon: MessageSquareIcon },
+        { id: "people", title: "People", path: "/sandbox/directory/people", status: "284", icon: UsersIcon },
+        { id: "locations", title: "Locations", path: "/sandbox/directory/locations", status: "32", icon: MapPinIcon },
+        { id: "teams", title: "Teams", path: "/sandbox/directory/teams", status: "9", icon: UserRound },
+        { id: "tags", title: "Tags", path: "/sandbox/directory/tags", status: "", icon: TagIcon },
+        { id: "feedback", title: "Feedback", path: "/sandbox/directory/feedback", status: "6", icon: MessageSquareIcon },
     ],
+};
+
+const defaultPanel: Record<RailItemId, PanelItemId> = {
+    drive: "documents",
+    directory: "people",
 };
 
 function IconRail({
@@ -93,27 +109,47 @@ function IconRail({
     );
 }
 
-function SidebarPanel({ items }: { items: PanelItem[] }) {
+export default function SandboxPage() {
+    return <SandboxShell initialRail="drive" initialPanel="documents" />;
+}
+
+function SidebarPanel({
+    items,
+    activeId,
+    onSelect,
+}: {
+    items: PanelItem[];
+    activeId: PanelItemId;
+    onSelect: (item: PanelItem) => void;
+}) {
     return (
         <aside className="hidden w-64 border-r bg-card lg:block">
             <div className="space-y-1 px-2 pb-4 pt-4">
-                {items.map((item) => (
-                    <button
-                        key={item.title}
-                        type="button"
-                        className="flex h-[52px] w-full items-center justify-between rounded-xl px-3 text-left transition hover:bg-muted"
-                    >
-                        <div className="flex items-center gap-3">
-                            <item.icon className="h-5 w-5 text-muted-foreground" />
-                            <span className="text-sm font-semibold text-foreground">{item.title}</span>
-                        </div>
-                        {item.status ? (
-                            <span className="rounded-full bg-muted px-2 py-1 text-[11px] font-semibold text-foreground">
-                                {item.status}
-                            </span>
-                        ) : null}
-                    </button>
-                ))}
+                {items.map((item) => {
+                    const isActive = item.id === activeId;
+                    return (
+                        <button
+                            key={item.id}
+                            type="button"
+                            onClick={() => onSelect(item)}
+                            className={cn(
+                                "flex h-[52px] w-full items-center justify-between rounded-xl px-3 text-left transition hover:bg-muted",
+                                isActive ? "border border-primary/40 bg-primary/10 text-primary shadow-sm" : "border border-transparent"
+                            )}
+                            aria-current={isActive ? "page" : undefined}
+                        >
+                            <div className="flex items-center gap-3">
+                                <item.icon className={cn("h-5 w-5 text-muted-foreground", isActive && "text-primary")} />
+                                <span className="text-sm font-semibold text-foreground">{item.title}</span>
+                            </div>
+                            {item.status ? (
+                                <span className="rounded-full bg-muted px-2 py-1 text-[11px] font-semibold text-foreground">
+                                    {item.status}
+                                </span>
+                            ) : null}
+                        </button>
+                    );
+                })}
             </div>
         </aside>
     );
@@ -255,16 +291,56 @@ function UpgradeCard() {
     );
 }
 
-export default function SandboxPage() {
-    const [activeRail, setActiveRail] = useState<RailItemId>("drive");
+export function SandboxShell({
+    initialRail = "drive",
+    initialPanel,
+}: {
+    initialRail?: RailItemId;
+    initialPanel?: PanelItemId;
+}) {
+    const router = useRouter();
+    const pathname = usePathname();
+    const [activeRail, setActiveRail] = useState<RailItemId>(initialRail);
+    const [activePanel, setActivePanel] = useState<PanelItemId>(initialPanel ?? defaultPanel[initialRail]);
+
+    useEffect(() => {
+        if (!pathname) return;
+        const parts = pathname.split("/").filter(Boolean);
+        if (parts[0] !== "sandbox") return;
+
+        const railSegment = parts[1];
+        const slug = parts[2];
+        const nextRail: RailItemId = railSegment === "directory" ? "directory" : "drive";
+        const panelMatch = panelItems[nextRail].find((item) => item.id === slug);
+        setActiveRail(nextRail);
+        setActivePanel(panelMatch?.id ?? defaultPanel[nextRail]);
+    }, [pathname]);
+
+    const handleRailSelect = (id: RailItemId) => {
+        const target = panelItems[id][0];
+        if (target) {
+            router.push(target.path);
+        }
+    };
+
+    const handlePanelSelect = (item: PanelItem) => {
+        router.push(item.path);
+    };
+
+    const activePanelItem = useMemo(
+        () => panelItems[activeRail].find((item) => item.id === activePanel) ?? panelItems[activeRail][0],
+        [activePanel, activeRail]
+    );
 
     const pageTitle = useMemo(() => {
-        return activeRail === "drive" ? "Drive overview" : "Directory overview";
-    }, [activeRail]);
+        const prefix = activeRail === "drive" ? "Drive" : "Directory";
+        return `${prefix} — ${activePanelItem.title}`;
+    }, [activePanelItem, activeRail]);
 
     const breadcrumb = useMemo(() => {
-        return activeRail === "drive" ? "Drive / Overview" : "Directory / Overview";
-    }, [activeRail]);
+        const prefix = activeRail === "drive" ? "Drive" : "Directory";
+        return `${prefix} / ${activePanelItem.title}`;
+    }, [activePanelItem, activeRail]);
 
     const metrics = useMemo(
         () =>
@@ -288,8 +364,8 @@ export default function SandboxPage() {
         <div className="flex min-h-svh flex-col bg-muted">
             <TopBar />
             <div className="flex flex-1 overflow-hidden bg-muted">
-                <IconRail activeId={activeRail} onSelect={setActiveRail} />
-                <SidebarPanel items={panelItems[activeRail]} label={activeRail === "drive" ? "Drive" : "Directory"} />
+                <IconRail activeId={activeRail} onSelect={handleRailSelect} />
+                <SidebarPanel items={panelItems[activeRail]} activeId={activePanel} onSelect={handlePanelSelect} />
                 <div className="flex min-w-0 flex-1 flex-col">
                     <div className="flex flex-col gap-5 overflow-y-auto px-6 pb-10 pt-4">
                         <div className="flex flex-col gap-1">
