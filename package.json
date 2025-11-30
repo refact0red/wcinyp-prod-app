@@ -6,7 +6,12 @@
   "scripts": {
     "dev": "next dev --turbopack -p 4000",
     "build": "next build",
-    "start": "next start -p 4000"
+    "start": "next start -p 4000",
+    "db:up": "docker compose up -d db",
+    "db:down": "docker compose down",
+    "db:generate": "drizzle-kit generate",
+    "db:migrate": "drizzle-kit push",
+    "db:seed": "tsx scripts/db/seed.ts"
   },
   "dependencies": {
     "@dnd-kit/core": "^6.3.1",
@@ -51,7 +56,9 @@
     "@types/pg": "^8.15.6",
     "@types/react": "^19.1.9",
     "@types/react-dom": "^19.1.7",
+    "drizzle-kit": "^0.31.7",
     "postcss": "^8.5.6",
+    "tsx": "^4.21.0",
     "typescript": "^5.9.2",
     "vite": "^7.2.4",
     "vitest": "^4.0.13"

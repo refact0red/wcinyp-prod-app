@@ -15,10 +15,10 @@ This repo now has a Postgres-backed data layer for Drive. Drizzle manages schema
 ## Local setup
 ```sh
 cp .env.example .env
-npm run db:up           # starts Postgres via docker compose
-npm run db:migrate      # applies Drizzle migrations
-npm run db:seed         # truncates files, seeds documents/packets placeholders
-npm run dev             # app reads Drive data from Postgres
+bun run db:up           # starts Postgres via docker compose
+bun run db:migrate      # applies Drizzle migrations
+bun run db:seed         # truncates files, seeds documents/packets placeholders
+bun run dev             # app reads Drive data from Postgres
 ```
 - `db:down` stops/removes the container; the named volume (`pgdata`) persists unless you prune volumes.
 - Drizzle files live in `drizzle/migrations/` with journaling under `drizzle/migrations/meta`.
@@ -26,7 +26,7 @@ npm run dev             # app reads Drive data from Postgres
 ## Migrations discipline
 - Every schema change goes through Drizzle migration generation + apply.
 - No hand edits to the DB; no raw `psql` DDL outside migrations.
-- Use `npm run db:generate` to emit SQL from schema changes, then `db:migrate` to apply.
+- Use `bun run db:generate` to emit SQL from schema changes, then `db:migrate` to apply.
 
 ## Seeds
 - `scripts/db/seed.ts` truncates and inserts the current file seeds (documents) plus packet placeholders; Automations are empty for now.
