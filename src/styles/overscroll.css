@@ -1,0 +1,10 @@
+/* Prevent scroll chaining and elastic bounce globally. */
+:root,
+html,
+body {
+  overscroll-behavior: none;
+}
+
+[data-slot="sidebar-inset"] {
+  overscroll-behavior: contain;
+}
