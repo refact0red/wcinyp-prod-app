@@ -37,9 +37,13 @@ export type DriveMode = (typeof driveModes)[number]["id"];
 
 type DriveSubHeaderProps = {
   activeMode?: DriveMode;
+  trailingContent?: React.ReactNode;
 };
 
-export function DriveSubHeader({ activeMode: activeModeProp }: DriveSubHeaderProps) {
+export function DriveSubHeader({
+  activeMode: activeModeProp,
+  trailingContent,
+}: DriveSubHeaderProps) {
   const searchParams = useSearchParams();
 
   const modeFromUrl = searchParams?.get("mode") ?? undefined;
@@ -58,5 +62,5 @@ export function DriveSubHeader({ activeMode: activeModeProp }: DriveSubHeaderPro
     current: active === mode.id,
   }));
 
-  return <SiteSubHeader items={items} />;
+  return <SiteSubHeader items={items} trailingContent={trailingContent} />;
 }

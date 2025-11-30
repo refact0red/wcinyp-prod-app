@@ -1,7 +1,7 @@
 import type { ColumnResizeMode, TableState } from "@tanstack/react-table"
 
-export const defaultPageSize = 10
-export const pageSizeOptions = [10, 20, 30, 50]
+export const defaultPageSize = 10000
+export const pageSizeOptions = [defaultPageSize]
 
 export const defaultColumnSizing = {
   size: 160,

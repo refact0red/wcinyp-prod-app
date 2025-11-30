@@ -5,6 +5,7 @@ import { cn } from "@/lib/utils"
 type TableShellProps = React.HTMLAttributes<HTMLDivElement> & {
   withBorder?: boolean
   stickyHeader?: boolean
+  scrollable?: boolean
 }
 
 export function TableShell({
@@ -12,12 +13,14 @@ export function TableShell({
   children,
   withBorder = true,
   stickyHeader = true,
+  scrollable = false,
   ...props
 }: TableShellProps) {
   return (
     <div
       className={cn(
-        "overflow-hidden rounded-lg",
+        "relative rounded-lg",
+        scrollable ? "overflow-auto" : "overflow-hidden",
         stickyHeader && "[&_thead]:sticky [&_thead]:top-0 [&_thead]:z-10",
         withBorder ? "border" : "",
         className

@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { FilterIcon, SearchIcon } from "lucide-react";
+import { FilterIcon, SearchIcon, UploadCloudIcon } from "lucide-react";
 
 import type { DriveMode } from "@/components/shadcn/drive-subheader";
 import { ColumnVisibilityMenu } from "@/components/table/column-visibility-menu";
@@ -62,6 +62,10 @@ export function DriveToolbar({ mode }: DriveToolbarProps) {
         </div>
 
         <div className="flex items-center gap-3">
+          <Button size="sm" className="h-8">
+            <UploadCloudIcon className="size-4" />
+            Upload
+          </Button>
           <ToggleGroup
             type="single"
             size="sm"

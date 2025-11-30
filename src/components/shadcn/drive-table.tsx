@@ -64,6 +64,10 @@ function formatDate(date: string) {
   }).format(new Date(date))
 }
 
+const driveRowClasses =
+  "group bg-[#0b0b0b] text-white hover:bg-[#1b1b1b] data-[state=selected]:bg-[#141414] transition-colors"
+const drivePinnedCellClasses = "bg-[#0b0b0b] group-hover:bg-[#1b1b1b]"
+
 const columns: ColumnDef<DriveItem>[] = [
   {
     id: "select",
@@ -130,66 +134,57 @@ const columns: ColumnDef<DriveItem>[] = [
   },
   {
     id: "actions",
-    enablePinning: true,
+    enablePinning: false,
     size: 240,
     header: "Actions",
     cell: () => (
-      <div className="flex justify-end">
-        <div className="inline-flex overflow-hidden rounded-md border bg-background shadow-xs">
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <Button
-                variant="ghost"
-                size="sm"
-                className="border-border focus-visible:z-10 inline-flex h-auto rounded-none border-l px-3 py-2 first:border-l-0"
-              >
-                <PrinterIcon className="size-4" />
-                <span className="text-xs font-medium">Print</span>
-              </Button>
-            </TooltipTrigger>
-            <TooltipContent sideOffset={6}>Print</TooltipContent>
-          </Tooltip>
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <Button
-                variant="ghost"
-                size="sm"
-                className="border-border focus-visible:z-10 inline-flex h-auto rounded-none border-l px-3 py-2 first:border-l-0"
-              >
-                <DownloadIcon className="size-4" />
-                <span className="text-xs font-medium">Download</span>
-              </Button>
-            </TooltipTrigger>
-            <TooltipContent sideOffset={6}>Download</TooltipContent>
-          </Tooltip>
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <Button
-                variant="ghost"
-                size="sm"
-                className="border-border focus-visible:z-10 inline-flex h-auto rounded-none border-l px-3 py-2 first:border-l-0"
-              >
-                <Link2Icon className="size-4" />
-                <span className="text-xs font-medium">Copy Link</span>
-              </Button>
-            </TooltipTrigger>
-            <TooltipContent sideOffset={6}>Copy link</TooltipContent>
-          </Tooltip>
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="ghost" size="icon-sm" className="border-l px-2">
-                <MoreVerticalIcon className="size-4" />
-                <span className="sr-only">Open menu</span>
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-36">
-              <DropdownMenuItem>Open</DropdownMenuItem>
-              <DropdownMenuItem>Rename</DropdownMenuItem>
-              <DropdownMenuItem>Move</DropdownMenuItem>
-              <DropdownMenuItem>Delete</DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-        </div>
+      <div className="flex justify-end gap-1">
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Button variant="ghost" size="icon-sm" className="text-white hover:bg-white/10">
+              <PrinterIcon className="size-4" />
+              <span className="sr-only">Print</span>
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent sideOffset={6}>Print</TooltipContent>
+        </Tooltip>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Button variant="ghost" size="icon-sm" className="text-white hover:bg-white/10">
+              <DownloadIcon className="size-4" />
+              <span className="sr-only">Download</span>
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent sideOffset={6}>Download</TooltipContent>
+        </Tooltip>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Button
+              variant="ghost"
+              size="icon-sm"
+              className="text-white hover:bg-white/10"
+              disabled
+            >
+              <Link2Icon className="size-4" />
+              <span className="sr-only">Copy link (disabled)</span>
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent sideOffset={6}>OneDrive link (disabled)</TooltipContent>
+        </Tooltip>
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="ghost" size="icon-sm" className="text-white hover:bg-white/10">
+              <MoreVerticalIcon className="size-4" />
+              <span className="sr-only">Open menu</span>
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end" className="w-36">
+            <DropdownMenuItem>Open</DropdownMenuItem>
+            <DropdownMenuItem>Rename</DropdownMenuItem>
+            <DropdownMenuItem>Move</DropdownMenuItem>
+            <DropdownMenuItem>Delete</DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
       </div>
     ),
   },
@@ -221,10 +216,9 @@ export function DriveTableProvider({
   const { table, resetState } = useDataTable<DriveItem>({
     data: driveItems,
     columns,
-    stateKey: "drive-table",
+    stateKey: "drive-table-v3",
     getRowId: (row) => row.id.toString(),
     initialState: {
-      columnPinning: { right: ["actions"] },
       columnVisibility: {
         size: false,
       },
@@ -249,22 +243,26 @@ export function DriveTable() {
 
   return (
     <div className="flex h-full flex-1 flex-col overflow-hidden bg-card">
-      <TableShell withBorder={false} className="h-full flex-1 overflow-auto rounded-none">
+      <TableShell
+        withBorder={false}
+        scrollable={false}
+        className="h-full flex-1 rounded-none"
+      >
         {virtualized ? (
           <VirtualTable
             table={table}
             scrollHeight="calc(100vh - 220px)"
             renderHeader={() => (
-              <TableHeader className="bg-muted/10">
+              <TableHeader className="sticky top-0 z-20 bg-card">
                 {table.getHeaderGroups().map((headerGroup) => (
-                  <TableRow key={headerGroup.id}>
+                  <TableRow key={headerGroup.id} className="hover:bg-transparent">
                     {headerGroup.headers.map((header) => (
                       <TableHead
                         key={header.id}
                         colSpan={header.colSpan}
                         style={{ width: header.getSize(), ...getPinnedStyle(header.column) }}
                         className={cn(
-                          "h-[var(--drive-header-h)] px-3",
+                          "sticky top-0 z-20 h-[var(--drive-header-h)] bg-card px-3",
                           header.column.getIsPinned() ? "bg-muted/10" : undefined
                         )}
                       >
@@ -288,69 +286,81 @@ export function DriveTable() {
                 <TableCell
                   key={cell.id}
                   style={{ width: cell.column.getSize(), ...getPinnedStyle(cell.column) }}
-                  className={cell.column.getIsPinned() ? "bg-card" : undefined}
+                  className={cell.column.getIsPinned() ? drivePinnedCellClasses : undefined}
                 >
                   {flexRender(cell.column.columnDef.cell, cell.getContext())}
                 </TableCell>
               ))
             }
+            rowClassName={driveRowClasses}
           />
         ) : (
-          <Table>
-            <TableHeader className="bg-muted/10">
-              {table.getHeaderGroups().map((headerGroup) => (
-                <TableRow key={headerGroup.id}>
-                  {headerGroup.headers.map((header) => (
-                    <TableHead
-                      key={header.id}
-                      colSpan={header.colSpan}
-                      style={{ width: header.getSize(), ...getPinnedStyle(header.column) }}
-                      className={cn(
-                        "h-[var(--drive-header-h)] px-3",
-                        header.column.getIsPinned() ? "bg-muted/10" : undefined
-                      )}
-                    >
-                      {header.isPlaceholder
-                        ? null
-                        : flexRender(
-                            header.column.columnDef.header,
-                            header.getContext()
+          <div className="flex h-full flex-1 flex-col">
+            <div className="sticky top-0 z-20 bg-card shadow-sm">
+              <Table containerClassName="overflow-visible" className="border-separate border-spacing-0">
+                <TableHeader>
+                  {table.getHeaderGroups().map((headerGroup) => (
+                    <TableRow key={headerGroup.id} className="hover:bg-transparent">
+                      {headerGroup.headers.map((header) => (
+                        <TableHead
+                          key={header.id}
+                          colSpan={header.colSpan}
+                          style={{ width: header.getSize(), ...getPinnedStyle(header.column) }}
+                          className={cn(
+                            "h-[var(--drive-header-h)] bg-card px-3",
+                            header.column.getIsPinned() ? "bg-muted/10" : undefined
                           )}
-                    </TableHead>
+                        >
+                          {header.isPlaceholder
+                            ? null
+                            : flexRender(
+                                header.column.columnDef.header,
+                                header.getContext()
+                              )}
+                        </TableHead>
+                      ))}
+                    </TableRow>
                   ))}
-                </TableRow>
-              ))}
-            </TableHeader>
-            <TableBody>
-              {table.getRowModel().rows.map((row) => (
-                <TableRow
-                  key={row.id}
-                  data-state={row.getIsSelected() && "selected"}
-                  className="hover:bg-muted/30"
-                >
-                  {row.getVisibleCells().map((cell) => (
-                    <TableCell
-                      key={cell.id}
-                      style={{
-                        width: cell.column.getSize(),
-                        ...getPinnedStyle(cell.column),
-                      }}
-                      className={cell.column.getIsPinned() ? "bg-card" : undefined}
+                </TableHeader>
+              </Table>
+            </div>
+            <div className="flex-1 overflow-auto">
+              <Table
+                containerClassName="overflow-visible"
+                className="border-separate border-spacing-0"
+              >
+                <TableBody>
+                  {table.getRowModel().rows.map((row) => (
+                    <TableRow
+                      key={row.id}
+                      data-state={row.getIsSelected() && "selected"}
+                      className={driveRowClasses}
                     >
-                      {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                    </TableCell>
+                      {row.getVisibleCells().map((cell) => (
+                        <TableCell
+                          key={cell.id}
+                          style={{
+                            width: cell.column.getSize(),
+                            ...getPinnedStyle(cell.column),
+                          }}
+                          className={cell.column.getIsPinned() ? drivePinnedCellClasses : undefined}
+                        >
+                          {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                        </TableCell>
+                      ))}
+                    </TableRow>
                   ))}
-                </TableRow>
-              ))}
-              {!table.getRowModel().rows.length && (
-                <TableRow>
-                  <TableCell colSpan={table.getAllColumns().length}>
-                    <EmptyState title="No files" description="Try adjusting your filters." />
-                  </TableCell>
-                </TableRow>
-              )}
-            </TableBody>
-          </Table>
+                  {!table.getRowModel().rows.length && (
+                    <TableRow>
+                      <TableCell colSpan={table.getAllColumns().length}>
+                        <EmptyState title="No files" description="Try adjusting your filters." />
+                      </TableCell>
+                    </TableRow>
+                  )}
+                </TableBody>
+              </Table>
+            </div>
+          </div>
         )}
       </TableShell>
     </div>
