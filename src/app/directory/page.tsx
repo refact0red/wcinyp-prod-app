@@ -693,22 +693,15 @@ export default function DirectoryPage() {
               inputMode="numeric"
               pattern="\d{10}"
               maxLength={10}
-              className="h-8 w-full pl-9 text-sm"
+              className="h-8 w-full pl-9 pr-9 text-sm"
             />
-          </div>
-          <Button type="submit" disabled={isLoading} className="h-8 gap-2 px-3 text-sm">
             {isLoading ? (
-              <>
-                <Loader2 className="size-4 animate-spin" />
-                Looking up NPI…
-              </>
-            ) : (
-              <>
-                <Search className="size-4" />
-                Search
-              </>
-            )}
-          </Button>
+              <Loader2 className="text-muted-foreground absolute right-3 top-1/2 size-4 -translate-y-1/2 animate-spin" />
+            ) : null}
+          </div>
+          <div className="text-xs text-muted-foreground">
+            Press Enter to search
+          </div>
         </form>
       </div>
     ) : null;
@@ -772,7 +765,10 @@ export default function DirectoryPage() {
         layout={layout}
       >
         {activeTab === "wcinyp" && (
-          <div className="px-4 lg:px-6 text-sm text-muted-foreground">WCINYP overview coming soon.</div>
+          <div className="px-4 lg:px-6 text-sm text-muted-foreground">
+            {/* TODO: Fold Staff + Locations into the WCINYP tab and build a detailed dept view (team explainer, linked cards, files, group email, lead nurse form, etc.) so WCINYP is the single entry point. */}
+            WCINYP overview coming soon.
+          </div>
         )}
 
         {activeTab === "people" && <DirectoryTable />}
