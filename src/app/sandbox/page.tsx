@@ -351,7 +351,7 @@ function DocumentsTable({
     };
 
     return (
-        <Card className="overflow-hidden">
+        <Card className="h-full overflow-hidden">
             <div className="border-b border-border bg-card px-5 py-4">
                 <div className="relative">
                     <Search className="pointer-events-none absolute left-3 top-3.5 h-4 w-4 text-muted-foreground" />
@@ -411,6 +411,49 @@ function DocumentsTable({
     );
 }
 
+function DocumentSideCard({
+    activePill,
+    onPillChange,
+}: {
+    activePill: string;
+    onPillChange: (id: string) => void;
+}) {
+    const pills = [
+        { id: "preview", label: "Preview" },
+        { id: "print-queue", label: "Print Queue" },
+    ];
+
+    return (
+        <Card className="flex h-full flex-col">
+            <div className="flex min-h-[76px] items-center justify-center border-b border-border px-5 py-4">
+                <div className="flex items-center gap-2">
+                    {pills.map((pill) => {
+                        const isActive = pill.id === activePill;
+                        return (
+                            <button
+                                key={pill.id}
+                                type="button"
+                                onClick={() => onPillChange(pill.id)}
+                                className={cn(
+                                    "rounded-full border px-3 py-1.5 text-sm font-semibold transition",
+                                    isActive
+                                        ? "border-foreground bg-foreground text-background shadow-sm"
+                                        : "border-border bg-card text-foreground hover:border-foreground/50 hover:bg-card"
+                                )}
+                            >
+                                {pill.label}
+                            </button>
+                        );
+                    })}
+                </div>
+            </div>
+            <div className="flex flex-1 items-center justify-center px-4 py-6 text-sm text-muted-foreground">
+                Preview panel placeholder
+            </div>
+        </Card>
+    );
+}
+
 export function SandboxShell({
     initialRail = "drive",
     initialPanel,
@@ -424,6 +467,7 @@ export function SandboxShell({
     const [activePanel, setActivePanel] = useState<PanelItemId>(initialPanel ?? defaultPanel[initialRail]);
     const [activePill, setActivePill] = useState<string | null>(null);
     const [documentSearch, setDocumentSearch] = useState<string>("");
+    const [documentSidePill, setDocumentSidePill] = useState<string>("preview");
 
     useEffect(() => {
         if (!pathname) return;
@@ -446,6 +490,7 @@ export function SandboxShell({
     useEffect(() => {
         if (activePanel !== "documents") {
             setDocumentSearch("");
+            setDocumentSidePill("preview");
         }
     }, [activePanel]);
 
@@ -518,57 +563,52 @@ export function SandboxShell({
                 <IconRail activeId={activeRail} onSelect={handleRailSelect} />
                 <SidebarPanel items={panelItems[activeRail]} activeId={activePanel} onSelect={handlePanelSelect} />
                 <div className="flex min-w-0 flex-1 flex-col">
-                    <div className="flex flex-col gap-5 px-6 pb-10 pt-4">
-                        <div className="flex flex-col gap-2">
-                            <div className="flex flex-wrap items-center justify-between gap-3">
-                                <div className="flex flex-wrap items-center gap-3">
-                                    <p className="text-xl font-semibold text-foreground">{pageTitle}</p>
-                                    <span className="h-5 w-px bg-border" aria-hidden="true" />
-                                    <span className="flex items-center gap-2 text-sm text-muted-foreground">
-                                        {/* TODO: turn into a link with hover state to navigate back to rail root */}
-                                        <breadcrumb.Icon className="h-4 w-4" />
-                                        <span aria-hidden="true">-</span>
-                                        <span>{breadcrumb.label}</span>
-                                    </span>
-                                </div>
-                                <button
-                                    type="button"
-                                    className="hidden items-center gap-2 rounded-lg bg-foreground px-4 py-2 text-sm font-semibold text-background shadow-sm transition hover:opacity-90 sm:flex"
-                                >
-                                    Open {activeRail}
-                                    <ChevronRight className="h-4 w-4" />
-                                </button>
+                    <div className="flex flex-1 flex-col gap-5 px-6 pb-10 pt-4">
+                        <div className="flex flex-wrap items-center justify-between gap-3">
+                            <div className="flex flex-wrap items-center gap-3">
+                                <p className="text-xl font-semibold text-foreground">{pageTitle}</p>
+                                <span className="h-5 w-px bg-border" aria-hidden="true" />
+                                {pillNavItems[activePanel]?.length ? (
+                                    <div className="flex flex-wrap items-center gap-2">
+                                        {pillNavItems[activePanel]?.map((pill) => {
+                                            const isActive = activePill === pill.id;
+                                            return (
+                                                <button
+                                                    key={pill.id}
+                                                    type="button"
+                                                    onClick={() => setActivePill(pill.id)}
+                                                    className={cn(
+                                                        "rounded-full border px-3 py-1.5 text-sm font-semibold transition",
+                                                        isActive
+                                                            ? "border-foreground bg-foreground text-background shadow-sm"
+                                                            : "border-border bg-card text-foreground hover:border-foreground/50 hover:bg-card"
+                                                    )}
+                                                >
+                                                    {pill.label}
+                                                </button>
+                                            );
+                                        })}
+                                    </div>
+                                ) : null}
                             </div>
-                            {pillNavItems[activePanel]?.length ? (
-                                <div className="flex flex-wrap gap-2">
-                                    {pillNavItems[activePanel]?.map((pill) => {
-                                        const isActive = activePill === pill.id;
-                                        return (
-                                            <button
-                                                key={pill.id}
-                                                type="button"
-                                                onClick={() => setActivePill(pill.id)}
-                                                className={cn(
-                                                    "rounded-full border px-3 py-1.5 text-sm font-semibold transition",
-                                                    isActive
-                                                        ? "border-foreground bg-foreground text-background shadow-sm"
-                                                        : "border-border bg-card text-foreground hover:border-foreground/50 hover:bg-card"
-                                                )}
-                                            >
-                                                {pill.label}
-                                            </button>
-                                        );
-                                    })}
-                                </div>
-                            ) : null}
+                            <button
+                                type="button"
+                                className="hidden items-center gap-2 rounded-lg bg-foreground px-4 py-2 text-sm font-semibold text-background shadow-sm transition hover:opacity-90 sm:flex"
+                            >
+                                Open {activeRail}
+                                <ChevronRight className="h-4 w-4" />
+                            </button>
                         </div>
 
                         {activePanel === "documents" ? (
-                            <DocumentsTable
-                                searchTerm={documentSearch}
-                                onSearchChange={setDocumentSearch}
-                                rows={filteredDocuments}
-                            />
+                            <div className="grid flex-1 items-stretch gap-4 lg:grid-cols-[minmax(0,1fr)_320px]">
+                                <DocumentsTable
+                                    searchTerm={documentSearch}
+                                    onSearchChange={setDocumentSearch}
+                                    rows={filteredDocuments}
+                                />
+                                <DocumentSideCard activePill={documentSidePill} onPillChange={setDocumentSidePill} />
+                            </div>
                         ) : null}
 
                         {activePanel !== "documents" ? (
