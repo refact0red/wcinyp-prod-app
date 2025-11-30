@@ -1,7 +1,7 @@
 "use client"
 
 import * as React from "react"
-import { ColumnDef, flexRender } from "@tanstack/react-table"
+import { ColumnDef, Table as ReactTable, flexRender } from "@tanstack/react-table"
 import {
   DownloadIcon,
   FileSpreadsheetIcon,
@@ -17,14 +17,10 @@ import {
 
 import type { DriveItem, DriveItemType } from "@/app/drive/data"
 import { driveItems } from "@/app/drive/data"
-import { BulkActionsBar } from "@/components/table/bulk-actions-bar"
 import { EmptyState } from "@/components/table/empty-state"
-import { TablePagination } from "@/components/table/table-pagination"
 import { TableShell } from "@/components/table/table-shell"
-import { TableToolbar } from "@/components/table/table-toolbar"
 import { VirtualTable } from "@/components/table/virtual-table"
 import { useDataTable } from "@/components/table/use-data-table"
-import { Button } from "@/components/shadcn/ui/button"
 import { Checkbox } from "@/components/shadcn/ui/checkbox"
 import {
   DropdownMenu,
@@ -41,6 +37,8 @@ import {
   TableRow,
 } from "@/components/shadcn/ui/table"
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/shadcn/ui/tooltip"
+import { Button } from "@/components/shadcn/ui/button"
+import { cn } from "@/lib/utils"
 
 const typeIcon: Record<DriveItemType, typeof FileTextIcon> = {
   Document: FileTextIcon,
@@ -72,21 +70,25 @@ const columns: ColumnDef<DriveItem>[] = [
     size: 50,
     enableSorting: false,
     header: ({ table }) => (
-      <Checkbox
-        aria-label="Select all"
-        checked={
-          table.getIsAllPageRowsSelected() ||
-          (table.getIsSomePageRowsSelected() && "indeterminate")
-        }
-        onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
-      />
+      <div className="flex justify-start pl-7">
+        <Checkbox
+          aria-label="Select all"
+          checked={
+            table.getIsAllPageRowsSelected() ||
+            (table.getIsSomePageRowsSelected() && "indeterminate")
+          }
+          onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
+        />
+      </div>
     ),
     cell: ({ row }) => (
-      <Checkbox
-        aria-label={`Select ${row.original.name}`}
-        checked={row.getIsSelected()}
-        onCheckedChange={(value) => row.toggleSelected(!!value)}
-      />
+      <div className="flex justify-start pl-7">
+        <Checkbox
+          aria-label={`Select ${row.original.name}`}
+          checked={row.getIsSelected()}
+          onCheckedChange={(value) => row.toggleSelected(!!value)}
+        />
+      </div>
     ),
   },
   {
@@ -109,55 +111,6 @@ const columns: ColumnDef<DriveItem>[] = [
     },
   },
   {
-    id: "quick-actions",
-    header: "Quick Actions",
-    size: 240,
-    enablePinning: true,
-    cell: () => (
-      <div className="inline-flex overflow-hidden rounded-md border bg-background shadow-xs">
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <Button
-              variant="ghost"
-              size="sm"
-              className="border-border focus-visible:z-10 inline-flex h-auto rounded-none border-l px-3 py-2 first:border-l-0"
-            >
-              <PrinterIcon className="size-4" />
-              <span className="text-xs font-medium">Print</span>
-            </Button>
-          </TooltipTrigger>
-          <TooltipContent sideOffset={6}>Print</TooltipContent>
-        </Tooltip>
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <Button
-              variant="ghost"
-              size="sm"
-              className="border-border focus-visible:z-10 inline-flex h-auto rounded-none border-l px-3 py-2 first:border-l-0"
-            >
-              <DownloadIcon className="size-4" />
-              <span className="text-xs font-medium">Download</span>
-            </Button>
-          </TooltipTrigger>
-          <TooltipContent sideOffset={6}>Download</TooltipContent>
-        </Tooltip>
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <Button
-              variant="ghost"
-              size="sm"
-              className="border-border focus-visible:z-10 inline-flex h-auto rounded-none border-l px-3 py-2 first:border-l-0"
-            >
-              <Link2Icon className="size-4" />
-              <span className="text-xs font-medium">Copy Link</span>
-            </Button>
-          </TooltipTrigger>
-          <TooltipContent sideOffset={6}>Copy link</TooltipContent>
-        </Tooltip>
-      </div>
-    ),
-  },
-  {
     accessorKey: "updated",
     header: "Updated",
     size: 150,
@@ -178,30 +131,93 @@ const columns: ColumnDef<DriveItem>[] = [
   {
     id: "actions",
     enablePinning: true,
-    size: 70,
+    size: 240,
+    header: "Actions",
     cell: () => (
-      <div className="flex justify-end gap-2">
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="ghost" size="icon-sm" className="size-8">
-              <MoreVerticalIcon className="size-4" />
-              <span className="sr-only">Open menu</span>
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="w-36">
-            <DropdownMenuItem>Open</DropdownMenuItem>
-            <DropdownMenuItem>Rename</DropdownMenuItem>
-            <DropdownMenuItem>Move</DropdownMenuItem>
-            <DropdownMenuItem>Delete</DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
+      <div className="flex justify-end">
+        <div className="inline-flex overflow-hidden rounded-md border bg-background shadow-xs">
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button
+                variant="ghost"
+                size="sm"
+                className="border-border focus-visible:z-10 inline-flex h-auto rounded-none border-l px-3 py-2 first:border-l-0"
+              >
+                <PrinterIcon className="size-4" />
+                <span className="text-xs font-medium">Print</span>
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent sideOffset={6}>Print</TooltipContent>
+          </Tooltip>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button
+                variant="ghost"
+                size="sm"
+                className="border-border focus-visible:z-10 inline-flex h-auto rounded-none border-l px-3 py-2 first:border-l-0"
+              >
+                <DownloadIcon className="size-4" />
+                <span className="text-xs font-medium">Download</span>
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent sideOffset={6}>Download</TooltipContent>
+          </Tooltip>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button
+                variant="ghost"
+                size="sm"
+                className="border-border focus-visible:z-10 inline-flex h-auto rounded-none border-l px-3 py-2 first:border-l-0"
+              >
+                <Link2Icon className="size-4" />
+                <span className="text-xs font-medium">Copy Link</span>
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent sideOffset={6}>Copy link</TooltipContent>
+          </Tooltip>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" size="icon-sm" className="border-l px-2">
+                <MoreVerticalIcon className="size-4" />
+                <span className="sr-only">Open menu</span>
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-36">
+              <DropdownMenuItem>Open</DropdownMenuItem>
+              <DropdownMenuItem>Rename</DropdownMenuItem>
+              <DropdownMenuItem>Move</DropdownMenuItem>
+              <DropdownMenuItem>Delete</DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
       </div>
     ),
   },
 ]
 
-export function DriveTable() {
-  const [virtualized, setVirtualized] = React.useState(false)
+type DriveTableContextValue = {
+  table: ReactTable<DriveItem>
+  resetState: () => void
+}
+
+const DriveTableContext =
+  React.createContext<DriveTableContextValue | undefined>(undefined)
+
+export function useDriveTableContext() {
+  const context = React.useContext(DriveTableContext)
+  if (!context) {
+    throw new Error(
+      "useDriveTableContext must be used within a DriveTableProvider"
+    )
+  }
+  return context
+}
+
+export function DriveTableProvider({
+  children,
+}: {
+  children: React.ReactNode
+}) {
   const { table, resetState } = useDataTable<DriveItem>({
     data: driveItems,
     columns,
@@ -209,54 +225,53 @@ export function DriveTable() {
     getRowId: (row) => row.id.toString(),
     initialState: {
       columnPinning: { right: ["actions"] },
+      columnVisibility: {
+        size: false,
+      },
     },
   })
 
+  const value = React.useMemo(
+    () => ({ table, resetState }),
+    [table, resetState]
+  )
+
   return (
-    <div className="overflow-hidden rounded-lg border bg-card">
-      <TableToolbar
-        table={table}
-        searchPlaceholder="Search files"
-        onReset={resetState}
-        rightSlot={
-          <Button variant="ghost" size="sm" onClick={() => setVirtualized((v) => !v)}>
-            {virtualized ? "Disable virtualization" : "Enable virtualization"}
-          </Button>
-        }
-      />
-      <BulkActionsBar
-        table={table}
-        actions={
-          <>
-            <Button variant="secondary" size="sm">
-              Download
-            </Button>
-            <Button variant="destructive" size="sm">
-              Delete
-            </Button>
-          </>
-        }
-      />
-      <TableShell withBorder={false}>
+    <DriveTableContext.Provider value={value}>
+      {children}
+    </DriveTableContext.Provider>
+  )
+}
+
+export function DriveTable() {
+  const { table } = useDriveTableContext()
+  const [virtualized] = React.useState(false)
+
+  return (
+    <div className="flex h-full flex-1 flex-col overflow-hidden bg-card">
+      <TableShell withBorder={false} className="h-full flex-1 overflow-auto rounded-none">
         {virtualized ? (
           <VirtualTable
             table={table}
-            scrollHeight="520px"
+            scrollHeight="calc(100vh - 220px)"
             renderHeader={() => (
-              <TableHeader className="bg-muted/40">
+              <TableHeader className="bg-muted/10">
                 {table.getHeaderGroups().map((headerGroup) => (
-              <TableRow key={headerGroup.id}>
-                {headerGroup.headers.map((header) => (
-                  <TableHead
-                    key={header.id}
-                    colSpan={header.colSpan}
-                    style={{ width: header.getSize(), ...getPinnedStyle(header.column) }}
-                    className={header.column.getIsPinned() ? "bg-muted" : undefined}
-                  >
-                    {header.isPlaceholder
-                      ? null
-                      : flexRender(
-                          header.column.columnDef.header,
+                  <TableRow key={headerGroup.id}>
+                    {headerGroup.headers.map((header) => (
+                      <TableHead
+                        key={header.id}
+                        colSpan={header.colSpan}
+                        style={{ width: header.getSize(), ...getPinnedStyle(header.column) }}
+                        className={cn(
+                          "h-[var(--drive-header-h)] px-3",
+                          header.column.getIsPinned() ? "bg-muted/10" : undefined
+                        )}
+                      >
+                        {header.isPlaceholder
+                          ? null
+                          : flexRender(
+                              header.column.columnDef.header,
                               header.getContext()
                             )}
                       </TableHead>
@@ -282,20 +297,23 @@ export function DriveTable() {
           />
         ) : (
           <Table>
-            <TableHeader className="bg-muted/40">
+            <TableHeader className="bg-muted/10">
               {table.getHeaderGroups().map((headerGroup) => (
                 <TableRow key={headerGroup.id}>
-                {headerGroup.headers.map((header) => (
-                  <TableHead
-                    key={header.id}
-                    colSpan={header.colSpan}
-                    style={{ width: header.getSize(), ...getPinnedStyle(header.column) }}
-                    className={header.column.getIsPinned() ? "bg-muted" : undefined}
-                  >
-                    {header.isPlaceholder
-                      ? null
-                      : flexRender(
-                          header.column.columnDef.header,
+                  {headerGroup.headers.map((header) => (
+                    <TableHead
+                      key={header.id}
+                      colSpan={header.colSpan}
+                      style={{ width: header.getSize(), ...getPinnedStyle(header.column) }}
+                      className={cn(
+                        "h-[var(--drive-header-h)] px-3",
+                        header.column.getIsPinned() ? "bg-muted/10" : undefined
+                      )}
+                    >
+                      {header.isPlaceholder
+                        ? null
+                        : flexRender(
+                            header.column.columnDef.header,
                             header.getContext()
                           )}
                     </TableHead>
@@ -335,7 +353,6 @@ export function DriveTable() {
           </Table>
         )}
       </TableShell>
-      <TablePagination table={table} />
     </div>
   )
 }
