@@ -699,9 +699,6 @@ export default function DirectoryPage() {
               <Loader2 className="text-muted-foreground absolute right-3 top-1/2 size-4 -translate-y-1/2 animate-spin" />
             ) : null}
           </div>
-          <div className="text-xs text-muted-foreground">
-            Press Enter to search
-          </div>
         </form>
       </div>
     ) : null;
