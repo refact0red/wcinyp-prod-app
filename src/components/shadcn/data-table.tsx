@@ -39,10 +39,8 @@ import { EmptyState } from "@/components/table/empty-state"
 import { TableShell } from "@/components/table/table-shell"
 import { TableToolbar } from "@/components/table/table-toolbar"
 import { BulkActionsBar } from "@/components/table/bulk-actions-bar"
-import { TablePagination } from "@/components/table/table-pagination"
 import { VirtualTable } from "@/components/table/virtual-table"
 import { useDataTable } from "@/components/table/use-data-table"
-import { defaultTableState } from "@/components/table/table-config"
 import { Badge } from "@/components/shadcn/ui/badge"
 import { Button } from "@/components/shadcn/ui/button"
 import {
@@ -375,7 +373,6 @@ export function DataTable({ data: initialData }: { data: OutlineItem[] }) {
     stateKey: "dashboard-outline-table",
     initialState: {
       columnPinning: { right: ["actions"] },
-      pagination: defaultTableState.pagination,
     },
     meta: {
       onRowUpdate: (updatedRow: OutlineItem) => {
@@ -573,7 +570,6 @@ export function DataTable({ data: initialData }: { data: OutlineItem[] }) {
             </DndContext>
           )}
         </TableShell>
-        <TablePagination table={table} />
       </TabsContent>
       <TabsContent
         value="past-performance"

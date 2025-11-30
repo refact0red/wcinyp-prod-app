@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 
 import { DrivePageClient } from "./drive-client";
 import type { DriveMode } from "@/components/shadcn/drive-subheader";
+import type { DriveFile } from "@/app/drive/data";
+import { fetchDriveFilesByMode } from "@/server/drive/files";
 
 export const metadata: Metadata = {
   title: "Drive",
@@ -23,5 +25,7 @@ export default async function DrivePage({ searchParams }: DrivePageProps) {
       ? (modeFromUrl as DriveMode)
       : "documents";
 
-  return <DrivePageClient mode={resolvedMode} />;
+  const files: DriveFile[] = await fetchDriveFilesByMode(resolvedMode);
+
+  return <DrivePageClient mode={resolvedMode} files={files} />;
 }

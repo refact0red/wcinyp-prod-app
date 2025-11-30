@@ -30,6 +30,18 @@ Open [http://localhost:4000](http://localhost:4000) with your browser to see the
 
 You can start editing the page by modifying `src/app/page.tsx`. The page auto-updates as you edit the file.
 
+> [!NOTE]
+> TODO: npm installs currently fail because `cmdk@0.2.1` pegs `react@^18` while this repo is on React 19. We’re using Bun as the package manager, so a `.npmrc` with `legacy-peer-deps=true` isn’t in the repo. If npm workflows become necessary, either add that `.npmrc`, upgrade `cmdk` when it supports React 19, or align React down to 18.
+
+## Drive data layer (Postgres + Drizzle)
+
+- Docs: `docs/drive-data.md` (schema, migrations, seeds, commands)
+- ADR: `docs/adr/0001-drive-data-layer.md`
+- Key commands (npm):
+  - `npm run db:up` / `npm run db:down`
+  - `npm run db:migrate`
+  - `npm run db:seed` (truncates and reloads Drive seeds)
+
 ## Resources
 
 Untitled UI React is built on top of [Untitled UI Figma](https://www.untitledui.com/figma), the world's largest and most popular Figma UI kit and design system. Explore more:

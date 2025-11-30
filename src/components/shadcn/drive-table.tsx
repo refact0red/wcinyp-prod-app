@@ -15,8 +15,8 @@ import {
   ShareIcon,
 } from "lucide-react"
 
-import type { DriveItem, DriveItemType } from "@/app/drive/data"
-import { driveItems } from "@/app/drive/data"
+import type { DriveFile, DriveItemType } from "@/app/drive/data"
+import type { DriveMode } from "@/components/shadcn/drive-subheader"
 import { EmptyState } from "@/components/table/empty-state"
 import { TableShell } from "@/components/table/table-shell"
 import { VirtualTable } from "@/components/table/virtual-table"
@@ -68,7 +68,32 @@ const driveRowClasses =
   "group bg-[#0b0b0b] text-white hover:bg-[#1b1b1b] data-[state=selected]:bg-[#141414] transition-colors"
 const drivePinnedCellClasses = "bg-[#0b0b0b] group-hover:bg-[#1b1b1b]"
 
-const columns: ColumnDef<DriveItem>[] = [
+const emptyStateByMode: Record<
+  DriveMode,
+  {
+    title: string
+    description: string
+  }
+> = {
+  documents: {
+    title: "No documents",
+    description: "Documents are filtered out. Adjust filters or upload a file.",
+  },
+  packets: {
+    title: "No packets yet",
+    description: "Preset bundles will appear here; use Documents while we map packets.",
+  },
+  automations: {
+    title: "No automations yet",
+    description: "The Self Pay workflow and other automations will land here soon.",
+  },
+  all: {
+    title: "No files",
+    description: "Try a different filter or check the Documents tab.",
+  },
+}
+
+const columns: ColumnDef<DriveFile>[] = [
   {
     id: "select",
     size: 50,
@@ -191,7 +216,8 @@ const columns: ColumnDef<DriveItem>[] = [
 ]
 
 type DriveTableContextValue = {
-  table: ReactTable<DriveItem>
+  mode: DriveMode
+  table: ReactTable<DriveFile>
   resetState: () => void
 }
 
@@ -209,14 +235,18 @@ export function useDriveTableContext() {
 }
 
 export function DriveTableProvider({
+  files,
+  mode,
   children,
 }: {
+  files: DriveFile[]
+  mode: DriveMode
   children: React.ReactNode
 }) {
-  const { table, resetState } = useDataTable<DriveItem>({
-    data: driveItems,
+  const { table, resetState } = useDataTable<DriveFile>({
+    data: files,
     columns,
-    stateKey: "drive-table-v3",
+    stateKey: `drive-table-v4-${mode}`,
     getRowId: (row) => row.id.toString(),
     initialState: {
       columnVisibility: {
@@ -225,9 +255,13 @@ export function DriveTableProvider({
     },
   })
 
+  React.useEffect(() => {
+    resetState()
+  }, [mode, resetState, files])
+
   const value = React.useMemo(
-    () => ({ table, resetState }),
-    [table, resetState]
+    () => ({ table, resetState, mode }),
+    [table, resetState, mode]
   )
 
   return (
@@ -238,8 +272,9 @@ export function DriveTableProvider({
 }
 
 export function DriveTable() {
-  const { table } = useDriveTableContext()
+  const { table, mode } = useDriveTableContext()
   const [virtualized] = React.useState(false)
+  const emptyStateCopy = emptyStateByMode[mode]
 
   return (
     <div className="flex h-full flex-1 flex-col overflow-hidden bg-card">
@@ -279,7 +314,10 @@ export function DriveTable() {
               </TableHeader>
             )}
             emptyState={
-              <EmptyState title="No files" description="Try adjusting your filters." />
+              <EmptyState
+                title={emptyStateCopy.title}
+                description={emptyStateCopy.description}
+              />
             }
             renderRow={(row) =>
               row.getVisibleCells().map((cell) => (
@@ -353,7 +391,10 @@ export function DriveTable() {
                   {!table.getRowModel().rows.length && (
                     <TableRow>
                       <TableCell colSpan={table.getAllColumns().length}>
-                        <EmptyState title="No files" description="Try adjusting your filters." />
+                        <EmptyState
+                          title={emptyStateCopy.title}
+                          description={emptyStateCopy.description}
+                        />
                       </TableCell>
                     </TableRow>
                   )}

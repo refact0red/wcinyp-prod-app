@@ -6,12 +6,14 @@ import { DriveTable, DriveTableProvider } from "@/components/shadcn/drive-table"
 import { DriveSubHeader, type DriveMode } from "@/components/shadcn/drive-subheader";
 import { DriveToolbar } from "@/components/shadcn/drive-toolbar";
 import { LabShell } from "@/components/shadcn/lab-shell";
+import type { DriveFile } from "@/app/drive/data";
 
 type DrivePageClientProps = {
   mode: DriveMode;
+  files: DriveFile[];
 };
 
-export function DrivePageClient({ mode }: DrivePageClientProps) {
+export function DrivePageClient({ mode, files }: DrivePageClientProps) {
   const [mounted, setMounted] = React.useState(false);
   const driveLayoutStyle = React.useMemo(
     () => ({
@@ -29,7 +31,7 @@ export function DrivePageClient({ mode }: DrivePageClientProps) {
   if (!mounted) return null;
 
   return (
-    <DriveTableProvider>
+    <DriveTableProvider mode={mode} files={files}>
       <LabShell
         title="Drive"
         stickyChrome

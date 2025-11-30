@@ -1,20 +1,31 @@
+import type { DriveMode } from "@/components/shadcn/drive-subheader";
+
 export type DriveItemStatus = "Synced" | "In Review" | "Draft";
 
 export type DriveItemType = "Document" | "Presentation" | "Spreadsheet" | "Image" | "Folder";
 
 export type DriveItem = {
-  id: number;
+  id: string;
   name: string;
   type: DriveItemType;
   status: DriveItemStatus;
   updated: string;
   size: string;
-  shared: boolean;
+  shared?: boolean;
   href: string;
 };
 
+export type DriveCollection = "documents" | "packets" | "automations" | "public";
+
+export type DriveFile = Omit<DriveItem, "shared"> & {
+  collections: DriveCollection[];
+  mimeType: string;
+};
+
+type DriveItemSeed = Omit<DriveItem, "id"> & { id: number };
+
 // Static inventory derived from public/documents/drive assets
-export const driveItems: DriveItem[] = [
+export const driveItems: DriveItemSeed[] = [
   {
     id: 1,
     name: "ABN - 55th Street",
@@ -726,3 +737,68 @@ export const driveItems: DriveItem[] = [
     href: "/documents/drive/X-Ray%20Questionnaire.pdf",
   }
 ];
+
+const defaultMimeType = "application/pdf";
+
+function normalizeDocuments(): DriveFile[] {
+  return driveItems.map(({ shared: _shared, ...item }) => ({
+    ...item,
+    id: item.id.toString(),
+    collections: ["documents"],
+    mimeType: defaultMimeType,
+  }));
+}
+
+export const packetSeeds: DriveFile[] = [
+  {
+    id: "1001",
+    name: "MRI Prostate Packet",
+    type: "Folder",
+    status: "In Review",
+    updated: "2025-11-30T10:22:00.000Z",
+    size: "3 docs",
+    collections: ["packets"],
+    mimeType: defaultMimeType,
+    href: "#",
+  },
+  {
+    id: "1002",
+    name: "Breast Biopsy Packet",
+    type: "Folder",
+    status: "In Review",
+    updated: "2025-11-30T10:22:00.000Z",
+    size: "2 docs",
+    collections: ["packets"],
+    mimeType: defaultMimeType,
+    href: "#",
+  },
+  {
+    id: "1003",
+    name: "Lung Screening Packet",
+    type: "Folder",
+    status: "Draft",
+    updated: "2025-11-30T10:22:00.000Z",
+    size: "2 docs",
+    collections: ["packets"],
+    mimeType: defaultMimeType,
+    href: "#",
+  },
+];
+
+export const automationSeeds: DriveFile[] = [];
+
+const documentFiles = normalizeDocuments();
+
+export function getFilesByMode(mode: DriveMode): DriveFile[] {
+  switch (mode) {
+    case "documents":
+      return documentFiles;
+    case "packets":
+      return packetSeeds;
+    case "automations":
+      return automationSeeds;
+    case "all":
+    default:
+      return [...documentFiles, ...packetSeeds, ...automationSeeds];
+  }
+}

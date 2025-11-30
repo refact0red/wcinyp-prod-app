@@ -1,7 +1,7 @@
 "use client";
 
 import { useSearchParams } from "next/navigation";
-import { FileTextIcon, HardDriveIcon, LayersIcon, WorkflowIcon } from "lucide-react";
+import { CloudIcon, FileTextIcon, LayersIcon, WorkflowIcon } from "lucide-react";
 
 import { SiteSubHeader } from "@/components/shadcn/site-subheader";
 
@@ -28,7 +28,7 @@ export const driveModes = [
   {
     id: "all",
     label: "Public Drive",
-    icon: HardDriveIcon,
+    icon: CloudIcon,
     href: "/drive?mode=all",
   },
 ] as const;

@@ -3,7 +3,7 @@
 import * as React from "react";
 import { ChevronLeftIcon, ChevronRightIcon, FileTextIcon } from "lucide-react";
 
-import { driveItems } from "@/app/drive/data";
+import { useDriveTableContext } from "@/components/shadcn/drive-table";
 import { Button } from "@/components/shadcn/ui/button";
 
 function formatDate(date: string) {
@@ -18,12 +18,24 @@ function formatDate(date: string) {
 
 export function DriveSidebar() {
   const [currentPage, setCurrentPage] = React.useState(0);
+  const { table, mode } = useDriveTableContext();
 
-  const item = driveItems[0];
+  const firstRow = table.getRowModel().rows[0];
+  const item = firstRow?.original;
   const totalPages = 4;
 
   if (!item) {
-    return null;
+    const emptyMessage =
+      mode === "packets"
+        ? "Packets will land here soon."
+        : mode === "automations"
+          ? "Automations will land here soon."
+          : "No file selected.";
+    return (
+      <div className="flex h-full items-center justify-center bg-card px-4 text-sm text-muted-foreground">
+        {emptyMessage}
+      </div>
+    );
   }
 
   const handlePrevious = () => {
