@@ -167,12 +167,17 @@ export function useDataTable<TData>({
   initialState,
   onStateChange,
 }: UseDataTableProps<TData>) {
+  const initialStateKey = React.useMemo(
+    () => (initialState ? JSON.stringify(initialState) : "no-initial-state"),
+    [initialState]
+  )
+  const initialStateMemo = React.useMemo(() => initialState, [initialStateKey])
   const [hasMounted, setHasMounted] = React.useState(false)
   const [hasHydrated, setHasHydrated] = React.useState(!stateKey)
 
   const [tableState, dispatch] = React.useReducer(
     tableStateReducer,
-    buildState({ initialState })
+    buildState({ initialState: initialStateMemo })
   )
 
   React.useEffect(() => {
@@ -186,16 +191,14 @@ export function useDataTable<TData>({
     }
 
     const persisted = readPersistedState(stateKey)
-    if (persisted) {
-      dispatch({ type: "hydrate", payload: persisted, initialState })
-    }
+    dispatch({ type: "hydrate", payload: persisted, initialState: initialStateMemo })
     setHasHydrated(true)
-  }, [stateKey, hasMounted, initialState])
+  }, [stateKey, hasMounted, initialStateMemo])
 
   const resetState = React.useCallback(() => {
-    dispatch({ type: "reset", initialState })
+    dispatch({ type: "reset", initialState: initialStateMemo })
     clearPersistedState(stateKey)
-  }, [initialState, stateKey])
+  }, [initialStateMemo, stateKey])
 
   React.useEffect(() => {
     if (!stateKey || !hasHydrated) return
