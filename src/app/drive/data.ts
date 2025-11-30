@@ -1,4 +1,5 @@
 import type { DriveMode } from "@/components/shadcn/drive-subheader";
+export type { DriveMode };
 
 export type DriveItemStatus = "Synced" | "In Review" | "Draft";
 

@@ -14,7 +14,6 @@ type DrivePageClientProps = {
 };
 
 export function DrivePageClient({ mode, files }: DrivePageClientProps) {
-  const [mounted, setMounted] = React.useState(false);
   const driveLayoutStyle = React.useMemo(
     () => ({
       ["--drive-header-h" as string]: "42px",
@@ -23,12 +22,6 @@ export function DrivePageClient({ mode, files }: DrivePageClientProps) {
     }),
     []
   );
-
-  React.useEffect(() => {
-    setMounted(true);
-  }, []);
-
-  if (!mounted) return null;
 
   return (
     <DriveTableProvider mode={mode} files={files}>

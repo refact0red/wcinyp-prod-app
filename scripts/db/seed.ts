@@ -2,24 +2,28 @@ import "dotenv/config";
 import { randomUUID } from "node:crypto";
 import { sql } from "drizzle-orm";
 
-import { automationSeeds, driveItems, packetSeeds } from "@/app/drive/data";
+import { automationSeeds, driveItems, packetSeeds, type DriveCollection } from "@/app/drive/data";
 import { db } from "@/server/db/client";
 import { files } from "@/server/db/schema";
 
+type InsertFile = typeof files.$inferInsert;
+
+const toCollections = (collections: DriveCollection[]): InsertFile["collections"] => collections;
+
 async function seedFiles() {
-  const fileRows = [
+  const fileRows: InsertFile[] = [
     ...driveItems.map((item) => ({
       id: randomUUID(),
       name: item.name,
       type: item.type,
       status: item.status,
-      collections: ["documents"],
-      tags: [] as string[],
+      collections: toCollections(["documents"]),
+      tags: [],
       sizeLabel: item.size,
-      sizeBytes: null as number | null,
+      sizeBytes: null,
       updatedAt: new Date(item.updated),
       href: item.href,
-      externalLink: null as string | null,
+      externalLink: null,
       mimeType: "application/pdf",
     })),
     ...packetSeeds.map((item) => ({
@@ -27,13 +31,13 @@ async function seedFiles() {
       name: item.name,
       type: item.type,
       status: item.status,
-      collections: item.collections,
-      tags: [] as string[],
+      collections: toCollections(item.collections),
+      tags: [],
       sizeLabel: item.size,
-      sizeBytes: null as number | null,
+      sizeBytes: null,
       updatedAt: new Date(item.updated),
       href: item.href,
-      externalLink: null as string | null,
+      externalLink: null,
       mimeType: item.mimeType,
     })),
     ...automationSeeds.map((item) => ({
@@ -41,13 +45,13 @@ async function seedFiles() {
       name: item.name,
       type: item.type,
       status: item.status,
-      collections: item.collections,
-      tags: [] as string[],
+      collections: toCollections(item.collections),
+      tags: [],
       sizeLabel: item.size,
-      sizeBytes: null as number | null,
+      sizeBytes: null,
       updatedAt: new Date(item.updated),
       href: item.href,
-      externalLink: null as string | null,
+      externalLink: null,
       mimeType: item.mimeType,
     })),
   ];

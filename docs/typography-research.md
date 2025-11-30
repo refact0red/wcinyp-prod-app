@@ -25,7 +25,7 @@
 
 ## Recommended pairings for Inter
 
-There is no official pairing list on the Inter site or Google Fonts specimen, but common and practical pairings (aligned with Untitled UI and modern web practice) are:
+There is no official pairing list on the Inter site or Google Fonts specimen, but common and practical pairings (aligned with modern web practice) are:
 
 - **Sans (UI / body)**
   - Keep using Inter as the primary sans, with a robust system fallback:
@@ -34,7 +34,7 @@ There is no official pairing list on the Inter site or Google Fonts specimen, bu
 - **Mono (code, IDs, tabular data)**
   - Use a stack that favors **Roboto Mono** but falls back gracefully:
     - `ui-monospace, "Roboto Mono", SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace`.
-  - This is what the Main app already uses as `--font-mono` and matches Untitled UI’s React starter.
+  - This is what the Main app already uses as `--font-mono`.
 
 - **Serif (long-form reading, special headings)**
   - There is no Inter serif, so use a conventional, always-available system serif stack:
@@ -65,7 +65,7 @@ This ensures:
 
 ### 3. Suggested font tokens for Labs (future refinement)
 
-To align Labs with Main and Untitled UI, and to give Tailwind/shadcn a complete font token set, we can later define:
+To align Labs with Main and to give Tailwind/shadcn a complete font token set, we can later define:
 
 - `--font-sans`:
 
