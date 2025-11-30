@@ -221,6 +221,16 @@ export function SiteHeader({
                 <div className="flex items-center gap-2">
                     {actions ? <div className="flex items-center gap-2">{actions}</div> : null}
                     <ThemeToggle />
+                    <Button
+                        type="button"
+                        variant="outline"
+                        size="icon"
+                        className="h-9 w-9 shrink-0 group-data-[collapsible=icon]:opacity-0"
+                        aria-label="View notifications"
+                        title="Notifications"
+                    >
+                        <BellIcon className="h-4 w-4" aria-hidden="true" />
+                    </Button>
                     <DropdownMenu>
                         <DropdownMenuTrigger className="inline-flex items-center justify-center rounded-full outline-none ring-offset-background focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2">
                             <Avatar className="h-8 w-8">

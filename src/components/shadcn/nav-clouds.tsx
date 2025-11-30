@@ -1,6 +1,7 @@
 "use client"
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { usePathname } from "next/navigation";
 import { ChevronRight, File, type LucideIcon } from "lucide-react";
 
 import { cn } from "@/lib/utils";
@@ -31,8 +32,14 @@ type TreeProps = {
 
 const TreeNode = ({ item, depth = 0 }: TreeProps) => {
     const hasChildren = Boolean(item.items && item.items.length > 0);
-    const defaultOpen = useMemo(() => item.isActive || depth === 0, [item.isActive, depth]);
+    const defaultOpen = useMemo(() => Boolean(item.isActive), [item.isActive]);
     const [open, setOpen] = useState<boolean>(defaultOpen);
+
+    useEffect(() => {
+        if (item.isActive) {
+            setOpen(true);
+        }
+    }, [item.isActive]);
 
     const handleToggle = (event: React.MouseEvent) => {
         if (!hasChildren) return;
@@ -95,12 +102,30 @@ const TreeNode = ({ item, depth = 0 }: TreeProps) => {
 };
 
 export function NavClouds({ items }: { items: CloudNavItem[] }) {
+    const pathname = usePathname();
+
+    const itemsWithActive = useMemo(
+        () =>
+            items.map(function normalize(item): CloudNavItem {
+                const children = item.items?.map((child) => normalize(child));
+                const childIsActive = children?.some((child) => child.isActive) ?? false;
+                const selfIsActive = item.isActive ?? (item.url ? (pathname ?? "").startsWith(item.url) : false);
+
+                return {
+                    ...item,
+                    items: children,
+                    isActive: selfIsActive || childIsActive,
+                };
+            }),
+        [items, pathname],
+    );
+
     return (
         <SidebarGroup>
             <SidebarGroupLabel>Folders</SidebarGroupLabel>
             <SidebarGroupContent>
                 <SidebarMenu>
-                    {items.map((item, index) => (
+                    {itemsWithActive.map((item, index) => (
                         <TreeNode key={`${item.title}-${index}`} item={item} />
                     ))}
                 </SidebarMenu>

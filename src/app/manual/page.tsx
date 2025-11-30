@@ -6,6 +6,8 @@ export const metadata: Metadata = {
     title: "Manual",
 };
 
+// TODO: Replace the Manual header button row with a shared tabs-style header so the active state is an underline instead of a filled button, and condense the per-site buttons into a single "Site Manual" dropdown.
+
 export default function ManualPage() {
     return (
         <LabShell

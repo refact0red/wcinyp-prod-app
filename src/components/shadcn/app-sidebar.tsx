@@ -4,7 +4,6 @@ import * as React from "react"
 import {
   BarChart3Icon,
   BookIcon,
-  BotIcon,
   CameraIcon,
   BlocksIcon,
   CalendarDaysIcon,
@@ -18,8 +17,8 @@ import {
   UsersIcon,
 } from "lucide-react"
 
-import { NavDocuments } from "@/components/shadcn/nav-documents"
 import { NavMain } from "@/components/shadcn/nav-main"
+import { NavClouds } from "@/components/shadcn/nav-clouds"
 import {
   Sidebar,
   SidebarContent,
@@ -29,6 +28,62 @@ import {
   SidebarMenuItem,
   SidebarRail,
 } from "@/components/shadcn/ui/sidebar"
+
+const experimentalItems = [
+  {
+    name: "Dashboard",
+    url: "/dashboard",
+    icon: LayoutDashboardIcon,
+  },
+  {
+    name: "3D Models",
+    url: "/experimental/3d-models",
+    icon: FileIcon,
+  },
+  {
+    name: "Calendar",
+    url: "#",
+    icon: CalendarDaysIcon,
+  },
+  {
+    name: "EPIC DAR",
+    url: "#",
+    icon: BarChart3Icon,
+  },
+  {
+    name: "AMION",
+    url: "#",
+    icon: CircleUserRoundIcon,
+  },
+  {
+    name: "Team",
+    url: "#",
+    icon: CircleUserRoundIcon,
+  },
+]
+
+const adminItems = [
+  {
+    name: "Users",
+    url: "/admin/users",
+    icon: UsersIcon,
+  },
+  {
+    name: "Locations",
+    url: "/admin/locations",
+    icon: BlocksIcon,
+  },
+  {
+    name: "Staff",
+    url: "/admin/staff",
+    icon: BlocksIcon,
+  },
+  {
+    name: "Feedback",
+    url: "/admin/feedback",
+    icon: FileIcon,
+  },
+]
 
 export const appSidebarData = {
   user: {
@@ -49,115 +104,45 @@ export const appSidebarData = {
       icon: UsersIcon,
     },
     {
+      title: "Teams",
+      url: "/teams",
+      icon: CircleUserRoundIcon,
+    },
+    {
       title: "Manual",
       url: "/manual",
       icon: BookIcon,
     },
+    {
+      title: "Timesheet",
+      url: "/timesheet",
+      icon: ClipboardClockIcon,
+    },
   ],
   navClouds: [
     {
-      title: "Capture",
-      icon: CameraIcon,
-      isActive: true,
-      url: "#",
-      items: [
-        {
-          title: "Active Proposals",
-          url: "#",
-        },
-        {
-          title: "Archived",
-          url: "#",
-        },
-      ],
-    },
-    {
-      title: "Proposal",
-      icon: FileTextIcon,
-      url: "#",
-      items: [
-        {
-          title: "Active Proposals",
-          url: "#",
-        },
-        {
-          title: "Archived",
-          url: "#",
-        },
-      ],
-    },
-    {
-      title: "Prompts",
+      title: "Experimental",
       icon: FileCodeIcon,
-      url: "#",
-      items: [
-        {
-          title: "Active Proposals",
-          url: "#",
-        },
-        {
-          title: "Archived",
-          url: "#",
-        },
-      ],
+      items: experimentalItems.map((item) => ({
+        title: item.name,
+        url: item.url,
+        icon: item.icon,
+      })),
+    },
+    {
+      title: "Admin",
+      icon: FileTextIcon,
+      items: adminItems.map((item) => ({
+        title: item.name,
+        url: item.url,
+        icon: item.icon,
+      })),
     },
   ],
   navSecondary: [
   ],
-  documents: [
-    {
-      name: "Dashboard",
-      url: "/dashboard",
-      icon: LayoutDashboardIcon,
-    },
-    {
-      name: "Timesheet",
-      url: "#",
-      icon: ClipboardClockIcon,
-    },
-    {
-      name: "Calendar",
-      url: "#",
-      icon: CalendarDaysIcon,
-    },
-    {
-      name: "Self-Pay Automation",
-      url: "#",
-      icon: BotIcon,
-    },
-    {
-      name: "EPIC DAR",
-      url: "#",
-      icon: BarChart3Icon,
-    },
-    {
-      name: "AMION",
-      url: "#",
-      icon: CircleUserRoundIcon,
-    },
-    {
-      name: "Team",
-      url: "#",
-      icon: CircleUserRoundIcon,
-    },
-  ],
-  admin: [
-    {
-      name: "Users",
-      url: "/admin/users",
-      icon: UsersIcon,
-    },
-    {
-      name: "Locations",
-      url: "/admin/locations",
-      icon: BlocksIcon,
-    },
-    {
-      name: "Staff",
-      url: "/admin/staff",
-      icon: BlocksIcon,
-    },
-  ],
+  documents: experimentalItems,
+  admin: adminItems,
 }
 
 function WciLogoIcon(props: React.SVGProps<SVGSVGElement>) {
@@ -216,8 +201,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       </SidebarHeader>
       <SidebarContent>
         <NavMain items={appSidebarData.navMain} />
-        <NavDocuments label="Experimental" items={appSidebarData.documents} />
-        <NavDocuments label="Admin" items={appSidebarData.admin} />
+        <NavClouds items={appSidebarData.navClouds} />
       </SidebarContent>
       <SidebarRail />
     </Sidebar>

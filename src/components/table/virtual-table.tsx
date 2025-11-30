@@ -17,6 +17,7 @@ type VirtualTableProps<TData> = {
   estimateSize?: number
   overscan?: number
   className?: string
+  rowClassName?: string
   emptyState?: React.ReactNode
   scrollHeight?: string
 }
@@ -28,6 +29,7 @@ export function VirtualTable<TData>({
   estimateSize = 64,
   overscan = 8,
   className,
+  rowClassName,
   emptyState,
   scrollHeight = "640px",
 }: VirtualTableProps<TData>) {
@@ -66,6 +68,7 @@ export function VirtualTable<TData>({
               <TableRow
                 key={row.id}
                 data-state={row.getIsSelected() && "selected"}
+                className={cn("group hover:bg-muted/30", rowClassName)}
                 style={{
                   position: "absolute",
                   width: "100%",
