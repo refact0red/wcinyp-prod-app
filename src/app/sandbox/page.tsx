@@ -84,7 +84,7 @@ function IconRail({
     onSelect: (id: RailItemId) => void;
 }) {
     return (
-        <div className="flex w-[72px] flex-col items-center gap-3 border-r bg-card px-3 py-4">
+        <div className="sticky top-16 z-20 flex h-[calc(100vh-64px)] w-[72px] flex-col items-center gap-3 border-r bg-card px-3 py-4">
             {railItems.map((item) => {
                 const Icon = item.icon;
                 const isActive = item.id === activeId;
@@ -123,7 +123,7 @@ function SidebarPanel({
     onSelect: (item: PanelItem) => void;
 }) {
     return (
-        <aside className="hidden w-64 border-r bg-card lg:block">
+        <aside className="sticky top-16 z-10 hidden h-[calc(100vh-64px)] w-64 border-r bg-card lg:block">
             <div className="space-y-1 px-2 pb-4 pt-4">
                 {items.map((item) => {
                     const isActive = item.id === activeId;
@@ -157,7 +157,7 @@ function SidebarPanel({
 
 function TopBar() {
     return (
-        <header className="grid grid-cols-[minmax(220px,auto)_1fr_minmax(56px,auto)] items-center gap-4 border-b bg-card px-6 py-3">
+        <header className="sticky top-0 z-30 grid h-16 grid-cols-[minmax(220px,auto)_1fr_minmax(56px,auto)] items-center gap-4 border-b bg-card px-6 py-3">
             <div className="flex items-center gap-3">
                 <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10 text-sm font-semibold text-primary">
                     WC
@@ -363,11 +363,11 @@ export function SandboxShell({
     return (
         <div className="flex min-h-svh flex-col bg-muted">
             <TopBar />
-            <div className="flex flex-1 overflow-hidden bg-muted">
+            <div className="flex flex-1 bg-muted">
                 <IconRail activeId={activeRail} onSelect={handleRailSelect} />
                 <SidebarPanel items={panelItems[activeRail]} activeId={activePanel} onSelect={handlePanelSelect} />
                 <div className="flex min-w-0 flex-1 flex-col">
-                    <div className="flex flex-col gap-5 overflow-y-auto px-6 pb-10 pt-4">
+                    <div className="flex flex-col gap-5 px-6 pb-10 pt-4">
                         <div className="flex flex-col gap-1">
                             <div className="flex items-center gap-2 text-sm text-muted-foreground">
                                 {breadcrumb}
