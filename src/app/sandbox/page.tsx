@@ -1,25 +1,27 @@
 "use client";
 
-import type { ComponentType } from "react";
+import type { ChangeEvent, ComponentType } from "react";
 import { useEffect, useMemo, useState } from "react";
 
 import {
     Activity,
     BarChart2,
+    Building2Icon,
     ClipboardList,
     CloudIcon,
     ChevronRight,
     Cloud,
     FileTextIcon,
     HardDriveIcon,
+    HospitalIcon,
+    IdCardIcon,
     LayersIcon,
     ListChecks,
-    MapPinIcon,
-    MessageSquareIcon,
+    RadiationIcon,
     Search,
     Share2Icon,
     Shield,
-    TagIcon,
+    StethoscopeIcon,
     Upload,
     UserRound,
     UsersIcon,
@@ -38,8 +40,10 @@ type RailItem = {
 };
 
 type DrivePanelId = "documents" | "packets" | "handouts" | "automations" | "public-drive";
-type DirectoryPanelId = "people" | "locations" | "teams" | "tags" | "feedback";
+type DirectoryPanelId = "wcinyp" | "staff" | "locations" | "radiologists" | "providers" | "npi-lookup";
 type PanelItemId = DrivePanelId | DirectoryPanelId;
+
+type PillNavItem = { id: string; label: string };
 
 type PanelItem = {
     id: PanelItemId;
@@ -63,18 +67,60 @@ const panelItems: Record<RailItemId, PanelItem[]> = {
         { id: "public-drive", title: "Public Drive", path: "/sandbox/drive/public-drive", status: "", icon: CloudIcon },
     ],
     directory: [
-        { id: "people", title: "People", path: "/sandbox/directory/people", status: "284", icon: UsersIcon },
-        { id: "locations", title: "Locations", path: "/sandbox/directory/locations", status: "32", icon: MapPinIcon },
-        { id: "teams", title: "Teams", path: "/sandbox/directory/teams", status: "9", icon: UserRound },
-        { id: "tags", title: "Tags", path: "/sandbox/directory/tags", status: "", icon: TagIcon },
-        { id: "feedback", title: "Feedback", path: "/sandbox/directory/feedback", status: "6", icon: MessageSquareIcon },
+        { id: "wcinyp", title: "WCINYP", path: "/sandbox/directory/wcinyp", status: "", icon: Building2Icon },
+        { id: "staff", title: "Staff", path: "/sandbox/directory/staff", status: "284", icon: UsersIcon },
+        { id: "locations", title: "Locations", path: "/sandbox/directory/locations", status: "32", icon: HospitalIcon },
+        { id: "radiologists", title: "Radiologists", path: "/sandbox/directory/radiologists", status: "", icon: RadiationIcon },
+        { id: "providers", title: "Providers", path: "/sandbox/directory/providers", status: "", icon: StethoscopeIcon },
+        { id: "npi-lookup", title: "NPI Lookup", path: "/sandbox/directory/npi-lookup", status: "", icon: IdCardIcon },
     ],
 };
 
 const defaultPanel: Record<RailItemId, PanelItemId> = {
     drive: "documents",
-    directory: "people",
+    directory: "wcinyp",
 };
+
+const pillNavItems: Partial<Record<PanelItemId, PillNavItem[]>> = {
+    documents: [
+        { id: "appointment", label: "Appointment" },
+        { id: "bundles", label: "Bundles" },
+        { id: "insurance-financial", label: "Insurance/ Financial" },
+    ],
+};
+
+const documentRows = [
+    {
+        currentLoginDate: "2025-11-30",
+        currentLoginTime: "10:11:58",
+        device: "desktop",
+        locationCountry: "United States",
+        locationDetail: "(2607:fb90:5503:45e5:b0cf:a5ed:eca:cdcb)",
+        firstLoginDate: "2025-11-30",
+        firstLoginTime: "10:11:58",
+        loginType: "google",
+    },
+    {
+        currentLoginDate: "2025-11-29",
+        currentLoginTime: "15:09:00",
+        device: "desktop",
+        locationCountry: "United States",
+        locationDetail: "(140.251.71.72)",
+        firstLoginDate: "2025-11-29",
+        firstLoginTime: "15:09:00",
+        loginType: "google",
+    },
+    {
+        currentLoginDate: "2025-11-29",
+        currentLoginTime: "12:17:33",
+        device: "desktop",
+        locationCountry: "United States",
+        locationDetail: "(140.251.71.95)",
+        firstLoginDate: "2025-11-29",
+        firstLoginTime: "12:17:33",
+        loginType: "google",
+    },
+];
 
 function IconRail({
     activeId,
@@ -291,6 +337,80 @@ function UpgradeCard() {
     );
 }
 
+function DocumentsTable({
+    searchTerm,
+    onSearchChange,
+    rows,
+}: {
+    searchTerm: string;
+    onSearchChange: (value: string) => void;
+    rows: typeof documentRows;
+}) {
+    const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
+        onSearchChange(event.target.value);
+    };
+
+    return (
+        <Card className="overflow-hidden">
+            <div className="border-b border-border bg-card px-5 py-4">
+                <div className="relative">
+                    <Search className="pointer-events-none absolute left-3 top-3.5 h-4 w-4 text-muted-foreground" />
+                    <input
+                        value={searchTerm}
+                        onChange={handleChange}
+                        placeholder="Search"
+                        className="h-11 w-full rounded-xl border border-border bg-muted px-10 text-sm text-foreground placeholder:text-muted-foreground outline-none transition focus:border-primary/60 focus:bg-card"
+                        type="search"
+                    />
+                </div>
+            </div>
+            <div className="overflow-x-auto">
+                <table className="min-w-full text-sm text-foreground">
+                    <thead className="bg-card">
+                        <tr className="border-b border-border">
+                            <th className="px-6 py-3 text-left text-sm font-semibold text-foreground">
+                                <span className="inline-flex items-center gap-1">
+                                    Current Login
+                                    <ChevronRight className="-rotate-90 h-4 w-4 text-muted-foreground" />
+                                </span>
+                            </th>
+                            <th className="px-6 py-3 text-left text-sm font-semibold text-foreground">Device</th>
+                            <th className="px-6 py-3 text-left text-sm font-semibold text-foreground">Location</th>
+                            <th className="px-6 py-3 text-left text-sm font-semibold text-foreground">
+                                <span className="inline-flex items-center gap-1">
+                                    First Login
+                                    <ChevronRight className="-rotate-90 h-4 w-4 text-muted-foreground" />
+                                </span>
+                            </th>
+                            <th className="px-6 py-3 text-left text-sm font-semibold text-foreground">Login Type</th>
+                        </tr>
+                    </thead>
+                    <tbody className="divide-y divide-border">
+                        {rows.map((row) => (
+                            <tr key={`${row.currentLoginDate}-${row.currentLoginTime}`} className="bg-card">
+                                <td className="px-6 py-4 align-top">
+                                    <div className="text-sm font-semibold text-foreground">{row.currentLoginDate}</div>
+                                    <div className="text-sm text-muted-foreground">{row.currentLoginTime}</div>
+                                </td>
+                                <td className="px-6 py-4 align-top text-sm text-foreground">{row.device}</td>
+                                <td className="px-6 py-4 align-top text-sm text-foreground">
+                                    <div>{row.locationCountry}</div>
+                                    {row.locationDetail ? <div className="text-muted-foreground">{row.locationDetail}</div> : null}
+                                </td>
+                                <td className="px-6 py-4 align-top">
+                                    <div className="text-sm font-semibold text-foreground">{row.firstLoginDate}</div>
+                                    <div className="text-sm text-muted-foreground">{row.firstLoginTime}</div>
+                                </td>
+                                <td className="px-6 py-4 align-top text-sm text-foreground">{row.loginType}</td>
+                            </tr>
+                        ))}
+                    </tbody>
+                </table>
+            </div>
+        </Card>
+    );
+}
+
 export function SandboxShell({
     initialRail = "drive",
     initialPanel,
@@ -302,6 +422,8 @@ export function SandboxShell({
     const pathname = usePathname();
     const [activeRail, setActiveRail] = useState<RailItemId>(initialRail);
     const [activePanel, setActivePanel] = useState<PanelItemId>(initialPanel ?? defaultPanel[initialRail]);
+    const [activePill, setActivePill] = useState<string | null>(null);
+    const [documentSearch, setDocumentSearch] = useState<string>("");
 
     useEffect(() => {
         if (!pathname) return;
@@ -315,6 +437,17 @@ export function SandboxShell({
         setActiveRail(nextRail);
         setActivePanel(panelMatch?.id ?? defaultPanel[nextRail]);
     }, [pathname]);
+
+    useEffect(() => {
+        const pills = pillNavItems[activePanel];
+        setActivePill(pills?.[0]?.id ?? null);
+    }, [activePanel]);
+
+    useEffect(() => {
+        if (activePanel !== "documents") {
+            setDocumentSearch("");
+        }
+    }, [activePanel]);
 
     const handleRailSelect = (id: RailItemId) => {
         const target = panelItems[id][0];
@@ -332,15 +465,33 @@ export function SandboxShell({
         [activePanel, activeRail]
     );
 
-    const pageTitle = useMemo(() => {
-        const prefix = activeRail === "drive" ? "Drive" : "Directory";
-        return `${prefix} — ${activePanelItem.title}`;
-    }, [activePanelItem, activeRail]);
+    const pageTitle = useMemo(() => activePanelItem.title, [activePanelItem]);
 
     const breadcrumb = useMemo(() => {
-        const prefix = activeRail === "drive" ? "Drive" : "Directory";
-        return `${prefix} / ${activePanelItem.title}`;
+        const Icon = activeRail === "drive" ? HardDriveIcon : UsersIcon;
+        return { Icon, label: activePanelItem.title };
     }, [activePanelItem, activeRail]);
+
+    const filteredDocuments = useMemo(() => {
+        const query = documentSearch.trim().toLowerCase();
+        if (!query) return documentRows;
+
+        return documentRows.filter((row) =>
+            [
+                row.currentLoginDate,
+                row.currentLoginTime,
+                row.device,
+                row.locationCountry,
+                row.locationDetail ?? "",
+                row.firstLoginDate,
+                row.firstLoginTime,
+                row.loginType,
+            ]
+                .join(" ")
+                .toLowerCase()
+                .includes(query)
+        );
+    }, [documentSearch]);
 
     const metrics = useMemo(
         () =>
@@ -368,18 +519,17 @@ export function SandboxShell({
                 <SidebarPanel items={panelItems[activeRail]} activeId={activePanel} onSelect={handlePanelSelect} />
                 <div className="flex min-w-0 flex-1 flex-col">
                     <div className="flex flex-col gap-5 px-6 pb-10 pt-4">
-                        <div className="flex flex-col gap-1">
-                            <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                                {breadcrumb}
-                                <span className="h-1 w-1 rounded-full bg-muted-foreground/50" />
-                                <span className="text-foreground">Sandbox</span>
-                            </div>
-                            <div className="flex items-center justify-between">
-                                <div>
-                                    <p className="text-2xl font-semibold text-foreground">{pageTitle}</p>
-                                    <p className="text-sm text-muted-foreground">
-                                        Hostinger-inspired shell for the UI migration sandbox.
-                                    </p>
+                        <div className="flex flex-col gap-2">
+                            <div className="flex flex-wrap items-center justify-between gap-3">
+                                <div className="flex flex-wrap items-center gap-3">
+                                    <p className="text-xl font-semibold text-foreground">{pageTitle}</p>
+                                    <span className="h-5 w-px bg-border" aria-hidden="true" />
+                                    <span className="flex items-center gap-2 text-sm text-muted-foreground">
+                                        {/* TODO: turn into a link with hover state to navigate back to rail root */}
+                                        <breadcrumb.Icon className="h-4 w-4" />
+                                        <span aria-hidden="true">-</span>
+                                        <span>{breadcrumb.label}</span>
+                                    </span>
                                 </div>
                                 <button
                                     type="button"
@@ -389,158 +539,192 @@ export function SandboxShell({
                                     <ChevronRight className="h-4 w-4" />
                                 </button>
                             </div>
+                            {pillNavItems[activePanel]?.length ? (
+                                <div className="flex flex-wrap gap-2">
+                                    {pillNavItems[activePanel]?.map((pill) => {
+                                        const isActive = activePill === pill.id;
+                                        return (
+                                            <button
+                                                key={pill.id}
+                                                type="button"
+                                                onClick={() => setActivePill(pill.id)}
+                                                className={cn(
+                                                    "rounded-full border px-3 py-1.5 text-sm font-semibold transition",
+                                                    isActive
+                                                        ? "border-foreground bg-foreground text-background shadow-sm"
+                                                        : "border-border bg-card text-foreground hover:border-foreground/50 hover:bg-card"
+                                                )}
+                                            >
+                                                {pill.label}
+                                            </button>
+                                        );
+                                    })}
+                                </div>
+                            ) : null}
                         </div>
 
-                        <div className="grid gap-4 lg:grid-cols-3">
-                            <Card className="lg:col-span-2">
-                                <div className="flex flex-col gap-4 p-5">
-                                    <div className="flex flex-wrap items-start justify-between gap-3">
-                                        <div className="flex items-center gap-3">
-                                            <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-primary/10 text-primary">
-                                                {activeRail === "drive" ? <HardDriveIcon className="h-6 w-6" /> : <UsersIcon className="h-6 w-6" />}
+                        {activePanel === "documents" ? (
+                            <DocumentsTable
+                                searchTerm={documentSearch}
+                                onSearchChange={setDocumentSearch}
+                                rows={filteredDocuments}
+                            />
+                        ) : null}
+
+                        {activePanel !== "documents" ? (
+                            <>
+                                <div className="grid gap-4 lg:grid-cols-3">
+                                    <Card className="lg:col-span-2">
+                                        <div className="flex flex-col gap-4 p-5">
+                                            <div className="flex flex-wrap items-start justify-between gap-3">
+                                                <div className="flex items-center gap-3">
+                                                    <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-primary/10 text-primary">
+                                                        {activeRail === "drive" ? <HardDriveIcon className="h-6 w-6" /> : <UsersIcon className="h-6 w-6" />}
+                                                    </div>
+                                                    <div>
+                                                        <p className="text-sm font-semibold text-foreground">
+                                                            {activeRail === "drive" ? "Drive workspace" : "Directory records"}
+                                                        </p>
+                                                        <p className="text-sm text-muted-foreground">
+                                                            Root access • last synced 2m ago
+                                                        </p>
+                                                    </div>
+                                                </div>
+                                                <div className="flex flex-wrap items-center gap-2">
+                                                    <span className="rounded-full bg-emerald-100 px-3 py-1 text-xs font-semibold text-emerald-800">
+                                                        Running
+                                                    </span>
+                                                    <button
+                                                        type="button"
+                                                        className="rounded-lg border border-border px-3 py-2 text-sm font-semibold text-foreground hover:bg-muted"
+                                                    >
+                                                        Reboot
+                                                    </button>
+                                                    <button
+                                                        type="button"
+                                                        className="rounded-lg bg-primary px-3 py-2 text-sm font-semibold text-primary-foreground shadow-sm"
+                                                    >
+                                                        Manage
+                                                    </button>
+                                                </div>
                                             </div>
+                                            <div className="grid gap-3 sm:grid-cols-2">
+                                                <StatRow label="CPU usage" value="18%" hint="stable, low" icon={Activity} />
+                                                <StatRow label="Memory usage" value="32%" hint="2.5 GB / 8 GB" icon={BarChart2} />
+                                                <StatRow label="Incoming traffic" value="23.2 MB" hint="last 24h" icon={Upload} />
+                                                <StatRow label="Outgoing traffic" value="5.2 MB" hint="last 24h" icon={Cloud} />
+                                            </div>
+                                        </div>
+                                    </Card>
+
+                                    <Card className="p-5">
+                                        <div className="flex h-full flex-col gap-3">
+                                            <div className="flex items-center justify-between">
+                                                <div>
+                                                    <p className="text-sm font-semibold text-foreground">Quick actions</p>
+                                                    <p className="text-xs text-muted-foreground">Follow-up tasks for this space</p>
+                                                </div>
+                                            </div>
+                                            <div className="space-y-2">
+                                                <button className="flex w-full items-center justify-between rounded-xl border border-border px-3 py-3 text-left text-sm font-semibold text-foreground transition hover:bg-muted" type="button">
+                                                    Sync new uploads
+                                                    <ChevronRight className="h-4 w-4 text-muted-foreground" />
+                                                </button>
+                                                <button className="flex w-full items-center justify-between rounded-xl border border-border px-3 py-3 text-left text-sm font-semibold text-foreground transition hover:bg-muted" type="button">
+                                                    Review flagged items
+                                                    <ChevronRight className="h-4 w-4 text-muted-foreground" />
+                                                </button>
+                                                <button className="flex w-full items-center justify-between rounded-xl border border-border px-3 py-3 text-left text-sm font-semibold text-foreground transition hover:bg-muted" type="button">
+                                                    Share latest bundle
+                                                    <ChevronRight className="h-4 w-4 text-muted-foreground" />
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </Card>
+                                </div>
+
+                                <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+                                    {metrics.map((metric) => (
+                                        <MetricCard
+                                            key={metric.title}
+                                            title={metric.title}
+                                            value={metric.value}
+                                            sub={metric.sub}
+                                            accent={metric.accent}
+                                        />
+                                    ))}
+                                </div>
+
+                                <UpgradeCard />
+
+                                <div className="grid gap-4 md:grid-cols-2">
+                                    <Card className="p-5">
+                                        <div className="flex items-center justify-between">
                                             <div>
                                                 <p className="text-sm font-semibold text-foreground">
-                                                    {activeRail === "drive" ? "Drive workspace" : "Directory records"}
+                                                    Access & backups
                                                 </p>
-                                                <p className="text-sm text-muted-foreground">
-                                                    Root access • last synced 2m ago
+                                                <p className="text-xs text-muted-foreground">
+                                                    Keys, firewall, snapshots in one place.
                                                 </p>
                                             </div>
+                                            <ListChecks className="h-5 w-5 text-muted-foreground" />
                                         </div>
-                                        <div className="flex flex-wrap items-center gap-2">
-                                            <span className="rounded-full bg-emerald-100 px-3 py-1 text-xs font-semibold text-emerald-800">
-                                                Running
-                                            </span>
-                                            <button
-                                                type="button"
-                                                className="rounded-lg border border-border px-3 py-2 text-sm font-semibold text-foreground hover:bg-muted"
-                                            >
-                                                Reboot
-                                            </button>
-                                            <button
-                                                type="button"
-                                                className="rounded-lg bg-primary px-3 py-2 text-sm font-semibold text-primary-foreground shadow-sm"
-                                            >
-                                                Manage
-                                            </button>
+                                        <div className="mt-3 grid gap-2">
+                                            <div className="flex items-center justify-between rounded-xl bg-muted px-3 py-3 text-sm">
+                                                <div className="flex items-center gap-2">
+                                                    <Shield className="h-4 w-4 text-primary" />
+                                                    SSH keys
+                                                </div>
+                                                <span className="text-xs text-muted-foreground">3 active</span>
+                                            </div>
+                                            <div className="flex items-center justify-between rounded-xl bg-muted px-3 py-3 text-sm">
+                                                <div className="flex items-center gap-2">
+                                                    <Shield className="h-4 w-4 text-primary" />
+                                                    Firewall rules
+                                                </div>
+                                                <span className="text-xs text-muted-foreground">6 rules</span>
+                                            </div>
+                                            <div className="flex items-center justify-between rounded-xl bg-muted px-3 py-3 text-sm">
+                                                <div className="flex items-center gap-2">
+                                                    <Cloud className="h-4 w-4 text-primary" />
+                                                    Snapshots
+                                                </div>
+                                                <span className="text-xs text-muted-foreground">Daily</span>
+                                            </div>
                                         </div>
-                                    </div>
-                                    <div className="grid gap-3 sm:grid-cols-2">
-                                        <StatRow label="CPU usage" value="18%" hint="stable, low" icon={Activity} />
-                                        <StatRow label="Memory usage" value="32%" hint="2.5 GB / 8 GB" icon={BarChart2} />
-                                        <StatRow label="Incoming traffic" value="23.2 MB" hint="last 24h" icon={Upload} />
-                                        <StatRow label="Outgoing traffic" value="5.2 MB" hint="last 24h" icon={Cloud} />
-                                    </div>
-                                </div>
-                            </Card>
+                                    </Card>
 
-                            <Card className="p-5">
-                                <div className="flex h-full flex-col gap-3">
-                                    <div className="flex items-center justify-between">
-                                        <div>
-                                            <p className="text-sm font-semibold text-foreground">Quick actions</p>
-                                            <p className="text-xs text-muted-foreground">Follow-up tasks for this space</p>
+                                    <Card className="p-5">
+                                        <div className="flex items-center justify-between">
+                                            <div>
+                                                <p className="text-sm font-semibold text-foreground">
+                                                    Context
+                                                </p>
+                                                <p className="text-xs text-muted-foreground">
+                                                    Who owns it, where it runs, plan details.
+                                                </p>
+                                            </div>
+                                            <HardDriveIcon className="h-5 w-5 text-muted-foreground" />
                                         </div>
-                                    </div>
-                                    <div className="space-y-2">
-                                        <button className="flex w-full items-center justify-between rounded-xl border border-border px-3 py-3 text-left text-sm font-semibold text-foreground transition hover:bg-muted" type="button">
-                                            Sync new uploads
-                                            <ChevronRight className="h-4 w-4 text-muted-foreground" />
-                                        </button>
-                                        <button className="flex w-full items-center justify-between rounded-xl border border-border px-3 py-3 text-left text-sm font-semibold text-foreground transition hover:bg-muted" type="button">
-                                            Review flagged items
-                                            <ChevronRight className="h-4 w-4 text-muted-foreground" />
-                                        </button>
-                                        <button className="flex w-full items-center justify-between rounded-xl border border-border px-3 py-3 text-left text-sm font-semibold text-foreground transition hover:bg-muted" type="button">
-                                            Share latest bundle
-                                            <ChevronRight className="h-4 w-4 text-muted-foreground" />
-                                        </button>
-                                    </div>
-                                </div>
-                            </Card>
-                        </div>
-
-                        <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-                            {metrics.map((metric) => (
-                                <MetricCard
-                                    key={metric.title}
-                                    title={metric.title}
-                                    value={metric.value}
-                                    sub={metric.sub}
-                                    accent={metric.accent}
-                                />
-                            ))}
-                        </div>
-
-                        <UpgradeCard />
-
-                        <div className="grid gap-4 md:grid-cols-2">
-                            <Card className="p-5">
-                                <div className="flex items-center justify-between">
-                                    <div>
-                                        <p className="text-sm font-semibold text-foreground">
-                                            Access & backups
-                                        </p>
-                                        <p className="text-xs text-muted-foreground">
-                                            Keys, firewall, snapshots in one place.
-                                        </p>
-                                    </div>
-                                    <ListChecks className="h-5 w-5 text-muted-foreground" />
-                                </div>
-                                <div className="mt-3 grid gap-2">
-                                    <div className="flex items-center justify-between rounded-xl bg-muted px-3 py-3 text-sm">
-                                        <div className="flex items-center gap-2">
-                                            <Shield className="h-4 w-4 text-primary" />
-                                            SSH keys
+                                        <div className="mt-4 grid gap-2 text-sm">
+                                            <div className="flex items-center justify-between rounded-xl bg-muted px-3 py-3">
+                                                <span className="text-muted-foreground">Owner</span>
+                                                <span className="font-semibold text-foreground">Content Admin</span>
+                                            </div>
+                                            <div className="flex items-center justify-between rounded-xl bg-muted px-3 py-3">
+                                                <span className="text-muted-foreground">Region</span>
+                                                <span className="font-semibold text-foreground">US-East</span>
+                                            </div>
+                                            <div className="flex items-center justify-between rounded-xl bg-muted px-3 py-3">
+                                                <span className="text-muted-foreground">Plan</span>
+                                                <span className="font-semibold text-foreground">Sandbox</span>
+                                            </div>
                                         </div>
-                                        <span className="text-xs text-muted-foreground">3 active</span>
-                                    </div>
-                                    <div className="flex items-center justify-between rounded-xl bg-muted px-3 py-3 text-sm">
-                                        <div className="flex items-center gap-2">
-                                            <Shield className="h-4 w-4 text-primary" />
-                                            Firewall rules
-                                        </div>
-                                        <span className="text-xs text-muted-foreground">6 rules</span>
-                                    </div>
-                                    <div className="flex items-center justify-between rounded-xl bg-muted px-3 py-3 text-sm">
-                                        <div className="flex items-center gap-2">
-                                            <Cloud className="h-4 w-4 text-primary" />
-                                            Snapshots
-                                        </div>
-                                        <span className="text-xs text-muted-foreground">Daily</span>
-                                    </div>
+                                    </Card>
                                 </div>
-                            </Card>
-
-                            <Card className="p-5">
-                                <div className="flex items-center justify-between">
-                                    <div>
-                                        <p className="text-sm font-semibold text-foreground">
-                                            Context
-                                        </p>
-                                        <p className="text-xs text-muted-foreground">
-                                            Who owns it, where it runs, plan details.
-                                        </p>
-                                    </div>
-                                    <HardDriveIcon className="h-5 w-5 text-muted-foreground" />
-                                </div>
-                                <div className="mt-4 grid gap-2 text-sm">
-                                    <div className="flex items-center justify-between rounded-xl bg-muted px-3 py-3">
-                                        <span className="text-muted-foreground">Owner</span>
-                                        <span className="font-semibold text-foreground">Content Admin</span>
-                                    </div>
-                                    <div className="flex items-center justify-between rounded-xl bg-muted px-3 py-3">
-                                        <span className="text-muted-foreground">Region</span>
-                                        <span className="font-semibold text-foreground">US-East</span>
-                                    </div>
-                                    <div className="flex items-center justify-between rounded-xl bg-muted px-3 py-3">
-                                        <span className="text-muted-foreground">Plan</span>
-                                        <span className="font-semibold text-foreground">Sandbox</span>
-                                    </div>
-                                </div>
-                            </Card>
-                        </div>
+                            </>
+                        ) : null}
                     </div>
                 </div>
             </div>
