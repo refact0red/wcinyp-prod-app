@@ -6,6 +6,7 @@ Guidelines for automated agents working in this repo.
 
 - Build an internal platform that makes senior patient coordinators faster, more confident, and more consistent.
 - Treat Drive, Manual, and Directory as one workspace that reduces context switching and centralizes operational knowledge.
+- Demonstrate clear, compounding value—and the impact of a dedicated Admin stewarding this platform—so leadership wants to invest in both the product and the person responsible for it.
 
 ## Product principles
 
@@ -47,6 +48,34 @@ Guidelines for automated agents working in this repo.
 - For new work, update types/schemas first, then APIs/server logic, then UI; keep them aligned.
 - Do not over-engineer; pick the simplest solution that respects the data model and keeps options open.
 - When in doubt, ask: does this make the tool more useful to coordinators right now, or clarify the long-term platform?
+
+## UX and navigation
+
+- Design for mouse-first use, with keyboard as a powerful accelerator for people who want it; neither mode should feel second-class.
+- Optimize for “under pressure” moments: the app should feel obvious and dependable even when someone only drops in occasionally or is trying to move very quickly.
+- Keep navigation shallow and predictable: clear page titles, consistent layouts, and one or two primary actions per view so the app feels focused, not like a pile of features.
+- Use cross-linking and contextual entry points (for example: from search to details to related workflows) so coordinators rarely have to wonder “where do I go next?”
+
+## Command menu and global search
+
+- Treat the global command/search menu as the primary “do anything” surface: experienced users should be able to start most tasks there.
+- From the command menu, support jumping to entities (for example: resources, workflows, directory entries), triggering common actions (for example: create, archive, flag, handoff), and opening key tools or views.
+- When adding new capabilities, always ask: what is the command-menu surface for this, and how would a power user invoke it without touching the mouse?
+- Use backend capacity (for example: our KVM Hostinger environment) for indexing, precomputation, and caching so command menu and search feel extremely fast and reliable.
+
+## Keyboard-accelerated workflows
+
+- Ensure core flows are keyboard-accelerated even if most people click: focus behavior, tab order, and shortcuts should make experts feel faster, not get in the way.
+- Maintain a small, coherent set of global shortcuts (for example: open command menu, navigate back, open help/shortcuts, submit feedback) and reuse patterns across the app.
+- When introducing new shortcuts, keep them discoverable (for example: a shortcuts help view or contextual hints) and avoid one-off keybindings that break expectations.
+- Treat keyboard accessibility as a baseline requirement: if something can be clicked, it should also be focusable and activatable via the keyboard.
+
+## Performance and polish
+
+- Treat perceived speed as a core product principle: interactions should feel smooth, responsive, and calm so coordinators trust the app in time-sensitive situations.
+- Use server-side power deliberately: precompute, cache, and shape data on the backend so the UI can stay simple, fast, and focused on coordinator workflows.
+- Favor clear, maintainable code with targeted optimizations in hot paths over clever but fragile micro-optimizations; optimize where it materially improves coordinator experience.
+- Aim for a cohesive, finished feel: consistent loading, empty, error, and success states; thoughtful microcopy; and interactions that feel intentional rather than bolted on.
 
 ## Auditability and history
 
