@@ -11,13 +11,14 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/shadcn/ui/select";
+import type { WcinypRadiologistSpecialty } from "@/lib/wcinyp/radiologists";
 
 type DirectoryRadiologistsToolbarProps = {
   search: string;
   onSearchChange: (value: string) => void;
-  specialties: string[];
-  selectedSpecialty?: string;
-  onSpecialtyChange: (value?: string) => void;
+  specialties: WcinypRadiologistSpecialty[];
+  selectedSpecialty?: WcinypRadiologistSpecialty;
+  onSpecialtyChange: (value?: WcinypRadiologistSpecialty) => void;
   onAddRadiologist?: () => void;
   onEditRadiologist?: () => void;
   canEditRadiologist?: boolean;
@@ -53,7 +54,9 @@ export function DirectoryRadiologistsToolbar({
               <Select
                 value={selectedSpecialty ?? "all"}
                 onValueChange={(value) => {
-                  onSpecialtyChange(value === "all" ? undefined : value);
+                  onSpecialtyChange(
+                    value === "all" ? undefined : (value as WcinypRadiologistSpecialty)
+                  );
                 }}
               >
                 <SelectTrigger size="sm" className="min-w-[11rem] bg-background">

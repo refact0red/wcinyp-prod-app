@@ -29,7 +29,7 @@ import type { NormalizedAddress, NormalizedNpiRecord, NpiLookupError, NpiLookupR
 import { wcinypLocations, type WcinypLocation } from "@/lib/wcinyp/locations";
 import { DirectoryRadiologistsGrid } from "@/components/shadcn/directory-radiologists-grid";
 import { DirectoryRadiologistsToolbar } from "@/components/shadcn/directory-radiologists-toolbar";
-import { wcinypRadiologists, type WcinypRadiologist } from "@/lib/wcinyp/radiologists";
+import { wcinypRadiologists, type WcinypRadiologist, type WcinypRadiologistSpecialty } from "@/lib/wcinyp/radiologists";
 import { wcinypProviders, type WcinypProvider } from "@/lib/wcinyp/providers";
 import { wcinypProviderCommonMistakes, type WcinypProviderCommonMistake } from "@/lib/wcinyp/provider-common-mistakes";
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from "@/components/shadcn/ui/sheet";
@@ -405,7 +405,7 @@ export default function DirectoryPage() {
   const [selectedLocationId, setSelectedLocationId] = useState<string | null>(null);
   const [radiologists, setRadiologists] = useState<WcinypRadiologist[]>(wcinypRadiologists);
   const [radiologistSearch, setRadiologistSearch] = useState("");
-  const [radiologistSpecialty, setRadiologistSpecialty] = useState<string | undefined>(undefined);
+  const [radiologistSpecialty, setRadiologistSpecialty] = useState<WcinypRadiologistSpecialty | undefined>(undefined);
   const [isRadiologistSheetOpen, setIsRadiologistSheetOpen] = useState(false);
   const [selectedRadiologistId, setSelectedRadiologistId] = useState<string | null>(null);
   const [editingRadiologistId, setEditingRadiologistId] = useState<string | null>(null);
