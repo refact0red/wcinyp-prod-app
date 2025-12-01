@@ -353,15 +353,17 @@ function DocumentsTable({
     return (
         <Card className="h-full overflow-hidden">
             <div className="border-b border-border bg-card px-5 py-4">
-                <div className="relative">
-                    <Search className="pointer-events-none absolute left-3 top-3.5 h-4 w-4 text-muted-foreground" />
-                    <input
-                        value={searchTerm}
-                        onChange={handleChange}
-                        placeholder="Search"
-                        className="h-11 w-full rounded-xl border border-border bg-muted px-10 text-sm text-foreground placeholder:text-muted-foreground outline-none transition focus:border-primary/60 focus:bg-card"
-                        type="search"
-                    />
+                <div className="flex w-full justify-center">
+                    <div className="relative w-full max-w-2xl">
+                        <Search className="pointer-events-none absolute left-3 top-3.5 h-4 w-4 text-muted-foreground" />
+                        <input
+                            value={searchTerm}
+                            onChange={handleChange}
+                            placeholder="Search"
+                            className="h-11 w-full rounded-xl border border-border bg-muted px-10 text-sm text-foreground placeholder:text-muted-foreground outline-none transition focus:border-primary/60 focus:bg-card"
+                            type="search"
+                        />
+                    </div>
                 </div>
             </div>
             <div className="overflow-x-auto">
